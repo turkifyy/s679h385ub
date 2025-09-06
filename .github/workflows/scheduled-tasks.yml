@@ -1,0 +1,41 @@
+name: SocialHub Scheduled Tasks
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # كل 10 دقائق للمنشورات المجدولة
+    - cron: '0 3 * * *'     # كل يوم الساعة 3 صباحاً لتجديد التوكنات
+    - cron: '0 4 * * 0'     # كل أسبوع يوم الأحد الساعة 4 صباحاً للنسخ الاحتياطي
+  workflow_dispatch:        # يسمح بالتشغيل اليدوي
+
+jobs:
+  scheduled-tasks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30     # وقت أقصى للتشغيل (30 دقيقة)
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: .github/scripts/package.json
+
+      - name: Install dependencies
+        run: cd .github/scripts && npm ci
+
+      - name: Run scheduled tasks
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID }}
+          FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}
+        run: cd .github/scripts && node scheduled-tasks.js
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: scheduler-logs
+          path: .github/scripts/logs/
