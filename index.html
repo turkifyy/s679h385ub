@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SocialHub v8.0 - Advanced Social Media Management Platform">
+    <meta name="keywords" content="social media, management, scheduling, analytics, Facebook, Instagram, Twitter, LinkedIn">
+    <meta name="author" content="SocialHub">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="SocialHub v8.0 - Social Media Management">
+    <meta property="og:description" content="Advanced social media management platform with scheduling, analytics, and multi-platform support">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SocialHub v8.0">
+    <meta name="twitter:description" content="Advanced social media management platform">
+    
+    <title>SocialHub v8.0 - Social Media Management Platform</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU29jaWFsSHViIHY4LjAiLCJzaG9ydF9uYW1lIjoiU29jaWFsSHViIiwiZGVzY3JpcHRpb24iOiJBZHZhbmNlZCBTb2NpYWwgTWVkaWEgTWFuYWdlbWVudCBQbGF0Zm9ybSIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZmZmZmZmIiwidGhlbWVfY29sb3IiOiIjNEY0NkU1IiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3oxaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jaUlIWnBaWGRDYjNnOUlqQWdNQ0ExTVRJZ05URXlJaUIzYVdSMGFEMGlOVEV5SWlCb1pXbG5hSFE5SWpVeE1pSWdabWxzYkQwaVlXeHNJaUFnSW1seVl5QjRMbU52Ym5SbGJuUTlJV2RzYVNRaUkrdDhaalYzTmpaOVB5OXRIMU45Ym1SUXJ6cG1ZbThyTWtaMmNqNCtQQzl6ZG1jKyIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="SocialHub v8.0">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading SocialHub v8.0...</p>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <i class="fas fa-share-alt"></i>
+                <h1>SocialHub v8.0</h1>
+                <p>Advanced Social Media Management Platform</p>
+            </div>
+            <div class="login-form">
+                <button id="googleSignIn" class="btn btn--primary btn--full-width">
+                    <i class="fab fa-google"></i>
+                    Sign in with Google
+                </button>
+                <div class="login-features">
+                    <div class="feature">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Schedule Posts</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics Dashboard</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-users"></i>
+                        <span>Multi-Platform Support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="main-app hidden">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-share-alt"></i>
+                    <span class="logo-text">SocialHub v8.0</span>
+                </div>
+                <button id="sidebarToggle" class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" data-section="dashboard" class="nav-link active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a></li>
+                    <li><a href="#" data-section="accounts" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span>Accounts</span>
+                    </a></li>
+                    <li><a href="#" data-section="composer" class="nav-link">
+                        <i class="fas fa-edit"></i>
+                        <span>Post Composer</span>
+                    </a></li>
+                    <li><a href="#" data-section="scheduler" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Scheduler</span>
+                    </a></li>
+                    <li><a href="#" data-section="analytics" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </a></li>
+                    <li><a href="#" data-section="drafts" class="nav-link">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Drafts</span>
+                    </a></li>
+                    <li><a href="#" data-section="settings" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img id="userAvatar" src="" alt="User Avatar" class="user-avatar">
+                    <div class="user-info">
+                        <span id="userName" class="user-name"></span>
+                        <span id="userEmail" class="user-email"></span>
+                    </div>
+                </div>
+                <button id="signOut" class="btn btn--outline btn--sm">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <h2 id="sectionTitle">Dashboard</h2>
+                </div>
+                <div class="header-right">
+                    <button id="themeToggle" class="btn btn--outline btn--sm">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button id="refreshBtn" class="btn btn--outline btn--sm">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button id="quickPostBtn" class="btn btn--primary btn--sm">
+                        <i class="fas fa-plus"></i>
+                        Quick Post
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content Sections -->
+            <div class="content-wrapper">
+                <!-- Dashboard Section -->
+                <section id="dashboardSection" class="content-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--color-bg-1);">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="totalPosts">0</h3>
+                                <p>Total Posts</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--color-bg-4);">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="totalEngagement">0</h3>
+                                <p>Total Engagement</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--color-bg-3);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="totalReach">0</h3>
+                                <p>Total Reach</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--color-bg-6);">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="scheduledPosts">0</h3>
+                                <p>Scheduled Posts</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Recent Activity</h3>
+                                <button class="btn btn--outline btn--sm">View All</button>
+                            </div>
+                            <div id="recentActivity" class="activity-list">
+                                <!-- Activity items will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Engagement Overview</h3>
+                                <div class="chart-controls">
+                                    <select id="chartPeriod" class="form-control">
+                                        <option value="7">Last 7 days</option>
+                                        <option value="30">Last 30 days</option>
+                                        <option value="90">Last 90 days</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="chart-container" style="position: relative; height: 300px;">
+                                <canvas id="engagementChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Accounts Section -->
+                <section id="accountsSection" class="content-section">
+                    <div class="section-header">
+                        <h3>Connected Accounts</h3>
+                        <button id="addAccountBtn" class="btn btn--primary">
+                            <i class="fas fa-plus"></i>
+                            Connect Account
+                        </button>
+                    </div>
+                    <div id="accountsList" class="accounts-grid">
+                        <!-- Accounts will be populated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Post Composer Section -->
+                <section id="composerSection" class="content-section">
+                    <div class="composer-container">
+                        <div class="composer-header">
+                            <h3>Create New Post</h3>
+                            <div class="composer-actions">
+                                <button id="saveDraftBtn" class="btn btn--outline">
+                                    <i class="fas fa-save"></i>
+                                    Save Draft
+                                </button>
+                                <button id="schedulePostBtn" class="btn btn--secondary">
+                                    <i class="fas fa-clock"></i>
+                                    Schedule
+                                </button>
+                                <button id="publishNowBtn" class="btn btn--primary">
+                                    <i class="fas fa-share"></i>
+                                    Publish Now
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="composer-content">
+                            <div class="composer-main">
+                                <div class="platform-selector">
+                                    <label class="form-label">Select Platforms</label>
+                                    <div id="platformCheckboxes" class="platform-checkboxes">
+                                        <!-- Platform checkboxes will be populated by JavaScript -->
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="postContent" class="form-label">Content</label>
+                                    <textarea id="postContent" class="form-control" rows="6" placeholder="What's happening?"></textarea>
+                                    <div class="character-counter">
+                                        <span id="characterCount">0</span> / <span id="characterLimit">280</span>
+                                    </div>
+                                </div>
+
+                                <div class="media-upload-section">
+                                    <label class="form-label">Media</label>
+                                    <div id="mediaDropzone" class="media-dropzone">
+                                        <div class="dropzone-content">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <p>Drag & drop media here or click to upload</p>
+                                            <input type="file" id="mediaInput" accept="image/*,video/*" multiple hidden>
+                                        </div>
+                                    </div>
+                                    <div id="mediaPreview" class="media-preview">
+                                        <!-- Media previews will be shown here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="composer-sidebar">
+                                <div class="post-preview">
+                                    <h4>Preview</h4>
+                                    <div id="postPreview" class="preview-content">
+                                        <div class="preview-platform facebook">
+                                            <div class="platform-header">
+                                                <i class="fab fa-facebook"></i>
+                                                <span>Facebook</span>
+                                            </div>
+                                            <div class="preview-post">
+                                                <div class="preview-text">Your post content will appear here...</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Scheduler Section -->
+                <section id="schedulerSection" class="content-section">
+                    <div class="scheduler-header">
+                        <h3>Content Calendar</h3>
+                        <div class="calendar-controls">
+                            <button id="prevMonth" class="btn btn--outline btn--sm">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span id="currentMonth" class="month-display"></span>
+                            <button id="nextMonth" class="btn btn--outline btn--sm">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <button id="todayBtn" class="btn btn--outline btn--sm">Today</button>
+                        </div>
+                    </div>
+                    <div id="calendar" class="calendar-grid">
+                        <!-- Calendar will be populated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Analytics Section -->
+                <section id="analyticsSection" class="content-section">
+                    <div class="analytics-header">
+                        <h3>Analytics Dashboard</h3>
+                        <div class="analytics-controls">
+                            <select id="analyticsTimeframe" class="form-control">
+                                <option value="7">Last 7 days</option>
+                                <option value="30">Last 30 days</option>
+                                <option value="90">Last 90 days</option>
+                            </select>
+                            <button id="exportAnalytics" class="btn btn--outline btn--sm">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <h4>Post Performance</h4>
+                            <div class="chart-container" style="position: relative; height: 300px;">
+                                <canvas id="postPerformanceChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="analytics-card">
+                            <h4>Platform Comparison</h4>
+                            <div class="chart-container" style="position: relative; height: 300px;">
+                                <canvas id="platformChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detailed-analytics">
+                        <h4>Detailed Metrics</h4>
+                        <div id="detailedMetrics" class="metrics-table">
+                            <!-- Detailed metrics will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Drafts Section -->
+                <section id="draftsSection" class="content-section">
+                    <div class="drafts-header">
+                        <h3>Draft Posts</h3>
+                        <div class="drafts-actions">
+                            <button id="bulkSchedule" class="btn btn--secondary">
+                                <i class="fas fa-calendar-plus"></i>
+                                Bulk Schedule
+                            </button>
+                            <button id="deleteDrafts" class="btn btn--outline">
+                                <i class="fas fa-trash"></i>
+                                Delete Selected
+                            </button>
+                        </div>
+                    </div>
+                    <div id="draftsList" class="drafts-list">
+                        <!-- Drafts will be populated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settingsSection" class="content-section">
+                    <div class="settings-container">
+                        <div class="settings-nav">
+                            <ul>
+                                <li><a href="#" data-tab="general" class="settings-tab active">General</a></li>
+                                <li><a href="#" data-tab="notifications" class="settings-tab">Notifications</a></li>
+                                <li><a href="#" data-tab="integrations" class="settings-tab">Integrations</a></li>
+                                <li><a href="#" data-tab="security" class="settings-tab">Security</a></li>
+                            </ul>
+                        </div>
+                        <div class="settings-content">
+                            <div id="generalSettings" class="settings-panel active">
+                                <h4>General Settings</h4>
+                                <div class="form-group">
+                                    <label class="form-label">Default Post Visibility</label>
+                                    <select class="form-control">
+                                        <option>Public</option>
+                                        <option>Friends</option>
+                                        <option>Private</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Time Zone</label>
+                                    <select class="form-control">
+                                        <option>UTC</option>
+                                        <option>EST</option>
+                                        <option>PST</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="notificationSettings" class="settings-panel">
+                                <h4>Notification Preferences</h4>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" checked>
+                                        Email notifications for scheduled posts
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" checked>
+                                        Push notifications for engagement
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox">
+                                        Daily analytics summary
+                                    </label>
+                                </div>
+                            </div>
+                            <div id="integrationSettings" class="settings-panel">
+                                <h4>API Integrations</h4>
+                                <div class="integration-status">
+                                    <div class="integration-item">
+                                        <span>Facebook API</span>
+                                        <span class="status status--success">Connected</span>
+                                    </div>
+                                    <div class="integration-item">
+                                        <span>Instagram API</span>
+                                        <span class="status status--success">Connected</span>
+                                    </div>
+                                    <div class="integration-item">
+                                        <span>Twitter API</span>
+                                        <span class="status status--error">Disconnected</span>
+                                    </div>
+                                    <div class="integration-item">
+                                        <span>LinkedIn API</span>
+                                        <span class="status status--warning">Limited Access</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="securitySettings" class="settings-panel">
+                                <h4>Security Settings</h4>
+                                <div class="form-group">
+                                    <label class="form-label">Two-Factor Authentication</label>
+                                    <button class="btn btn--outline">Enable 2FA</button>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Account Backup</label>
+                                    <button class="btn btn--outline">Download Backup</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Account Connection Modal -->
+    <div id="accountModal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Connect Social Media Account</h3>
+                <button class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="platform-options">
+                    <div class="platform-option" data-platform="facebook">
+                        <i class="fab fa-facebook"></i>
+                        <div class="platform-info">
+                            <h4>Facebook</h4>
+                            <p>Connect your Facebook pages and profiles</p>
+                        </div>
+                        <button class="btn btn--outline">Connect</button>
+                    </div>
+                    <div class="platform-option" data-platform="instagram">
+                        <i class="fab fa-instagram"></i>
+                        <div class="platform-info">
+                            <h4>Instagram</h4>
+                            <p>Connect your Instagram business account</p>
+                        </div>
+                        <button class="btn btn--outline">Connect</button>
+                    </div>
+                    <div class="platform-option" data-platform="twitter">
+                        <i class="fab fa-twitter"></i>
+                        <div class="platform-info">
+                            <h4>Twitter</h4>
+                            <p>Connect your Twitter account</p>
+                        </div>
+                        <button class="btn btn--outline">Connect</button>
+                    </div>
+                    <div class="platform-option" data-platform="linkedin">
+                        <i class="fab fa-linkedin"></i>
+                        <div class="platform-info">
+                            <h4>LinkedIn</h4>
+                            <p>Connect your LinkedIn profile or company page</p>
+                        </div>
+                        <button class="btn btn--outline">Connect</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Modal -->
+    <div id="scheduleModal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Schedule Post</h3>
+                <button class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Schedule Date</label>
+                    <input type="date" id="scheduleDate" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Schedule Time</label>
+                    <input type="time" id="scheduleTime" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Timezone</label>
+                    <select id="scheduleTimezone" class="form-control">
+                        <option value="UTC">UTC</option>
+                        <option value="EST">Eastern Time</option>
+                        <option value="PST">Pacific Time</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button id="cancelSchedule" class="btn btn--outline">Cancel</button>
+                    <button id="confirmSchedule" class="btn btn--primary">Schedule Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Floating Action Button -->
+    <button id="fab" class="fab hidden">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <script src="app.js"></script>
+</body>
+</html>
