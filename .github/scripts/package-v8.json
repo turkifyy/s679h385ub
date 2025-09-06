@@ -1,0 +1,278 @@
+{
+  "name": "socialhub-enhanced-v8",
+  "version": "8.0.0",
+  "description": "Enhanced SocialHub platform with comprehensive social media management, automated scheduling, and advanced analytics",
+  "main": "scheduled-tasks-v8.js",
+  "type": "module",
+  "scripts": {
+    "start": "node scheduled-tasks-v8.js",
+    "start:dev": "NODE_ENV=development node scheduled-tasks-v8.js",
+    "start:debug": "NODE_ENV=development LOG_LEVEL=debug node --inspect scheduled-tasks-v8.js",
+    "refresh-tokens": "node refresh-tokens-v8.js",
+    "refresh-tokens:debug": "LOG_LEVEL=debug node refresh-tokens-v8.js",
+    "health-check": "node -e \"const { SocialHubScheduler } = require('./scheduled-tasks-v8.js'); const scheduler = new SocialHubScheduler(); scheduler.initialize().then(() => scheduler.performSystemHealthCheck()).then(console.log).catch(console.error);\"",
+    "validate-env": "node -e \"const { Validator } = require('./refresh-tokens-v8.js'); try { Validator.validateEnvironmentVariables(); console.log('✅ Environment validation passed'); } catch(e) { console.error('❌ Environment validation failed:', e.message); process.exit(1); }\"",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "jest --testPathPattern=tests/unit",
+    "test:integration": "jest --testPathPattern=tests/integration --setupFilesAfterEnv ./tests/setup.js",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint . --ext .js --fix",
+    "lint:check": "eslint . --ext .js",
+    "format": "prettier --write *.js",
+    "format:check": "prettier --check *.js",
+    "security:audit": "npm audit --audit-level=moderate",
+    "security:fix": "npm audit fix",
+    "deps:update": "npm-check-updates -u",
+    "deps:check": "npm-check-updates",
+    "build": "node build-scripts/prepare-deployment.js",
+    "deploy:staging": "NODE_ENV=staging npm run build && npm run deploy",
+    "deploy:production": "NODE_ENV=production npm run build && npm run deploy",
+    "logs:view": "tail -f logs/scheduler-$(date +%Y-%m-%d).log",
+    "logs:error": "grep ERROR logs/scheduler-$(date +%Y-%m-%d).log",
+    "logs:clean": "find logs/ -name '*.log' -mtime +7 -delete",
+    "backup:create": "node -e \"const { SocialHubScheduler } = require('./scheduled-tasks-v8.js'); const scheduler = new SocialHubScheduler(); scheduler.initialize().then(() => scheduler.createSystemBackup()).then(console.log).catch(console.error);\"",
+    "analytics:generate": "node -e \"const { SocialHubScheduler } = require('./scheduled-tasks-v8.js'); const scheduler = new SocialHubScheduler(); scheduler.initialize().then(() => scheduler.generateDailyAnalytics()).then(console.log).catch(console.error);\"",
+    "precommit": "npm run lint:check && npm run test:unit && npm run security:audit"
+  },
+  "keywords": [
+    "social-media",
+    "automation",
+    "scheduling",
+    "facebook",
+    "instagram",
+    "twitter",
+    "linkedin",
+    "analytics",
+    "firebase",
+    "github-actions",
+    "nodejs",
+    "socialhub"
+  ],
+  "author": {
+    "name": "SocialHub Development Team",
+    "email": "dev@socialhub.app",
+    "url": "https://github.com/socialhub-platform"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/socialhub-platform/socialhub",
+  "bugs": {
+    "url": "https://github.com/socialhub-platform/socialhub/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/socialhub-platform/socialhub.git"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "firebase-admin": "^12.0.0",
+    "dotenv": "^16.3.1",
+    "joi": "^17.11.0",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1",
+    "node-cron": "^3.0.3",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.1",
+    "sharp": "^0.33.0",
+    "multer": "^1.4.5-lts.1",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "cors": "^2.8.5",
+    "compression": "^1.7.4",
+    "express-validator": "^7.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "eslint": "^8.56.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jest": "^27.6.0",
+    "eslint-plugin-security": "^1.7.1",
+    "prettier": "^3.1.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "npm-check-updates": "^16.14.12",
+    "nodemon": "^3.0.2",
+    "@types/node": "^20.10.5"
+  },
+  "peerDependencies": {
+    "express": "^4.18.0"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.8",
+    "utf-8-validate": "^6.0.3"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!node_modules/**",
+      "!coverage/**",
+      "!logs/**",
+      "!tests/**"
+    ],
+    "testMatch": [
+      "**/tests/**/*.test.js",
+      "**/?(*.)+(spec|test).js"
+    ],
+    "verbose": true,
+    "forceExit": true,
+    "clearMocks": true,
+    "resetMocks": true,
+    "restoreMocks": true
+  },
+  "eslintConfig": {
+    "extends": [
+      "airbnb-base",
+      "plugin:jest/recommended",
+      "plugin:security/recommended"
+    ],
+    "env": {
+      "node": true,
+      "jest": true,
+      "es6": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2022,
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-console": "warn",
+      "no-unused-vars": "error",
+      "no-undef": "error",
+      "indent": [
+        "error",
+        2
+      ],
+      "quotes": [
+        "error",
+        "single"
+      ],
+      "semi": [
+        "error",
+        "always"
+      ],
+      "comma-dangle": [
+        "error",
+        "never"
+      ],
+      "max-len": [
+        "warn",
+        {
+          "code": 120
+        }
+      ]
+    }
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "none",
+    "tabWidth": 2,
+    "semi": true,
+    "printWidth": 120,
+    "arrowParens": "avoid",
+    "endOfLine": "lf"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && npm run test:unit",
+      "pre-push": "npm run test && npm run security:audit"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "config": {
+    "app": {
+      "name": "SocialHub Enhanced",
+      "version": "8.0.0",
+      "environment": "production",
+      "timezone": "UTC",
+      "logLevel": "info",
+      "maxRetries": 3,
+      "retryDelay": 1000,
+      "batchSize": 10,
+      "maxConcurrentRequests": 5,
+      "tokenExpirationThreshold": 86400000,
+      "cleanupRetentionDays": 30,
+      "backupRetentionDays": 90
+    },
+    "firebase": {
+      "appId": "socialhub-prod-v8-0",
+      "collections": {
+        "users": "users",
+        "accounts": "allAccounts",
+        "posts": "posts",
+        "analytics": "analytics",
+        "system": "system",
+        "backups": "backups"
+      }
+    },
+    "apis": {
+      "facebook": {
+        "version": "v19.0",
+        "baseUrl": "https://graph.facebook.com",
+        "timeout": 30000
+      },
+      "twitter": {
+        "version": "2",
+        "baseUrl": "https://api.twitter.com",
+        "timeout": 30000
+      },
+      "instagram": {
+        "version": "v19.0",
+        "baseUrl": "https://graph.instagram.com",
+        "timeout": 30000
+      },
+      "linkedin": {
+        "version": "v2",
+        "baseUrl": "https://api.linkedin.com",
+        "timeout": 30000
+      }
+    },
+    "monitoring": {
+      "healthCheckInterval": 300000,
+      "metricsRetention": 2592000000,
+      "alertThresholds": {
+        "errorRate": 0.05,
+        "responseTime": 5000,
+        "failureCount": 10
+      }
+    }
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/socialhub-platform"
+  },
+  "files": [
+    "*.js",
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "docs/",
+    "config/",
+    "!logs/",
+    "!coverage/",
+    "!tests/",
+    "!.github/"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  }
+}
