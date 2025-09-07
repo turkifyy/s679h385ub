@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialHub Pro v8.5</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
+    
+    <!-- Arabic Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #1e3a8a; --secondary-color: #3b82f6;
+            --accent-color: #10b981; --warning-color: #f59e0b;
+            --danger-color: #ef4444; --dark-color: #1f2937; --light-color: #f3f4f6;
+            --border-color: #e5e7eb; --text-primary: #111827; --text-secondary: #6b7280;
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        [data-theme="dark"] {
+            --primary-color: #3b82f6; --secondary-color: #60a5fa; --dark-color: #0f172a;
+            --light-color: #1e293b; --border-color: #374151; --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+        body {
+            font-family: 'Tajawal', sans-serif; background-color: var(--light-color);
+            color: var(--text-primary); transition: var(--transition);
+        }
+        body[data-theme="dark"] { background-color: var(--dark-color); }
+        .sidebar-item.active, .sidebar-item:hover {
+            background: var(--gradient-primary); color: white;
+            transform: translateX(4px); box-shadow: var(--shadow-md);
+        }
+        .modal, .toast { pointer-events: none; opacity: 0; transform: translateY(20px); }
+        .modal.active, .toast.active { pointer-events: auto; opacity: 1; transform: translateY(0); }
+        .loading-spinner {
+            width: 40px; height: 40px; border-radius: 50%;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        /* For file input */
+        .file-input-label:hover { background-color: #eef2ff; }
+        [data-theme="dark"] .file-input-label:hover { background-color: #2a3a55; }
+    </style>
+</head>
+<body data-theme="light">
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black/60 flex-col items-center justify-center z-[100] transition-opacity duration-300 hidden">
+        <div class="loading-spinner mb-4"></div>
+        <p id="loading-text" class="text-white">جاري التحميل...</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast fixed bottom-5 right-5 bg-gray-800 text-white py-3 px-5 rounded-lg shadow-lg transition-all duration-300 z-[101]">
+        <p id="toast-message"></p>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-600 p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden text-center p-8">
+            <i class="fas fa-share-alt text-4xl text-blue-600 mb-3"></i>
+            <h1 class="text-3xl font-bold text-gray-800">SocialHub Pro</h1>
+            <p class="text-gray-600 mb-8">الإصدار 8.5 - منصة إدارة الشبكات الاجتماعية المتكاملة</p>
+            <button id="google-login-btn" class="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-3">
+                <img src="https://www.google.com/favicon.ico" alt="Google icon" class="w-6 h-6">
+                <span>تسجيل الدخول باستخدام جوجل</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Application Container -->
+    <div id="app-container" class="hidden">
+        <header class="bg-white dark:bg-dark-color shadow-md sticky top-0 z-40">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-share-alt text-2xl text-primary-color"></i>
+                    <span class="text-xl font-bold dark:text-text-primary">SocialHub Pro</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div id="user-profile" class="flex items-center gap-2">
+                        <img id="user-avatar" src="https://placehold.co/40x40/E2E8F0/4A5568?text=U" alt="User Avatar" class="w-8 h-8 rounded-full">
+                        <span id="user-name" class="font-semibold dark:text-text-primary"></span>
+                    </div>
+                    <button id="theme-switch" aria-label="Toggle dark mode" class="text-text-secondary dark:text-text-secondary text-xl"><i class="fas fa-moon"></i></button>
+                    <button id="logout-btn" class="bg-danger-color text-white px-4 py-2 rounded-lg hover:bg-red-700 transition text-sm">خروج</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row gap-6">
+                <!-- Sidebar -->
+                <aside class="w-full md:w-1/4 bg-white dark:bg-dark-color rounded-xl shadow-md p-5 self-start">
+                    <nav class="space-y-2">
+                        <a href="#" class="sidebar-item flex items-center p-3 rounded-lg text-text-secondary dark:text-text-secondary transition" data-section="dashboard"><i class="fas fa-tachometer-alt fa-fw ml-3"></i><span>لوحة التحكم</span></a>
+                        <a href="#" class="sidebar-item flex items-center p-3 rounded-lg text-text-secondary dark:text-text-secondary transition" data-section="composer"><i class="fas fa-edit fa-fw ml-3"></i><span>إنشاء منشور</span></a>
+                        <a href="#" class="sidebar-item flex items-center p-3 rounded-lg text-text-secondary dark:text-text-secondary transition" data-section="bulk-import"><i class="fas fa-file-import fa-fw ml-3"></i><span>استيراد جماعي</span></a>
+                        <a href="#" class="sidebar-item flex items-center p-3 rounded-lg text-text-secondary dark:text-text-secondary transition" data-section="analytics"><i class="fas fa-chart-line fa-fw ml-3"></i><span>التحليلات</span></a>
+                        <a href="#" class="sidebar-item flex items-center p-3 rounded-lg text-text-secondary dark:text-text-secondary transition" data-section="accounts"><i class="fas fa-users-cog fa-fw ml-3"></i><span>إدارة الحسابات</span></a>
+                    </nav>
+                </aside>
+
+                <!-- Content Area -->
+                <div id="content-area" class="w-full md:w-3/4">
+                    <!-- Dashboard Section -->
+                    <section id="dashboard-section" class="content-section">
+                        <h2 class="text-2xl font-bold mb-4 dark:text-text-primary">ملخص الأداء</h2>
+                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+                             <div class="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-5 rounded-xl shadow-lg"><p class="text-3xl font-bold" id="total-posts-stat">0</p><p>إجمالي المنشورات</p></div>
+                             <div class="bg-gradient-to-br from-green-500 to-green-700 text-white p-5 rounded-xl shadow-lg"><p class="text-3xl font-bold" id="published-posts-stat">0</p><p>تم نشرها</p></div>
+                             <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white p-5 rounded-xl shadow-lg"><p class="text-3xl font-bold" id="scheduled-posts-stat">0</p><p>مجدولة</p></div>
+                             <div class="bg-gradient-to-br from-red-500 to-red-700 text-white p-5 rounded-xl shadow-lg"><p class="text-3xl font-bold" id="draft-posts-stat">0</p><p>مسودات</p></div>
+                         </div>
+                         <div class="bg-white dark:bg-dark-color rounded-xl shadow-md p-5">
+                            <h3 class="font-bold text-lg mb-4 dark:text-text-primary">AI Insights: توصيات ذكية</h3>
+                            <div class="border-l-4 border-accent-color pl-4">
+                                <p class="dark:text-text-primary">أفضل وقت للنشر (توقيت دبي): <strong class="text-accent-color">10:30 صباحًا, 5:15 مساءً</strong></p>
+                                <p class="text-sm text-text-secondary dark:text-text-secondary">بناءً على تفاعل جمهورك الأسبوع الماضي.</p>
+                            </div>
+                         </div>
+                    </section>
+                    
+                    <!-- Composer Section -->
+                    <section id="composer-section" class="content-section hidden">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="lg:col-span-2 bg-white dark:bg-dark-color p-5 rounded-xl shadow-md">
+                                <h2 class="text-2xl font-bold mb-4 dark:text-text-primary">محرر المنشورات</h2>
+                                <textarea id="composer-text" class="w-full h-40 p-3 border dark:border-border-color rounded-lg bg-white dark:bg-light-color dark:text-text-primary" placeholder="اكتب منشورك هنا..."></textarea>
+                                <div class="flex items-center justify-between mt-2">
+                                    <button id="ai-suggest-btn" class="text-sm bg-purple-600 text-white px-3 py-1 rounded-md hover:bg-purple-700"><i class="fas fa-sparkles"></i> اقتراح AI</button>
+                                    <span id="char-count" class="text-sm text-text-secondary">0 / 280</span>
+                                </div>
+                                <div class="mt-4">
+                                    <h3 class="font-semibold mb-2 dark:text-text-primary">الوسائط</h3>
+                                    <label class="file-input-label border-2 border-dashed dark:border-border-color rounded-lg p-6 text-center cursor-pointer block">
+                                        <i class="fas fa-cloud-upload-alt text-3xl text-text-secondary"></i>
+                                        <p class="mt-1 text-sm text-text-secondary">اسحب وأفلت الصور أو انقر للاختيار</p>
+                                        <input type="file" id="media-upload" class="hidden" multiple accept="image/*,video/*">
+                                    </label>
+                                    <div id="media-preview" class="mt-2 grid grid-cols-4 gap-2"></div>
+                                </div>
+                                <div class="mt-6 flex items-center gap-4">
+                                    <button id="publish-now-btn" class="flex-1 bg-accent-color text-white py-2 rounded-lg font-bold">نشر الآن</button>
+                                    <button id="schedule-btn" class="flex-1 bg-secondary-color text-white py-2 rounded-lg">جدولة</button>
+                                    <button id="save-draft-btn" class="flex-1 border border-border-color text-text-secondary py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">حفظ كمسودة</button>
+                                </div>
+                                <div id="scheduler-options" class="hidden mt-4 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
+                                    <h4 class="font-bold mb-2 dark:text-text-primary">خيارات الجدولة (توقيت دبي)</h4>
+                                    <input type="datetime-local" id="schedule-datetime" class="w-full p-2 border dark:border-border-color rounded-lg bg-white dark:bg-light-color">
+                                    <button id="confirm-schedule-btn" class="w-full mt-2 bg-primary-color text-white py-2 rounded-lg">تأكيد الجدولة</button>
+                                </div>
+                            </div>
+                            <div class="bg-white dark:bg-dark-color p-5 rounded-xl shadow-md self-start">
+                                <h3 class="font-bold mb-3 dark:text-text-primary">معاينة المنصة</h3>
+                                <div class="border dark:border-border-color rounded-lg p-3">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <img id="preview-avatar" src="https://placehold.co/40x40/E2E8F0/4A5568?text=U" class="w-10 h-10 rounded-full">
+                                        <div>
+                                            <p id="preview-name" class="font-bold dark:text-text-primary"></p>
+                                            <small class="text-text-secondary">الآن · <i class="fab fa-facebook-f"></i></small>
+                                        </div>
+                                    </div>
+                                    <p id="preview-text" class="text-sm dark:text-text-primary whitespace-pre-wrap">...</p>
+                                    <div id="preview-media-container" class="mt-2 rounded-lg overflow-hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Bulk Import Section -->
+                    <section id="bulk-import-section" class="content-section hidden">
+                        <h2 class="text-2xl font-bold mb-4 dark:text-text-primary">الاستيراد الجماعي</h2>
+                        <div class="bg-white dark:bg-dark-color p-5 rounded-xl shadow-md">
+                            <label class="file-input-label border-2 border-dashed dark:border-border-color rounded-lg p-8 text-center cursor-pointer block mb-4">
+                                <i class="fas fa-file-csv text-4xl text-text-secondary"></i>
+                                <p class="mt-2 font-semibold dark:text-text-primary">انقر لاختيار ملف CSV أو JSON</p>
+                                <p class="text-sm text-text-secondary">(الحد الأقصى 50MB, 1000 منشور)</p>
+                                <input type="file" id="bulk-file-input" class="hidden" accept=".csv,.json">
+                            </label>
+                             <div id="import-file-info" class="hidden text-center mb-4">
+                                <p class="dark:text-text-primary">الملف المحدد: <span id="file-name" class="font-bold"></span></p>
+                            </div>
+                            <div id="import-feedback-area" class="hidden">
+                               <h3 class="font-bold mb-2 dark:text-text-primary">حالة الاستيراد</h3>
+                               <div id="import-feedback" class="p-3 mb-2 rounded-lg text-sm"></div>
+                               <button id="start-import-btn" class="w-full bg-accent-color text-white py-2 rounded-lg font-bold">بدء عملية الاستيراد</button>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Analytics Section -->
+                    <section id="analytics-section" class="content-section hidden">
+                        <h2 class="text-2xl font-bold mb-4 dark:text-text-primary">التحليلات والتقارير</h2>
+                        <div class="bg-white dark:bg-dark-color p-5 rounded-xl shadow-md">
+                            <div class="flex justify-end mb-4">
+                                <select id="analytics-period" class="p-2 rounded-lg border dark:border-border-color bg-white dark:bg-light-color">
+                                    <option value="7">آخر 7 أيام</option>
+                                    <option value="30">آخر 30 يوم</option>
+                                    <option value="90">آخر 90 يوم</option>
+                                </select>
+                            </div>
+                            <div class="h-96"><canvas id="engagement-chart"></canvas></div>
+                        </div>
+                    </section>
+                    
+                     <!-- Accounts Section -->
+                    <section id="accounts-section" class="content-section hidden">
+                        <h2 class="text-2xl font-bold mb-4 dark:text-text-primary">إدارة الحسابات المرتبطة</h2>
+                        <div class="bg-white dark:bg-dark-color p-5 rounded-xl shadow-md">
+                            <p class="text-text-secondary dark:text-text-secondary">هنا يمكنك ربط حساباتك على الشبكات الاجتماعية مثل فيسبوك، انستغرام، إكس، ولينكدإن.</p>
+                             <div class="mt-4 border-t dark:border-border-color pt-4">
+                                <!-- Placeholder for connected accounts list -->
+                                <p class="italic text-text-secondary dark:text-text-secondary">لا توجد حسابات مرتبطة حاليًا.</p>
+                                <button class="mt-4 bg-primary-color text-white px-5 py-2 rounded-lg hover:opacity-90">
+                                    <i class="fab fa-facebook-f ml-2"></i> ربط حساب فيسبوك
+                                </button>
+                                <!-- Add other buttons for other platforms -->
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script type="module">
+        // --- Firebase SDK Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, serverTimestamp, query, where, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+        // --- 1. CONFIG AND STATE ---
+        const firebaseConfig = {
+            // TODO: IMPORTANT! Replace with your actual Firebase configuration
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        const state = {
+            currentUser: null,
+            theme: localStorage.getItem('theme') || 'light',
+            chartInstance: null,
+            composerMediaFiles: [],
+            firestoreUnsubscribes: [],
+        };
+
+        // --- 2. INITIALIZATION ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            ui.init();
+            authModule.init();
+        });
+
+        // --- 3. UI MODULE ---
+        const ui = {
+            elements: {},
+            init() {
+                // Cache all DOM elements here
+                this.elements = {
+                    loadingOverlay: document.getElementById('loading-overlay'),
+                    loadingText: document.getElementById('loading-text'),
+                    toast: { container: document.getElementById('toast'), message: document.getElementById('toast-message') },
+                    loginScreen: document.getElementById('login-screen'),
+                    appContainer: document.getElementById('app-container'),
+                    googleLoginBtn: document.getElementById('google-login-btn'),
+                    logoutBtn: document.getElementById('logout-btn'),
+                    themeSwitch: document.getElementById('theme-switch'),
+                    userProfile: {
+                        avatar: document.getElementById('user-avatar'),
+                        name: document.getElementById('user-name'),
+                    },
+                    sidebarItems: document.querySelectorAll('.sidebar-item'),
+                    dashboard: {
+                        total: document.getElementById('total-posts-stat'),
+                        published: document.getElementById('published-posts-stat'),
+                        scheduled: document.getElementById('scheduled-posts-stat'),
+                        drafts: document.getElementById('draft-posts-stat'),
+                    },
+                    composer: {
+                        text: document.getElementById('composer-text'),
+                        aiSuggestBtn: document.getElementById('ai-suggest-btn'),
+                        charCount: document.getElementById('char-count'),
+                        mediaUpload: document.getElementById('media-upload'),
+                        mediaPreview: document.getElementById('media-preview'),
+                        publishNowBtn: document.getElementById('publish-now-btn'),
+                        scheduleBtn: document.getElementById('schedule-btn'),
+                        saveDraftBtn: document.getElementById('save-draft-btn'),
+                        schedulerOptions: document.getElementById('scheduler-options'),
+                        scheduleDatetime: document.getElementById('schedule-datetime'),
+                        confirmScheduleBtn: document.getElementById('confirm-schedule-btn'),
+                    },
+                    preview: {
+                        avatar: document.getElementById('preview-avatar'),
+                        name: document.getElementById('preview-name'),
+                        text: document.getElementById('preview-text'),
+                        mediaContainer: document.getElementById('preview-media-container'),
+                    },
+                    bulkImport: {
+                        input: document.getElementById('bulk-file-input'),
+                        fileInfo: document.getElementById('import-file-info'),
+                        fileName: document.getElementById('file-name'),
+                        feedbackArea: document.getElementById('import-feedback-area'),
+                        feedback: document.getElementById('import-feedback'),
+                        startBtn: document.getElementById('start-import-btn'),
+                    },
+                    analytics: {
+                        periodSelect: document.getElementById('analytics-period'),
+                        chartCanvas: document.getElementById('engagement-chart'),
+                    }
+                };
+                this.applyTheme();
+                this.attachEventListeners();
+            },
+            showLoading(text = 'جاري المعالجة...') {
+                this.elements.loadingText.textContent = text;
+                this.elements.loadingOverlay.classList.remove('hidden');
+                this.elements.loadingOverlay.classList.add('flex');
+            },
+            hideLoading() {
+                this.elements.loadingOverlay.classList.add('hidden');
+                this.elements.loadingOverlay.classList.remove('flex');
+            },
+            showToast(message, duration = 3000) {
+                this.elements.toast.message.textContent = message;
+                this.elements.toast.container.classList.add('active');
+                setTimeout(() => {
+                    this.elements.toast.container.classList.remove('active');
+                }, duration);
+            },
+            applyTheme() {
+                document.body.dataset.theme = state.theme;
+                const icon = this.elements.themeSwitch.querySelector('i');
+                if(icon) icon.className = state.theme === 'dark' ? 'fas fa-sun text-yellow-400' : 'fas fa-moon';
+            },
+            toggleTheme() {
+                state.theme = state.theme === 'light' ? 'dark' : 'light';
+                localStorage.setItem('theme', state.theme);
+                this.applyTheme();
+            },
+            updateUserProfile() {
+                if (state.currentUser) {
+                    this.elements.userProfile.avatar.src = state.currentUser.photoURL;
+                    this.elements.userProfile.name.textContent = state.currentUser.displayName;
+                    this.elements.preview.avatar.src = state.currentUser.photoURL;
+                    this.elements.preview.name.textContent = state.currentUser.displayName;
+                }
+            },
+            navigateTo(sectionId) {
+                document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+                document.getElementById(`${sectionId}-section`).classList.remove('hidden');
+
+                this.elements.sidebarItems.forEach(item => {
+                    item.classList.toggle('active', item.dataset.section === sectionId);
+                });
+
+                if (sectionId === 'analytics') {
+                    analyticsModule.renderChart();
+                }
+            },
+            attachEventListeners() {
+                this.elements.googleLoginBtn.addEventListener('click', authModule.signInWithGoogle);
+                this.elements.logoutBtn.addEventListener('click', authModule.signOutUser);
+                this.elements.themeSwitch.addEventListener('click', () => this.toggleTheme());
+                this.elements.sidebarItems.forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.navigateTo(item.dataset.section);
+                    });
+                });
+                // Composer Listeners
+                this.elements.composer.text.addEventListener('input', () => {
+                    const text = this.elements.composer.text.value;
+                    this.elements.preview.text.textContent = text || '...';
+                    this.elements.composer.charCount.textContent = `${text.length} / 280`;
+                });
+                this.elements.composer.aiSuggestBtn.addEventListener('click', composerModule.getAISuggestion);
+                this.elements.composer.mediaUpload.addEventListener('change', composerModule.handleMediaSelection);
+                this.elements.composer.publishNowBtn.addEventListener('click', () => composerModule.submitPost('published'));
+                this.elements.composer.saveDraftBtn.addEventListener('click', () => composerModule.submitPost('draft'));
+                this.elements.composer.scheduleBtn.addEventListener('click', () => {
+                     this.elements.composer.schedulerOptions.classList.toggle('hidden');
+                });
+                this.elements.composer.confirmScheduleBtn.addEventListener('click', () => composerModule.submitPost('scheduled'));
+                
+                // Bulk Import Listeners
+                this.elements.bulkImport.input.addEventListener('change', bulkImportModule.handleFileSelect);
+                this.elements.bulkImport.startBtn.addEventListener('click', bulkImportModule.startImportProcess);
+
+                // Analytics listener
+                this.elements.analytics.periodSelect.addEventListener('change', () => analyticsModule.renderChart());
+            }
+        };
+
+        // --- 4. AUTH MODULE ---
+        const authModule = {
+            init() {
+                onAuthStateChanged(auth, async user => {
+                    ui.showLoading("جاري المصادقة...");
+                    if (user) {
+                        state.currentUser = user;
+                        await this.findOrCreateUserInDb(user);
+                        ui.updateUserProfile();
+                        ui.navigateTo('dashboard');
+                        ui.elements.loginScreen.classList.add('hidden');
+                        ui.elements.appContainer.classList.remove('hidden');
+                        this.attachDataListeners();
+                    } else {
+                        state.currentUser = null;
+                        this.detachDataListeners();
+                        ui.elements.appContainer.classList.add('hidden');
+                        ui.elements.loginScreen.classList.remove('hidden');
+                    }
+                    ui.hideLoading();
+                });
+            },
+            async signInWithGoogle() {
+                ui.showLoading('جاري تسجيل الدخول...');
+                const provider = new GoogleAuthProvider();
+                try {
+                    await signInWithPopup(auth, provider);
+                } catch (error) {
+                    console.error("Google Sign-In Error:", error);
+                    ui.showToast("فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.");
+                    ui.hideLoading();
+                }
+            },
+            async signOutUser() {
+                await signOut(auth);
+            },
+            async findOrCreateUserInDb(user) {
+                const userRef = doc(db, 'users', user.uid);
+                const userSnap = await getDoc(userRef);
+                if (!userSnap.exists()) {
+                    await setDoc(userRef, {
+                        displayName: user.displayName,
+                        email: user.email,
+                        avatar: user.photoURL,
+                        role: 'user',
+                        createdAt: serverTimestamp()
+                    });
+                }
+            },
+            attachDataListeners() {
+                if (!state.currentUser) return;
+                this.detachDataListeners(); // Clear old listeners
+                
+                const commonQuery = query(collection(db, 'posts'), where("userId", "==", state.currentUser.uid));
+                
+                const queries = {
+                    total: commonQuery,
+                    published: query(commonQuery, where("status", "==", "published")),
+                    scheduled: query(commonQuery, where("status", "==", "scheduled")),
+                    drafts: query(collection(db, 'drafts'), where("userId", "==", state.currentUser.uid)),
+                };
+
+                for (const [key, q] of Object.entries(queries)) {
+                    const unsubscribe = onSnapshot(q, (snapshot) => {
+                       if(key === 'drafts') {
+                            ui.elements.dashboard.drafts.textContent = snapshot.size;
+                       } else if (key === 'total') {
+                            ui.elements.dashboard.total.textContent = snapshot.size;
+                       }
+                       else {
+                            ui.elements.dashboard[key].textContent = snapshot.size;
+                       }
+                    }, (error) => console.error(`Error listening to ${key}:`, error));
+                    state.firestoreUnsubscribes.push(unsubscribe);
+                }
+            },
+            detachDataListeners() {
+                state.firestoreUnsubscribes.forEach(unsub => unsub());
+                state.firestoreUnsubscribes = [];
+            }
+        };
+
+        // --- 5. COMPOSER & POSTS MODULE ---
+        const composerModule = {
+            getAISuggestion() {
+                ui.showLoading('AI يعمل على اقتراح...');
+                setTimeout(() => {
+                    const suggestions = ["اكتشف أحدث الميزات في منصتنا!", "نصيحة اليوم: حافظ على تفاعل جمهورك بالمحتوى القيم.", "هل تعلم؟ يمكنك جدولة منشوراتك مسبقًا معنا!"];
+                    ui.elements.composer.text.value = suggestions[Math.floor(Math.random() * suggestions.length)];
+                    ui.elements.composer.text.dispatchEvent(new Event('input'));
+                    ui.hideLoading();
+                }, 1500);
+            },
+            handleMediaSelection(event) {
+                state.composerMediaFiles = Array.from(event.target.files);
+                const previewContainer = ui.elements.composer.mediaPreview;
+                const previewTextContainer = ui.elements.preview.mediaContainer;
+                previewContainer.innerHTML = '';
+                previewTextContainer.innerHTML = '';
+                
+                state.composerMediaFiles.forEach(file => {
+                    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                        ui.showToast(`حجم الملف ${file.name} كبير جدًا.`);
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'w-full h-16 object-cover rounded';
+                        previewContainer.appendChild(img);
+                        
+                        const previewImg = img.cloneNode();
+                        previewImg.className = 'w-full h-auto rounded-lg';
+                        previewTextContainer.appendChild(previewImg);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            },
+            async submitPost(status) {
+                const content = ui.elements.composer.text.value.trim();
+                if (!content && state.composerMediaFiles.length === 0) {
+                    ui.showToast('لا يمكن نشر منشور فارغ.'); return;
+                }
+
+                ui.showLoading(status === 'published' ? 'جاري النشر...' : 'جاري الحفظ...');
+
+                try {
+                    const mediaUrls = await this.uploadMedia();
+                    
+                    const postData = {
+                        userId: state.currentUser.uid,
+                        content: content,
+                        media: mediaUrls,
+                        platforms: ['facebook'], // Example for now
+                        status: status,
+                        createdAt: serverTimestamp(),
+                        analyticsSummary: { likes: 0, comments: 0, shares: 0 }
+                    };
+
+                    if (status === 'scheduled') {
+                        const scheduleDate = new Date(ui.elements.composer.scheduleDatetime.value);
+                        if (isNaN(scheduleDate.getTime()) || scheduleDate < new Date()) {
+                            throw new Error('تاريخ الجدولة غير صالح أو في الماضي.');
+                        }
+                        postData.scheduleTime = scheduleDate;
+                    }
+
+                    const collectionName = status === 'draft' ? 'drafts' : 'posts';
+                    await addDoc(collection(db, collectionName), postData);
+
+                    ui.showToast(`تم ${status === 'published' ? 'نشر' : 'حفظ'} المنشور بنجاح!`);
+                    this.resetComposer();
+                } catch (error) {
+                    console.error("Error submitting post:", error);
+                    ui.showToast(`فشل: ${error.message}`);
+                } finally {
+                    ui.hideLoading();
+                }
+            },
+            async uploadMedia() {
+                const uploadPromises = state.composerMediaFiles.map(file => {
+                    const storageRef = ref(storage, `posts/${state.currentUser.uid}/${Date.now()}_${file.name}`);
+                    return uploadBytes(storageRef, file).then(snapshot => getDownloadURL(snapshot.ref));
+                });
+                return Promise.all(uploadPromises);
+            },
+            resetComposer() {
+                ui.elements.composer.text.value = '';
+                ui.elements.composer.mediaUpload.value = '';
+                ui.elements.composer.mediaPreview.innerHTML = '';
+                ui.elements.preview.mediaContainer.innerHTML = '';
+                ui.elements.composer.schedulerOptions.classList.add('hidden');
+                state.composerMediaFiles = [];
+                ui.elements.composer.text.dispatchEvent(new Event('input'));
+            }
+        };
+        
+        // --- 6. BULK IMPORT MODULE ---
+        const bulkImportModule = {
+            selectedFile: null,
+            handleFileSelect(event) {
+                this.selectedFile = event.target.files[0];
+                if (!this.selectedFile) return;
+
+                if (this.selectedFile.size > 50 * 1024 * 1024) { // 50MB limit
+                    ui.showToast('حجم الملف يتجاوز الحد الأقصى (50MB).');
+                    this.reset();
+                    return;
+                }
+                
+                ui.elements.bulkImport.fileName.textContent = this.selectedFile.name;
+                ui.elements.bulkImport.fileInfo.classList.remove('hidden');
+                ui.elements.bulkImport.feedback.innerHTML = `
+                    <p>الملف جاهز للرفع. عند الضغط على "بدء"، سيتم رفع الملف إلى الخادم لمعالجته في الخلفية.</p>
+                    <p class="text-sm text-text-secondary mt-1">ستتلقى إشعارًا عند اكتمال العملية.</p>
+                `;
+                ui.elements.bulkImport.feedback.className = 'p-3 mb-2 rounded-lg text-sm bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200';
+                ui.elements.bulkImport.feedbackArea.classList.remove('hidden');
+            },
+            async startImportProcess() {
+                if (!this.selectedFile || !state.currentUser) return;
+
+                ui.showLoading('جاري رفع ملف الاستيراد...');
+                
+                try {
+                    // Step 1: Upload the file to Firebase Storage
+                    const importFileRef = ref(storage, `imports/${state.currentUser.uid}/${Date.now()}_${this.selectedFile.name}`);
+                    await uploadBytes(importFileRef, this.selectedFile);
+
+                    // Step 2: Create a document in Firestore to trigger the Cloud Function
+                    await addDoc(collection(db, 'imports'), {
+                        userId: state.currentUser.uid,
+                        filename: this.selectedFile.name,
+                        storagePath: importFileRef.fullPath,
+                        status: 'uploaded', // The Cloud Function will update this status
+                        importedAt: serverTimestamp()
+                    });
+                    
+                    ui.elements.bulkImport.feedback.innerHTML = `
+                        <p class="font-bold">تم رفع الملف بنجاح!</p>
+                        <p>تتم الآن معالجة الملف في الخلفية. يمكنك متابعة العمل في المنصة.</p>
+                    `;
+                    ui.elements.bulkImport.feedback.className = 'p-3 mb-2 rounded-lg text-sm bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200';
+                    ui.showToast('بدأت عملية الاستيراد في الخلفية.');
+                    
+                } catch (error) {
+                    console.error("Error starting bulk import:", error);
+                    ui.showToast('حدث خطأ أثناء رفع ملف الاستيراد.');
+                    ui.elements.bulkImport.feedback.textContent = 'فشل في رفع الملف. يرجى المحاولة مرة أخرى.';
+                    ui.elements.bulkImport.feedback.className = 'p-3 mb-2 rounded-lg text-sm bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200';
+                } finally {
+                    ui.hideLoading();
+                }
+            },
+            reset() {
+                ui.elements.bulkImport.input.value = '';
+                ui.elements.bulkImport.fileInfo.classList.add('hidden');
+                ui.elements.bulkImport.feedbackArea.classList.add('hidden');
+                this.selectedFile = null;
+            }
+        };
+
+        // --- 7. ANALYTICS MODULE ---
+        const analyticsModule = {
+            async renderChart() {
+                const ctx = ui.elements.analytics.chartCanvas.getContext('2d');
+                if (!ctx || !state.currentUser) return; // Added check for currentUser
+                
+                const days = parseInt(ui.elements.analytics.periodSelect.value);
+                const endDate = new Date();
+                const startDate = window.dateFns.subDays(endDate, days);
+
+                // Fetch data from Firestore
+                const q = query(
+                    collection(db, 'posts'),
+                    where("userId", "==", state.currentUser.uid),
+                    where("createdAt", ">=", startDate),
+                    where("createdAt", "<=", endDate),
+                    orderBy("createdAt", "desc")
+                );
+
+                const querySnapshot = await getDocs(q); // FIX: Changed getDoc to getDocs for querying collections
+                
+                // Process data for the chart
+                const dataPoints = {};
+                if (querySnapshot) {
+                    querySnapshot.forEach(doc => {
+                        const post = doc.data();
+                        if (post.createdAt) { // Ensure createdAt field exists
+                           const dateStr = window.dateFns.format(post.createdAt.toDate(), 'yyyy-MM-dd');
+                            if (!dataPoints[dateStr]) {
+                                dataPoints[dateStr] = 0;
+                            }
+                            dataPoints[dateStr]++;
+                        }
+                    });
+                }
+
+
+                const labels = [];
+                const data = [];
+                for(let i=0; i < days; i++) {
+                    const date = window.dateFns.subDays(endDate, i);
+                    const dateStr = window.dateFns.format(date, 'yyyy-MM-dd');
+                    labels.unshift(dateStr);
+                    data.unshift(dataPoints[dateStr] || 0);
+                }
+
+                const chartData = {
+                    labels: labels,
+                    datasets: [{
+                        label: 'المنشورات', data: data,
+                        borderColor: 'var(--primary-color)', tension: 0.2, fill: true,
+                        backgroundColor: 'rgba(30, 58, 138, 0.1)'
+                    }]
+                };
+
+                if (state.chartInstance) state.chartInstance.destroy();
+                state.chartInstance = new Chart(ctx, { 
+                    type: 'line', 
+                    data: chartData, 
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'day',
+                                    tooltipFormat: 'MMM dd'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    } 
+                });
+            }
+        };
+    </script>
+</body>
+</html>
+
