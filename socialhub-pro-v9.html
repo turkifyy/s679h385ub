@@ -1,0 +1,2165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SocialHub Pro v9.0 - منصة إدارة وسائل التواصل الاجتماعي المتقدمة مع الذكاء الاصطناعي">
+    <meta name="keywords" content="social media, management, scheduling, analytics, AI, automation, Dubai">
+    <meta name="author" content="SocialHub Pro Team">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="SocialHub Pro v9.0 - منصة إدارة وسائل التواصل الاجتماعي">
+    <meta property="og:description" content="منصة احترافية لإدارة وسائل التواصل الاجتماعي مع الذكاء الاصطناعي">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourusername.github.io/socialhub-pro">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="SocialHub Pro">
+    
+    <title>SocialHub Pro v9.0 - منصة إدارة وسائل التواصل الاجتماعي</title>
+    
+    <!-- Bootstrap 5.3.8 Latest -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    
+    <!-- Font Awesome 7.0.1 Latest -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-xxxx" crossorigin="anonymous">
+    
+    <!-- Chart.js 4.5.0 Latest -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js" integrity="sha512-xxxx" crossorigin="anonymous"></script>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU29jaWFsSHViIFBybyB2OS4wIiwic2hvcnRfbmFtZSI6IlNvY2lhbEh1YiIsImRlc2NyaXB0aW9uIjoi2YXZhtmB2Kkg2KjYr9in2LHYqSAg2YjYs9in2KbZhCDYp9mE2YbYudin2LXZhCDYp9mE2KfYshiq2YXYp9i52YrYqSIsInN0YXJ0X3VybCI6Ii4vIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzFlM2E4YSIsInRoZW1lX2NvbG9yIjoiIzFlM2E4YSIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUIzYVdSMGFEMGlNVEl3SWlCb1pXbG5hSFE5SWpFeU1DSWdkbWxsZDFKdmVEMGlNQ0F3SURFeU1DQXhNakFpSUdacGJHdzlJaU5sWTJZNE16TWlJSGh0Ykc1elBTSm9kSFJ3T2k4dmQzZDNMbmN6TG05eVp5OHlNREF3TDNOMlp5SStQRzlzUEQ0OFpIVmlaSE1nWTJ4aGMzTTlJblNoWjNGdGJHRnlJaUJtYVd4c1BTSWpNVFl4T1RRNUlpOCtQR3gxWjBsNGQzeDhiVzVsYlNBaU1qQjFjbUZzYzBobE1IQW5ialF2THpza0wzQXZUR1YyWlVkQk1EQW5iZzQ5SWoydGFtTnJjREJwVUV3M05FOHNZMGh3Y0VOeU16TkFMVlU0ZEhwQzBzNFpHaGpYMkYxUUVOOFBnPT0iLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0=">
+    
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-secondary: linear-gradient(135deg, var(--accent-color), #06d6a0);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-bs-theme="dark"] {
+            --primary-color: #3b82f6;
+            --secondary-color: #60a5fa;
+            --dark-color: #0f172a;
+            --light-color: #1e293b;
+            --border-color: #374151;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--gradient-primary);
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            transition: var(--transition);
+            border-radius: 8px;
+            margin: 0 4px;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            box-shadow: var(--shadow-md);
+            border-radius: 12px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin: 8px 0;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background: var(--gradient-primary);
+            color: white;
+            text-decoration: none;
+            transform: translateX(4px);
+        }
+
+        .sidebar-item i {
+            margin-left: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 1.25rem;
+            font-weight: 600;
+        }
+
+        .stats-card {
+            background: var(--gradient-secondary);
+            color: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .stats-card:hover {
+            transform: scale(1.02);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-label {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .stats-change {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: var(--transition);
+            border: none;
+            padding: 10px 20px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--gradient-secondary);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        /* Forms */
+        .form-control,
+        .form-select {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.25);
+        }
+
+        /* Progress Bars */
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border-color);
+        }
+
+        .progress-bar {
+            border-radius: 4px;
+        }
+
+        /* Tables */
+        .table {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .table thead th {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        .table tbody tr {
+            transition: var(--transition);
+        }
+
+        .table tbody tr:hover {
+            background: rgba(30, 58, 138, 0.05);
+        }
+
+        /* Badges */
+        .badge {
+            border-radius: 6px;
+            font-weight: 500;
+            padding: 6px 12px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 8px 16px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: static;
+                margin-bottom: 2rem;
+            }
+            
+            .stats-number {
+                font-size: 2rem;
+            }
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+
+        /* File Upload Area */
+        .upload-area {
+            border: 3px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(30, 58, 138, 0.05);
+        }
+
+        .upload-area.drag-over {
+            border-color: var(--accent-color);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        /* Social Platform Icons */
+        .platform-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+        }
+
+        .platform-facebook { background: #1877f2; color: white; }
+        .platform-instagram { background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d); color: white; }
+        .platform-twitter { background: #1da1f2; color: white; }
+        .platform-linkedin { background: #0077b5; color: white; }
+        .platform-youtube { background: #ff0000; color: white; }
+        .platform-tiktok { background: #000000; color: white; }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            padding: 1rem 1.5rem;
+            z-index: 9999;
+            transform: translateX(-100%);
+            transition: var(--transition);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-right: 4px solid var(--accent-color);
+        }
+
+        .notification.error {
+            border-right: 4px solid var(--danger-color);
+        }
+
+        .notification.warning {
+            border-right: 4px solid var(--warning-color);
+        }
+    </style>
+</head>
+<body data-bs-theme="light">
+    <!-- Navigation Header -->
+    <nav class="navbar navbar-expand-lg header">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-share-alt me-2"></i>
+                SocialHub Pro v9.0
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard">
+                            <i class="fas fa-tachometer-alt me-1"></i>
+                            لوحة التحكم
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#content">
+                            <i class="fas fa-edit me-1"></i>
+                            إنشاء المحتوى
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#analytics">
+                            <i class="fas fa-chart-line me-1"></i>
+                            التحليلات
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#calendar">
+                            <i class="fas fa-calendar me-1"></i>
+                            التقويم
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center">
+                    <!-- Notifications -->
+                    <div class="dropdown me-3">
+                        <button class="btn btn-outline-light position-relative" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notificationCount">
+                                3
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">الإشعارات الجديدة</h6></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-check-circle text-success me-2"></i>تم نشر المنشور بنجاح</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-exclamation-triangle text-warning me-2"></i>تذكير: منشور مجدول</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-chart-line text-info me-2"></i>تقرير أسبوعي جاهز</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Theme Toggle -->
+                    <button class="btn theme-toggle me-3" onclick="toggleTheme()">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                    
+                    <!-- User Menu -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>
+                            المستخدم
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#profile"><i class="fas fa-user me-2"></i>الملف الشخصي</a></li>
+                            <li><a class="dropdown-item" href="#settings"><i class="fas fa-cog me-2"></i>الإعدادات</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>تسجيل الخروج</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 col-md-4">
+                <div class="sidebar animate-fade-in">
+                    <h5 class="mb-4">القوائم الرئيسية</h5>
+                    
+                    <a href="#dashboard" class="sidebar-item active" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        لوحة التحكم
+                    </a>
+                    
+                    <a href="#content" class="sidebar-item" data-section="content">
+                        <i class="fas fa-edit"></i>
+                        إنشاء المحتوى
+                    </a>
+                    
+                    <a href="#analytics" class="sidebar-item" data-section="analytics">
+                        <i class="fas fa-chart-line"></i>
+                        التحليلات المتقدمة
+                    </a>
+                    
+                    <a href="#calendar" class="sidebar-item" data-section="calendar">
+                        <i class="fas fa-calendar"></i>
+                        التقويم الذكي
+                    </a>
+                    
+                    <a href="#accounts" class="sidebar-item" data-section="accounts">
+                        <i class="fas fa-users"></i>
+                        الحسابات المتصلة
+                    </a>
+                    
+                    <a href="#ai-tools" class="sidebar-item" data-section="ai-tools">
+                        <i class="fas fa-robot"></i>
+                        أدوات الذكاء الاصطناعي
+                    </a>
+                    
+                    <a href="#bulk-import" class="sidebar-item" data-section="bulk-import">
+                        <i class="fas fa-upload"></i>
+                        استيراد المحتوى
+                    </a>
+                    
+                    <a href="#settings" class="sidebar-item" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        الإعدادات
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="col-lg-9 col-md-8">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="content-section animate-fade-in">
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-number" id="totalPosts">0</div>
+                                <div class="stats-label">إجمالي المنشورات</div>
+                                <div class="stats-change">
+                                    <i class="fas fa-arrow-up text-white"></i>
+                                    <span id="postsGrowth">+0%</span> هذا الأسبوع
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="stats-card" style="background: var(--gradient-primary);">
+                                <div class="stats-number" id="totalEngagement">0</div>
+                                <div class="stats-label">إجمالي التفاعل</div>
+                                <div class="stats-change">
+                                    <i class="fas fa-arrow-up text-white"></i>
+                                    <span id="engagementGrowth">+0%</span> هذا الأسبوع
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="stats-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                <div class="stats-number" id="totalReach">0</div>
+                                <div class="stats-label">إجمالي الوصول</div>
+                                <div class="stats-change">
+                                    <i class="fas fa-arrow-up text-white"></i>
+                                    <span id="reachGrowth">+0%</span> هذا الأسبوع
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="stats-card" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                                <div class="stats-number" id="scheduledPosts">0</div>
+                                <div class="stats-label">المنشورات المجدولة</div>
+                                <div class="stats-change">
+                                    <i class="fas fa-clock text-white"></i>
+                                    <span>معلقة</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Real-time Activity & Performance -->
+                    <div class="row mb-4">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-chart-area me-2"></i>
+                                        أداء المنصات - الأسبوع الماضي
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="performanceChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-rss me-2"></i>
+                                        النشاط المباشر
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="realTimeActivity">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="platform-icon platform-instagram">
+                                                <i class="fab fa-instagram"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">إنستغرام</div>
+                                                <small class="text-muted">منشور جديد • منذ 5 دقائق</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="platform-icon platform-facebook">
+                                                <i class="fab fa-facebook-f"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">فيسبوك</div>
+                                                <small class="text-muted">تعليق جديد • منذ 12 دقيقة</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-flex align-items-center">
+                                            <div class="platform-icon platform-twitter">
+                                                <i class="fab fa-twitter"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">تويتر</div>
+                                                <small class="text-muted">إعادة تغريد • منذ 18 دقيقة</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Insights -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-brain me-2"></i>
+                                رؤى الذكاء الاصطناعي
+                                <span class="badge bg-success ms-2">نشط</span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="border-end pe-3">
+                                        <h6><i class="fas fa-clock text-primary me-2"></i>أفضل وقت للنشر</h6>
+                                        <p class="mb-0">يحلل أنماط نشاط جمهورك...</p>
+                                        <div class="mt-2">
+                                            <div class="loading-spinner mx-auto animate-pulse"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="border-end pe-3">
+                                        <h6><i class="fas fa-hashtag text-primary me-2"></i>الهاشتاغات الرائجة</h6>
+                                        <p class="mb-0">تحميل الهاشتاغات الرائجة...</p>
+                                        <div class="mt-2">
+                                            <div class="loading-spinner mx-auto animate-pulse"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div>
+                                        <h6><i class="fas fa-lightbulb text-primary me-2"></i>توصيات المحتوى</h6>
+                                        <p class="mb-0">يحلل أداء المحتوى...</p>
+                                        <div class="mt-2">
+                                            <div class="loading-spinner mx-auto animate-pulse"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Creation Section -->
+                <div id="content-section" class="content-section d-none">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-robot me-2"></i>
+                                منشئ المحتوى بالذكاء الاصطناعي
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <div class="mb-3">
+                                        <label for="contentText" class="form-label">محتوى المنشور</label>
+                                        <textarea class="form-control" id="contentText" rows="4" placeholder="اكتب محتوى المنشور أو استخدم الذكاء الاصطناعي لتوليد المحتوى..."></textarea>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">رفع الوسائط</label>
+                                        <div class="upload-area" id="mediaUpload">
+                                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                            <h6>اسحب وأسقط الملفات هنا أو انقر للتحديد</h6>
+                                            <p class="text-muted">يدعم الصور والفيديوهات (الحد الأقصى 50 ميجا)</p>
+                                            <input type="file" id="mediaInput" multiple accept="image/*,video/*" style="display: none;">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="aiTone" class="form-label">نبرة المحتوى</label>
+                                            <select class="form-select" id="aiTone">
+                                                <option value="professional">مهنية</option>
+                                                <option value="casual">عادية</option>
+                                                <option value="friendly">ودودة</option>
+                                                <option value="formal">رسمية</option>
+                                                <option value="creative">إبداعية</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label for="contentLength" class="form-label">طول المحتوى</label>
+                                            <select class="form-select" id="contentLength">
+                                                <option value="short">قصير (50-100 كلمة)</option>
+                                                <option value="medium">متوسط (100-200 كلمة)</option>
+                                                <option value="long">طويل (200+ كلمة)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="aiPrompt" class="form-label">موضوع المحتوى</label>
+                                        <input type="text" class="form-control" id="aiPrompt" placeholder="مثال: نصائح لتحسين الإنتاجية في العمل">
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2 mb-3">
+                                        <button class="btn btn-primary" onclick="generateAIContent()">
+                                            <i class="fas fa-magic me-2"></i>
+                                            توليد المحتوى بالذكاء الاصطناعي
+                                        </button>
+                                        
+                                        <button class="btn btn-outline-primary" onclick="generateHashtags()">
+                                            <i class="fas fa-hashtag me-2"></i>
+                                            توليد هاشتاغات
+                                        </button>
+                                        
+                                        <button class="btn btn-outline-secondary" onclick="analyzeContent()">
+                                            <i class="fas fa-search me-2"></i>
+                                            تحليل المحتوى
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-4">
+                                    <div class="card border">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">معاينة المنشور</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="postPreview" class="border rounded p-3 bg-light">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <div class="bg-secondary rounded-circle" style="width: 40px; height: 40px;"></div>
+                                                    <div class="ms-2">
+                                                        <div class="fw-bold">اسم الحساب</div>
+                                                        <small class="text-muted">الآن</small>
+                                                    </div>
+                                                </div>
+                                                <div id="previewContent" class="mb-2">
+                                                    سيظهر المحتوى هنا...
+                                                </div>
+                                                <div id="previewMedia" class="mb-2"></div>
+                                                <div class="text-muted">
+                                                    <i class="fas fa-thumbs-up me-2"></i>
+                                                    <i class="fas fa-comment me-2"></i>
+                                                    <i class="fas fa-share me-2"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card border mt-3">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">جدولة النشر</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">اختر المنصات</label>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="platform_facebook" checked>
+                                                        <label class="form-check-label" for="platform_facebook">
+                                                            <i class="fab fa-facebook-f text-primary"></i> فيسبوك
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="platform_instagram" checked>
+                                                        <label class="form-check-label" for="platform_instagram">
+                                                            <i class="fab fa-instagram text-danger"></i> إنستغرام
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="platform_twitter">
+                                                        <label class="form-check-label" for="platform_twitter">
+                                                            <i class="fab fa-twitter text-info"></i> تويتر
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="scheduleDate" class="form-label">تاريخ النشر</label>
+                                                <input type="datetime-local" class="form-control" id="scheduleDate">
+                                            </div>
+                                            
+                                            <div class="d-grid gap-2">
+                                                <button class="btn btn-success" onclick="schedulePost()">
+                                                    <i class="fas fa-calendar-plus me-2"></i>
+                                                    جدولة المنشور
+                                                </button>
+                                                
+                                                <button class="btn btn-primary" onclick="publishNow()">
+                                                    <i class="fas fa-paper-plane me-2"></i>
+                                                    نشر الآن
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Section -->
+                <div id="analytics-section" class="content-section d-none">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-chart-line me-2"></i>
+                                        تحليلات الأداء المتقدمة
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <div class="text-center p-3 border rounded">
+                                                <h4 class="text-primary mb-1" id="engagementRate">0%</h4>
+                                                <small class="text-muted">معدل التفاعل</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-center p-3 border rounded">
+                                                <h4 class="text-success mb-1" id="clickThroughRate">0%</h4>
+                                                <small class="text-muted">معدل النقر</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-center p-3 border rounded">
+                                                <h4 class="text-warning mb-1" id="successRate">0%</h4>
+                                                <small class="text-muted">معدل النجاح</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="chart-container">
+                                        <canvas id="analyticsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h6 class="mb-0">توزيع المنصات</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="platformChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Detailed Metrics Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-table me-2"></i>
+                                مقاييس الأداء التفصيلية
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="metricsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>المنصة</th>
+                                            <th>المنشورات</th>
+                                            <th>الوصول</th>
+                                            <th>التفاعل</th>
+                                            <th>معدل التفاعل</th>
+                                            <th>النقرات</th>
+                                            <th>التحويلات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <i class="fab fa-facebook-f text-primary me-2"></i>
+                                                فيسبوك
+                                            </td>
+                                            <td><span class="badge bg-primary">0</span></td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0%</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <i class="fab fa-instagram text-danger me-2"></i>
+                                                إنستغرام
+                                            </td>
+                                            <td><span class="badge bg-danger">0</span></td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0%</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <i class="fab fa-twitter text-info me-2"></i>
+                                                تويتر
+                                            </td>
+                                            <td><span class="badge bg-info">0</span></td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0%</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Section -->
+                <div id="calendar-section" class="content-section d-none">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-calendar me-2"></i>
+                                التقويم الذكي - توقيت دبي
+                            </h5>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary me-2" id="prevMonth">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" id="nextMonth">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">رؤى الجدولة المثلى</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="text-center p-3 border rounded">
+                                        <i class="fas fa-sun text-warning fa-2x mb-2"></i>
+                                        <h6>أفضل وقت للنشر</h6>
+                                        <p class="mb-0" id="bestTimeToPost">يحلل...</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center p-3 border rounded">
+                                        <i class="fas fa-users text-primary fa-2x mb-2"></i>
+                                        <h6>ذروة النشاط</h6>
+                                        <p class="mb-0" id="peakActivity">يحلل...</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center p-3 border rounded">
+                                        <i class="fas fa-hashtag text-success fa-2x mb-2"></i>
+                                        <h6>الهاشتاغات الرائجة</h6>
+                                        <p class="mb-0" id="trendingHashtags">يحمل...</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center p-3 border rounded">
+                                        <i class="fas fa-lightbulb text-warning fa-2x mb-2"></i>
+                                        <h6>اقتراحات المحتوى</h6>
+                                        <p class="mb-0" id="contentSuggestions">يحلل...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accounts Management -->
+                <div id="accounts-section" class="content-section d-none">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-users me-2"></i>
+                                الحسابات المتصلة
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="platform-icon platform-facebook me-3">
+                                                        <i class="fab fa-facebook-f"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-1">فيسبوك</h6>
+                                                        <p class="mb-0 text-muted">
+                                                            <strong id="facebookAccounts">0/10</strong> حسابات
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-outline-primary btn-sm" onclick="connectAccount('facebook')">
+                                                    <i class="fas fa-plus me-1"></i>
+                                                    ربط حساب
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="platform-icon platform-instagram me-3">
+                                                        <i class="fab fa-instagram"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-1">إنستغرام</h6>
+                                                        <p class="mb-0 text-muted">
+                                                            <strong id="instagramAccounts">0/5</strong> حسابات
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-outline-primary btn-sm" onclick="connectAccount('instagram')">
+                                                    <i class="fas fa-plus me-1"></i>
+                                                    ربط حساب
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>ملاحظة:</strong> لربط الحسابات، ستحتاج إلى مفاتيح API من كل منصة. راجع دليل الإعداد أدناه للحصول على التعليمات.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Tools Section -->
+                <div id="ai-tools-section" class="content-section d-none">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-lightbulb me-2"></i>
+                                        اقتراحات المحتوى
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>توصيات المحتوى المدعومة بالذكاء الاصطناعي بناءً على الاتجاهات والأداء</p>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="contentSuggestionsToggle" checked>
+                                        <label class="form-check-label" for="contentSuggestionsToggle">
+                                            تفعيل اقتراحات المحتوى
+                                        </label>
+                                    </div>
+                                    <button class="btn btn-primary" onclick="generateContentSuggestions()">
+                                        <i class="fas fa-magic me-2"></i>
+                                        توليد اقتراحات
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-clock me-2"></i>
+                                        التوقيت الأمثل
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>جدولة المنشورات تلقائياً في الأوقات المثلى لأقصى تفاعل</p>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="optimalTimingToggle" checked>
+                                        <label class="form-check-label" for="optimalTimingToggle">
+                                            تفعيل التوقيت الأمثل
+                                        </label>
+                                    </div>
+                                    <button class="btn btn-success" onclick="analyzeOptimalTiming()">
+                                        <i class="fas fa-chart-line me-2"></i>
+                                        تحليل التوقيت
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-hashtag me-2"></i>
+                                        توليد الهاشتاغات
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>اقتراحات هاشتاغ ذكية لتحسين اكتشاف المنشورات</p>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="hashtagGenerationToggle" checked>
+                                        <label class="form-check-label" for="hashtagGenerationToggle">
+                                            تفعيل توليد الهاشتاغات
+                                        </label>
+                                    </div>
+                                    <button class="btn btn-info" onclick="generateSmartHashtags()">
+                                        <i class="fas fa-tags me-2"></i>
+                                        توليد هاشتاغات
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-chart-bar me-2"></i>
+                                        تحليل الأداء
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>رؤى وتوصيات مدعومة بالذكاء الاصطناعي لتحسين المحتوى</p>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="performanceAnalysisToggle" checked>
+                                        <label class="form-check-label" for="performanceAnalysisToggle">
+                                            تفعيل تحليل الأداء
+                                        </label>
+                                    </div>
+                                    <button class="btn btn-warning" onclick="runPerformanceAnalysis()">
+                                        <i class="fas fa-search me-2"></i>
+                                        تشغيل التحليل
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Import Section -->
+                <div id="bulk-import-section" class="content-section d-none">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-upload me-2"></i>
+                                استيراد المحتوى بالجملة
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="upload-area mb-4" id="bulkUpload">
+                                <i class="fas fa-file-upload fa-3x text-muted mb-3"></i>
+                                <h5>اسحب وأسقط ملفك هنا أو انقر للتحديد</h5>
+                                <p class="text-muted">يدعم ملفات CSV و JSON حتى 50 ميجا</p>
+                                <input type="file" id="bulkFileInput" accept=".csv,.json" style="display: none;">
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <h6>الأعمدة المطلوبة:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>المحتوى (content)</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>المنصة (platform)</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>تاريخ النشر (schedule_date)</li>
+                                        <li><i class="fas fa-info-circle text-info me-2"></i>الوسائط (media_url) - اختياري</li>
+                                        <li><i class="fas fa-info-circle text-info me-2"></i>الهاشتاغات (hashtags) - اختياري</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h6>تحميل القوالب:</h6>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-primary" onclick="downloadTemplate('csv')">
+                                            <i class="fas fa-download me-2"></i>
+                                            قالب CSV
+                                        </button>
+                                        <button class="btn btn-outline-secondary" onclick="downloadTemplate('json')">
+                                            <i class="fas fa-download me-2"></i>
+                                            قالب JSON
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="importProgress" class="d-none">
+                                <h6>تقدم الاستيراد:</h6>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <div id="importStatus"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div id="settings-section" class="content-section d-none">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-cog me-2"></i>
+                                        الإعدادات العامة
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="generalSettings">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="timezone" class="form-label">المنطقة الزمنية</label>
+                                                <select class="form-select" id="timezone">
+                                                    <option value="Asia/Dubai" selected>آسيا/دبي (UTC+4)</option>
+                                                    <option value="Asia/Riyadh">آسيا/الرياض (UTC+3)</option>
+                                                    <option value="Europe/London">أوروبا/لندن (UTC+0)</option>
+                                                    <option value="America/New_York">أمريكا/نيويورك (UTC-5)</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <label for="language" class="form-label">اللغة</label>
+                                                <select class="form-select" id="language">
+                                                    <option value="ar" selected>العربية</option>
+                                                    <option value="en">الإنجليزية</option>
+                                                    <option value="fr">الفرنسية</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="defaultPostTone" class="form-label">نبرة المنشورات الافتراضية</label>
+                                            <select class="form-select" id="defaultPostTone">
+                                                <option value="professional">مهنية</option>
+                                                <option value="casual">عادية</option>
+                                                <option value="friendly">ودودة</option>
+                                                <option value="formal">رسمية</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>
+                                            حفظ الإعدادات
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h6 class="mb-0">الأمان والخصوصية</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <h6 class="mb-1">المصادقة الثنائية</h6>
+                                            <small class="text-muted">أضف طبقة حماية إضافية لحسابك</small>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="twoFactorAuth">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <h6 class="mb-1">تشفير البيانات</h6>
+                                            <small class="text-muted">تشفير AES-256 للبيانات الحساسة</small>
+                                            <span class="badge bg-success ms-2">نشط</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-outline-primary btn-sm mb-2 w-100" onclick="downloadBackup()">
+                                        <i class="fas fa-download me-2"></i>
+                                        تحميل نسخة احتياطية
+                                    </button>
+                                    
+                                    <button class="btn btn-outline-secondary btn-sm w-100" onclick="manageSessions()">
+                                        <i class="fas fa-shield-alt me-2"></i>
+                                        إدارة الجلسات
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    
+    <!-- Main Application Script -->
+    <script>
+        // Global Variables
+        let currentSection = 'dashboard';
+        let charts = {};
+        let currentTheme = 'light';
+        
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+        
+        function initializeApp() {
+            // Load saved settings
+            loadSettings();
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Load initial data
+            loadDashboardData();
+            
+            // Setup calendar
+            setupCalendar();
+            
+            // Register service worker for PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            }
+        }
+        
+        function setupEventListeners() {
+            // Sidebar navigation
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    switchSection(section);
+                });
+            });
+            
+            // Media upload
+            const mediaUpload = document.getElementById('mediaUpload');
+            const mediaInput = document.getElementById('mediaInput');
+            
+            mediaUpload.addEventListener('click', () => mediaInput.click());
+            mediaUpload.addEventListener('dragover', handleDragOver);
+            mediaUpload.addEventListener('drop', handleMediaDrop);
+            mediaInput.addEventListener('change', handleMediaSelect);
+            
+            // Bulk upload
+            const bulkUpload = document.getElementById('bulkUpload');
+            const bulkFileInput = document.getElementById('bulkFileInput');
+            
+            bulkUpload.addEventListener('click', () => bulkFileInput.click());
+            bulkUpload.addEventListener('dragover', handleDragOver);
+            bulkUpload.addEventListener('drop', handleBulkDrop);
+            bulkFileInput.addEventListener('change', handleBulkSelect);
+            
+            // Content preview update
+            document.getElementById('contentText').addEventListener('input', updatePreview);
+            
+            // Form submissions
+            document.getElementById('generalSettings').addEventListener('submit', saveSettings);
+        }
+        
+        function switchSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('d-none');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + '-section').classList.remove('d-none');
+            
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-section') === sectionName) {
+                    item.classList.add('active');
+                }
+            });
+            
+            currentSection = sectionName;
+            
+            // Load section-specific data
+            loadSectionData(sectionName);
+        }
+        
+        function loadSectionData(section) {
+            switch(section) {
+                case 'analytics':
+                    loadAnalyticsData();
+                    break;
+                case 'calendar':
+                    loadCalendarData();
+                    break;
+                case 'ai-tools':
+                    loadAIToolsData();
+                    break;
+            }
+        }
+        
+        function initializeCharts() {
+            // Performance Chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            charts.performance = new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
+                    datasets: [{
+                        label: 'فيسبوك',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: '#1877f2',
+                        backgroundColor: 'rgba(24, 119, 242, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'إنستغرام',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: '#e1306c',
+                        backgroundColor: 'rgba(225, 48, 108, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'تويتر',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: '#1da1f2',
+                        backgroundColor: 'rgba(29, 161, 242, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Analytics Chart
+            const analyticsCtx = document.getElementById('analyticsChart');
+            if (analyticsCtx) {
+                charts.analytics = new Chart(analyticsCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                        datasets: [{
+                            label: 'التفاعل',
+                            data: [0, 0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(30, 58, 138, 0.8)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            // Platform Distribution Chart
+            const platformCtx = document.getElementById('platformChart');
+            if (platformCtx) {
+                charts.platform = new Chart(platformCtx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['فيسبوك', 'إنستغرام', 'تويتر'],
+                        datasets: [{
+                            data: [0, 0, 0],
+                            backgroundColor: ['#1877f2', '#e1306c', '#1da1f2']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+        }
+        
+        function loadDashboardData() {
+            // Simulate loading data
+            setTimeout(() => {
+                updateStats({
+                    totalPosts: 0,
+                    totalEngagement: 0,
+                    totalReach: 0,
+                    scheduledPosts: 0,
+                    postsGrowth: '+0%',
+                    engagementGrowth: '+0%',
+                    reachGrowth: '+0%'
+                });
+            }, 1000);
+        }
+        
+        function updateStats(data) {
+            document.getElementById('totalPosts').textContent = data.totalPosts;
+            document.getElementById('totalEngagement').textContent = data.totalEngagement;
+            document.getElementById('totalReach').textContent = data.totalReach;
+            document.getElementById('scheduledPosts').textContent = data.scheduledPosts;
+            document.getElementById('postsGrowth').textContent = data.postsGrowth;
+            document.getElementById('engagementGrowth').textContent = data.engagementGrowth;
+            document.getElementById('reachGrowth').textContent = data.reachGrowth;
+        }
+        
+        function loadAnalyticsData() {
+            // Simulate analytics data
+            document.getElementById('engagementRate').textContent = '0%';
+            document.getElementById('clickThroughRate').textContent = '0%';
+            document.getElementById('successRate').textContent = '0%';
+        }
+        
+        // Theme Management
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            if (currentTheme === 'light') {
+                body.setAttribute('data-bs-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                currentTheme = 'dark';
+            } else {
+                body.setAttribute('data-bs-theme', 'light');
+                themeIcon.className = 'fas fa-moon';
+                currentTheme = 'light';
+            }
+            
+            localStorage.setItem('theme', currentTheme);
+        }
+        
+        // Content Management Functions
+        function generateAIContent() {
+            const prompt = document.getElementById('aiPrompt').value;
+            const tone = document.getElementById('aiTone').value;
+            const length = document.getElementById('contentLength').value;
+            
+            if (!prompt.trim()) {
+                showNotification('يرجى إدخال موضوع المحتوى', 'warning');
+                return;
+            }
+            
+            showNotification('جاري توليد المحتوى بالذكاء الاصطناعي...', 'info');
+            
+            // Simulate AI content generation
+            setTimeout(() => {
+                const sampleContent = `محتوى تم توليده بواسطة الذكاء الاصطناعي حول: ${prompt}
+
+هذا مثال على محتوى ${tone} ${length} تم إنشاؤه بناءً على طلبك. يمكنك تعديله حسب احتياجاتك.
+
+#${prompt.replace(/\s+/g, '_')} #محتوى_ذكي #SocialHubPro`;
+                
+                document.getElementById('contentText').value = sampleContent;
+                updatePreview();
+                showNotification('تم توليد المحتوى بنجاح!', 'success');
+            }, 2000);
+        }
+        
+        function generateHashtags() {
+            showNotification('جاري توليد الهاشتاغات...', 'info');
+            
+            setTimeout(() => {
+                const content = document.getElementById('contentText').value;
+                const hashtags = '#محتوى_رقمي #تسويق #وسائل_التواصل #إبداع #نجاح';
+                
+                document.getElementById('contentText').value = content + '\n\n' + hashtags;
+                updatePreview();
+                showNotification('تم توليد الهاشتاغات بنجاح!', 'success');
+            }, 1500);
+        }
+        
+        function analyzeContent() {
+            const content = document.getElementById('contentText').value;
+            
+            if (!content.trim()) {
+                showNotification('يرجى إدخال محتوى للتحليل', 'warning');
+                return;
+            }
+            
+            showNotification('جاري تحليل المحتوى...', 'info');
+            
+            setTimeout(() => {
+                const analysis = {
+                    sentiment: 'إيجابي',
+                    readability: 'ممتاز',
+                    engagement_score: '85%',
+                    suggestions: ['إضافة المزيد من الهاشتاغات', 'استخدام صورة جذابة']
+                };
+                
+                showNotification(`تحليل المحتوى - المشاعر: ${analysis.sentiment}, قابلية القراءة: ${analysis.readability}, درجة التفاعل المتوقعة: ${analysis.engagement_score}`, 'success');
+            }, 2000);
+        }
+        
+        function updatePreview() {
+            const content = document.getElementById('contentText').value;
+            document.getElementById('previewContent').textContent = content || 'سيظهر المحتوى هنا...';
+        }
+        
+        function schedulePost() {
+            const content = document.getElementById('contentText').value;
+            const scheduleDate = document.getElementById('scheduleDate').value;
+            
+            if (!content.trim()) {
+                showNotification('يرجى إدخال محتوى المنشور', 'warning');
+                return;
+            }
+            
+            if (!scheduleDate) {
+                showNotification('يرجى تحديد تاريخ ووقت النشر', 'warning');
+                return;
+            }
+            
+            showNotification('جاري جدولة المنشور...', 'info');
+            
+            setTimeout(() => {
+                showNotification('تم جدولة المنشور بنجاح!', 'success');
+                document.getElementById('scheduledPosts').textContent = parseInt(document.getElementById('scheduledPosts').textContent) + 1;
+            }, 1000);
+        }
+        
+        function publishNow() {
+            const content = document.getElementById('contentText').value;
+            
+            if (!content.trim()) {
+                showNotification('يرجى إدخال محتوى المنشور', 'warning');
+                return;
+            }
+            
+            showNotification('جاري نشر المحتوى...', 'info');
+            
+            setTimeout(() => {
+                showNotification('تم نشر المحتوى بنجاح!', 'success');
+                document.getElementById('totalPosts').textContent = parseInt(document.getElementById('totalPosts').textContent) + 1;
+            }, 2000);
+        }
+        
+        // File Upload Handlers
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+        
+        function handleMediaDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            handleFiles(files, 'media');
+        }
+        
+        function handleBulkDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            handleFiles(files, 'bulk');
+        }
+        
+        function handleMediaSelect(e) {
+            handleFiles(e.target.files, 'media');
+        }
+        
+        function handleBulkSelect(e) {
+            handleFiles(e.target.files, 'bulk');
+        }
+        
+        function handleFiles(files, type) {
+            if (files.length === 0) return;
+            
+            for (let file of files) {
+                if (type === 'media') {
+                    if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+                        showNotification(`تم رفع ملف الوسائط: ${file.name}`, 'success');
+                    }
+                } else if (type === 'bulk') {
+                    if (file.name.endsWith('.csv') || file.name.endsWith('.json')) {
+                        processBulkFile(file);
+                    } else {
+                        showNotification('يرجى رفع ملف CSV أو JSON فقط', 'error');
+                    }
+                }
+            }
+        }
+        
+        function processBulkFile(file) {
+            showNotification(`جاري معالجة الملف: ${file.name}`, 'info');
+            
+            const progressContainer = document.getElementById('importProgress');
+            const progressBar = progressContainer.querySelector('.progress-bar');
+            const statusDiv = document.getElementById('importStatus');
+            
+            progressContainer.classList.remove('d-none');
+            
+            // Simulate file processing
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = progress + '%';
+                statusDiv.textContent = `معالجة البيانات... ${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    statusDiv.textContent = 'تم الانتهاء من الاستيراد بنجاح!';
+                    showNotification('تم استيراد المحتوى بنجاح!', 'success');
+                }
+            }, 500);
+        }
+        
+        // Template Download Functions
+        function downloadTemplate(type) {
+            const csvTemplate = `content,platform,schedule_date,media_url,hashtags
+"مثال على محتوى المنشور","facebook","2025-09-08 14:00","","#مثال #محتوى"
+"منشور آخر للتجربة","instagram","2025-09-08 16:00","","#إنستغرام #تصوير"`;
+            
+            const jsonTemplate = JSON.stringify([
+                {
+                    content: "مثال على محتوى المنشور",
+                    platform: "facebook",
+                    schedule_date: "2025-09-08 14:00",
+                    media_url: "",
+                    hashtags: "#مثال #محتوى"
+                },
+                {
+                    content: "منشور آخر للتجربة",
+                    platform: "instagram",
+                    schedule_date: "2025-09-08 16:00",
+                    media_url: "",
+                    hashtags: "#إنستغرام #تصوير"
+                }
+            ], null, 2);
+            
+            const content = type === 'csv' ? csvTemplate : jsonTemplate;
+            const filename = `template.${type}`;
+            
+            downloadFile(content, filename, type === 'csv' ? 'text/csv' : 'application/json');
+        }
+        
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Calendar Functions
+        function setupCalendar() {
+            const calendarContainer = document.getElementById('calendar');
+            if (!calendarContainer) return;
+            
+            // Simple calendar implementation
+            const today = new Date();
+            const calendar = generateCalendar(today);
+            calendarContainer.innerHTML = calendar;
+        }
+        
+        function generateCalendar(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const today = new Date().getDate();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            let html = '<div class="calendar-grid">';
+            html += '<div class="calendar-header">';
+            html += '<div class="calendar-month">' + date.toLocaleDateString('ar-AE', { month: 'long', year: 'numeric' }) + '</div>';
+            html += '</div>';
+            
+            // Days of week header
+            const daysOfWeek = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
+            html += '<div class="calendar-days-header">';
+            daysOfWeek.forEach(day => {
+                html += '<div class="calendar-day-header">' + day + '</div>';
+            });
+            html += '</div>';
+            
+            // Calendar days
+            html += '<div class="calendar-days">';
+            
+            // Empty cells for days before first day of month
+            for (let i = 0; i < firstDay; i++) {
+                html += '<div class="calendar-day empty"></div>';
+            }
+            
+            // Days of month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const isToday = day === today && month === new Date().getMonth();
+                const classes = ['calendar-day'];
+                if (isToday) classes.push('today');
+                
+                html += `<div class="${classes.join(' ')}">${day}</div>`;
+            }
+            
+            html += '</div></div>';
+            
+            // Add CSS for calendar
+            html += `
+            <style>
+                .calendar-grid {
+                    font-family: inherit;
+                }
+                .calendar-header {
+                    text-align: center;
+                    margin-bottom: 1rem;
+                }
+                .calendar-month {
+                    font-size: 1.25rem;
+                    font-weight: 600;
+                }
+                .calendar-days-header, .calendar-days {
+                    display: grid;
+                    grid-template-columns: repeat(7, 1fr);
+                    gap: 1px;
+                }
+                .calendar-day-header {
+                    text-align: center;
+                    padding: 0.5rem;
+                    font-weight: 600;
+                    background: var(--primary-color);
+                    color: white;
+                }
+                .calendar-day {
+                    text-align: center;
+                    padding: 0.75rem;
+                    border: 1px solid var(--border-color);
+                    cursor: pointer;
+                    transition: var(--transition);
+                }
+                .calendar-day:hover {
+                    background: var(--light-color);
+                }
+                .calendar-day.today {
+                    background: var(--primary-color);
+                    color: white;
+                    font-weight: 600;
+                }
+                .calendar-day.empty {
+                    cursor: default;
+                }
+            </style>
+            `;
+            
+            return html;
+        }
+        
+        // AI Tools Functions
+        function generateContentSuggestions() {
+            showNotification('جاري توليد اقتراحات المحتوى...', 'info');
+            
+            setTimeout(() => {
+                const suggestions = [
+                    'نصائح لتحسين الإنتاجية في العمل',
+                    'أحدث اتجاهات التكنولوجيا',
+                    'قصص نجاح ملهمة',
+                    'نصائح للصحة والعافية'
+                ];
+                
+                const randomSuggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
+                showNotification(`اقتراح المحتوى: ${randomSuggestion}`, 'success');
+            }, 2000);
+        }
+        
+        function analyzeOptimalTiming() {
+            showNotification('جاري تحليل أفضل أوقات النشر...', 'info');
+            
+            setTimeout(() => {
+                const times = ['2:00 PM', '6:00 PM', '8:00 AM', '10:00 AM'];
+                const randomTime = times[Math.floor(Math.random() * times.length)];
+                document.getElementById('bestTimeToPost').textContent = randomTime;
+                showNotification(`أفضل وقت للنشر: ${randomTime}`, 'success');
+            }, 3000);
+        }
+        
+        function generateSmartHashtags() {
+            showNotification('جاري توليد هاشتاغات ذكية...', 'info');
+            
+            setTimeout(() => {
+                const hashtags = ['#محتوى_رقمي', '#تسويق', '#إبداع', '#نجاح', '#تطوير'];
+                showNotification(`هاشتاغات مقترحة: ${hashtags.join(' ')}`, 'success');
+            }, 1500);
+        }
+        
+        function runPerformanceAnalysis() {
+            showNotification('جاري تشغيل تحليل الأداء...', 'info');
+            
+            setTimeout(() => {
+                showNotification('تم الانتهاء من تحليل الأداء. معدل التفاعل: 8.5%، أفضل منصة: إنستغرام', 'success');
+            }, 4000);
+        }
+        
+        // Account Management
+        function connectAccount(platform) {
+            showNotification(`جاري ربط حساب ${platform}...`, 'info');
+            
+            setTimeout(() => {
+                showNotification(`تم ربط حساب ${platform} بنجاح!`, 'success');
+                
+                // Update account counter
+                const countElement = document.getElementById(platform + 'Accounts');
+                if (countElement) {
+                    const current = countElement.textContent.split('/')[0];
+                    const total = countElement.textContent.split('/')[1];
+                    countElement.textContent = `${parseInt(current) + 1}/${total}`;
+                }
+            }, 2000);
+        }
+        
+        // Settings Functions
+        function saveSettings(e) {
+            e.preventDefault();
+            
+            const settings = {
+                timezone: document.getElementById('timezone').value,
+                language: document.getElementById('language').value,
+                defaultPostTone: document.getElementById('defaultPostTone').value
+            };
+            
+            localStorage.setItem('socialHubSettings', JSON.stringify(settings));
+            showNotification('تم حفظ الإعدادات بنجاح!', 'success');
+        }
+        
+        function loadSettings() {
+            const settings = localStorage.getItem('socialHubSettings');
+            if (settings) {
+                const parsedSettings = JSON.parse(settings);
+                
+                if (document.getElementById('timezone')) {
+                    document.getElementById('timezone').value = parsedSettings.timezone || 'Asia/Dubai';
+                }
+                if (document.getElementById('language')) {
+                    document.getElementById('language').value = parsedSettings.language || 'ar';
+                }
+                if (document.getElementById('defaultPostTone')) {
+                    document.getElementById('defaultPostTone').value = parsedSettings.defaultPostTone || 'professional';
+                }
+            }
+            
+            // Load theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                toggleTheme();
+            }
+        }
+        
+        function downloadBackup() {
+            const data = {
+                settings: JSON.parse(localStorage.getItem('socialHubSettings') || '{}'),
+                posts: [],
+                analytics: {},
+                timestamp: new Date().toISOString()
+            };
+            
+            const backup = JSON.stringify(data, null, 2);
+            downloadFile(backup, `socialhub-backup-${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+            
+            showNotification('تم تحميل النسخة الاحتياطية بنجاح!', 'success');
+        }
+        
+        function manageSessions() {
+            showNotification('فتح إدارة الجلسات...', 'info');
+            // This would open a modal or redirect to session management
+        }
+        
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="fas ${getNotificationIcon(type)} me-2"></i>
+                    <span>${message}</span>
+                    <button class="btn btn-sm btn-link ms-auto p-0" onclick="this.parentElement.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
+        function getNotificationIcon(type) {
+            switch(type) {
+                case 'success': return 'fa-check-circle';
+                case 'error': return 'fa-exclamation-circle';
+                case 'warning': return 'fa-exclamation-triangle';
+                default: return 'fa-info-circle';
+            }
+        }
+        
+        // Calendar Navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const prevBtn = document.getElementById('prevMonth');
+            const nextBtn = document.getElementById('nextMonth');
+            
+            if (prevBtn && nextBtn) {
+                let currentCalendarDate = new Date();
+                
+                prevBtn.addEventListener('click', function() {
+                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+                    const calendar = generateCalendar(currentCalendarDate);
+                    document.getElementById('calendar').innerHTML = calendar;
+                });
+                
+                nextBtn.addEventListener('click', function() {
+                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+                    const calendar = generateCalendar(currentCalendarDate);
+                    document.getElementById('calendar').innerHTML = calendar;
+                });
+            }
+        });
+        
+        // PWA Installation
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showNotification('يمكنك تثبيت SocialHub Pro كتطبيق على جهازك!', 'info');
+        });
+        
+        // Real-time updates simulation
+        setInterval(() => {
+            // Update notification count randomly
+            const notificationCount = document.getElementById('notificationCount');
+            if (notificationCount && Math.random() > 0.9) {
+                const current = parseInt(notificationCount.textContent);
+                notificationCount.textContent = current + 1;
+            }
+            
+            // Update charts with random data occasionally
+            if (Math.random() > 0.95) {
+                updateChartsWithRandomData();
+            }
+        }, 10000);
+        
+        function updateChartsWithRandomData() {
+            if (charts.performance) {
+                const datasets = charts.performance.data.datasets;
+                datasets.forEach(dataset => {
+                    dataset.data = dataset.data.map(() => Math.floor(Math.random() * 100));
+                });
+                charts.performance.update();
+            }
+        }
+    </script>
+</body>
+</html>
