@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialHub Pro v11.0 - المنصة المتقدمة لإدارة وسائل التواصل الاجتماعي</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e3a8a',
+                        secondary: '#3b82f6',
+                        accent: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                        dark: '#1f2937',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        'arabic': ['Tajawal', 'Segoe UI', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Arabic Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-secondary: linear-gradient(135deg, var(--accent-color), #06d6a0);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #3b82f6;
+            --secondary-color: #60a5fa;
+            --dark-color: #0f172a;
+            --light-color: #1e293b;
+            --border-color: #374151;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Tajawal', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: var(--text-primary);
+            transition: var(--transition);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--gradient-primary);
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin: 8px 0;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background: var(--gradient-primary);
+            color: white;
+            text-decoration: none;
+            transform: translateX(4px);
+        }
+
+        .stats-card {
+            background: var(--gradient-secondary);
+            color: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .stats-card:hover {
+            transform: scale(1.02);
+        }
+
+        .platform-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+        }
+
+        .platform-facebook { background: #1877f2; color: white; }
+        .platform-instagram { background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d); color: white; }
+        .platform-twitter { background: #1da1f2; color: white; }
+        .platform-linkedin { background: #0077b5; color: white; }
+
+        .upload-area {
+            border: 3px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(30, 58, 138, 0.05);
+        }
+
+        .calendar-day {
+            text-align: center;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .calendar-day:hover {
+            background: var(--light-color);
+        }
+
+        .calendar-day.today {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-day.has-posts {
+            background: rgba(16, 185, 129, 0.2);
+            position: relative;
+        }
+
+        .notification {
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            padding: 1rem 1.5rem;
+            z-index: 9999;
+            transform: translateX(-100%);
+            transition: var(--transition);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: static;
+                margin-bottom: 2rem;
+            }
+            
+            .stats-number {
+                font-size: 2rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 4px;
+        }
+
+        /* Post preview styles */
+        .post-preview {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            background: white;
+        }
+    </style>
+</head>
+<body class="font-arabic" data-theme="light">
+    <!-- Firebase Configuration -->
+    <script>
+        // استبدل هذه القيم بتفاصيل مشروع Firebase الخاص بك
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKD3QIxJdHw__UG2TEqf0TqyYCnw8wJf8",
+            authDomain: "socialhub-1370d.firebaseapp.com",
+            projectId: "socialhub-1370d",
+            storageBucket: "socialhub-1370d.firebasestorage.app",
+            messagingSenderId: "84815590328",
+            appId: "1:84815590328:web:2f12340380b37c2562d54d"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const storage = firebase.storage();
+    </script>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 flex flex-col items-center">
+            <div class="loading-spinner mb-4"></div>
+            <p class="text-gray-700" id="loadingText">جاري التحميل...</p>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-600 p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+            <div class="p-8">
+                <div class="text-center mb-6">
+                    <i class="fas fa-share-alt text-4xl text-blue-600 mb-3"></i>
+                    <h2 class="text-2xl font-bold text-gray-800">SocialHub Pro</h2>
+                    <p class="text-gray-600">منصة إدارة وسائل التواصل الاجتماعي المتقدمة</p>
+                </div>
+                
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label for="loginEmail" class="block text-gray-700 mb-2">البريد الإلكتروني</label>
+                        <input type="email" id="loginEmail" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="loginPassword" class="block text-gray-700 mb-2">كلمة المرور</label>
+                        <input type="password" id="loginPassword" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    
+                    <div class="flex items-center mb-4">
+                        <input type="checkbox" id="rememberMe" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                        <label for="rememberMe" class="mr-2 block text-sm text-gray-700">تذكرني</label>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition mb-4">تسجيل الدخول</button>
+                    
+                    <div class="text-center">
+                        <a href="#" id="showRegister" class="text-blue-600 text-sm hover:underline">إنشاء حساب جديد</a> | 
+                        <a href="#" id="showForgotPassword" class="text-blue-600 text-sm hover:underline">نسيت كلمة المرور؟</a>
+                    </div>
+                </form>
+                
+                <form id="registerForm" class="hidden">
+                    <div class="mb-4">
+                        <label for="registerName" class="block text-gray-700 mb-2">الاسم الكامل</label>
+                        <input type="text" id="registerName" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="registerEmail" class="block text-gray-700 mb-2">البريد الإلكتروني</label>
+                        <input type="email" id="registerEmail" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="registerPassword" class="block text-gray-700 mb-2">كلمة المرور</label>
+                        <input type="password" id="registerPassword" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="registerConfirmPassword" class="block text-gray-700 mb-2">تأكيد كلمة المرور</label>
+                        <input type="password" id="registerConfirmPassword" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition mb-4">إنشاء حساب</button>
+                    
+                    <div class="text-center">
+                        <a href="#" id="showLogin" class="text-blue-600 text-sm hover:underline">العودة لتسجيل الدخول</a>
+                    </div>
+                </form>
+                
+                <form id="forgotPasswordForm" class="hidden">
+                    <div class="mb-4">
+                        <label for="forgotEmail" class="block text-gray-700 mb-2">البريد الإلكتروني</label>
+                        <input type="email" id="forgotEmail" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-600 transition mb-4">إرسال رابط إعادة التعيين</button>
+                    
+                    <div class="text-center">
+                        <a href="#" id="showLoginFromForgot" class="text-blue-600 text-sm hover:underline">العودة لتسجيل الدخول</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="appContainer" class="hidden">
+        <!-- Header -->
+        <header class="header">
+            <nav class="container mx-auto px-4 py-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-share-alt text-white text-2xl mr-2"></i>
+                        <span class="text-white font-bold text-xl">SocialHub Pro v11.0</span>
+                    </div>
+                    
+                    <div class="hidden md:flex space-x-4">
+                        <a href="#dashboard" class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-lg transition">لوحة التحكم</a>
+                        <a href="#content" class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-lg transition">إنشاء المحتوى</a>
+                        <a href="#analytics" class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-lg transition">التحليلات</a>
+                        <a href="#calendar" class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-lg transition">التقويم</a>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <button id="themeToggle" class="text-white p-2 rounded-full hover:bg-white hover:bg-opacity-10 transition">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </button>
+                        
+                        <div class="relative">
+                            <button class="text-white p-2 rounded-full hover:bg-white hover:bg-opacity-10 transition">
+                                <i class="fas fa-bell"></i>
+                                <span class="absolute top-0 right-0 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center" id="notificationCount">0</span>
+                            </button>
+                        </div>
+                        
+                        <div class="relative">
+                            <button class="flex items-center text-white space-x-2 p-2 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="userName">المستخدم</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            
+                            <div class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden">
+                                <a href="#profile" class="block px-4 py-2 text-gray-800 hover:bg-gray-100"><i class="fas fa-user mr-2"></i>الملف الشخصي</a>
+                                <a href="#settings" class="block px-4 py-2 text-gray-800 hover:bg-gray-100"><i class="fas fa-cog mr-2"></i>الإعدادات</a>
+                                <hr class="my-2">
+                                <a href="#" id="logoutBtn" class="block px-4 py-2 text-gray-800 hover:bg-gray-100"><i class="fas fa-sign-out-alt mr-2"></i>تسجيل الخروج</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row gap-6">
+                <!-- Sidebar -->
+                <aside class="w-full md:w-1/4 bg-white rounded-xl shadow-md p-5">
+                    <h3 class="font-bold text-lg mb-4 text-gray-800">القوائم الرئيسية</h3>
+                    
+                    <div class="space-y-2">
+                        <a href="#dashboard" class="sidebar-item active" data-section="dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>لوحة التحكم</span>
+                        </a>
+                        
+                        <a href="#content" class="sidebar-item" data-section="content">
+                            <i class="fas fa-edit"></i>
+                            <span>إنشاء المحتوى</span>
+                        </a>
+                        
+                        <a href="#analytics" class="sidebar-item" data-section="analytics">
+                            <i class="fas fa-chart-line"></i>
+                            <span>التحليلات المتقدمة</span>
+                        </a>
+                        
+                        <a href="#calendar" class="sidebar-item" data-section="calendar">
+                            <i class="fas fa-calendar"></i>
+                            <span>التقويم الذكي</span>
+                        </a>
+                        
+                        <a href="#accounts" class="sidebar-item" data-section="accounts">
+                            <i class="fas fa-users"></i>
+                            <span>الحسابات المتصلة</span>
+                        </a>
+                        
+                        <a href="#bulk-import" class="sidebar-item" data-section="bulk-import">
+                            <i class="fas fa-upload"></i>
+                            <span>استيراد المحتوى</span>
+                        </a>
+                        
+                        <a href="#auto-posting" class="sidebar-item" data-section="auto-posting">
+                            <i class="fas fa-robot"></i>
+                            <span>النشر التلقائي</span>
+                        </a>
+                        
+                        <a href="#settings" class="sidebar-item" data-section="settings">
+                            <i class="fas fa-cog"></i>
+                            <span>الإعدادات</span>
+                        </a>
+                    </div>
+                    
+                    <div class="mt-8 pt-5 border-t border-gray-200">
+                        <h3 class="font-bold text-lg mb-4 text-gray-800">الإحصائيات السريعة</h3>
+                        
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">إجمالي المنشورات</span>
+                                <span class="font-bold" id="sidebarTotalPosts">0</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">المتصل حالياً</span>
+                                <span class="font-bold" id="sidebarConnectedAccounts">0</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">مجدول للنشر</span>
+                                <span class="font-bold" id="sidebarScheduled">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Content Area -->
+                <div class="w-full md:w-3/4">
+                    <!-- Dashboard Section -->
+                    <section id="dashboard-section" class="content-section">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+                            <div class="stats-card">
+                                <div class="text-3xl font-bold mb-1" id="totalPosts">0</div>
+                                <div class="text-sm opacity-90">إجمالي المنشورات</div>
+                                <div class="text-xs mt-2">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="postsGrowth">+0%</span> هذا الأسبوع
+                                </div>
+                            </div>
+                            
+                            <div class="stats-card" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6);">
+                                <div class="text-3xl font-bold mb-1" id="totalEngagement">0</div>
+                                <div class="text-sm opacity-90">إجمالي التفاعل</div>
+                                <div class="text-xs mt-2">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="engagementGrowth">+0%</span> هذا الأسبوع
+                                </div>
+                            </div>
+                            
+                            <div class="stats-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                <div class="text-3xl font-bold mb-1" id="totalReach">0</div>
+                                <div class="text-sm opacity-90">إجمالي الوصول</div>
+                                <div class="text-xs mt-2">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="reachGrowth">+0%</span> هذا الأسبوع
+                                </div>
+                            </div>
+                            
+                            <div class="stats-card" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                                <div class="text-3xl font-bold mb-1" id="scheduledPosts">0</div>
+                                <div class="text-sm opacity-90">المنشورات المجدولة</div>
+                                <div class="text-xs mt-2">
+                                    <i class="fas fa-clock"></i>
+                                    <span>قيد الانتظار</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+                            <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-5">
+                                <h3 class="font-bold text-lg mb-4 text-gray-800">أداء المنصات - الأسبوع الماضي</h3>
+                                <div class="h-80">
+                                    <canvas id="performanceChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-xl shadow-md p-5">
+                                <h3 class="font-bold text-lg mb-4 text-gray-800">النشاط المباشر</h3>
+                                <div id="realTimeActivity">
+                                    <div class="flex flex-col items-center justify-center h-64">
+                                        <div class="loading-spinner mb-3"></div>
+                                        <p class="text-gray-500">جاري تحميل النشاط...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-md p-5 mb-6">
+                            <h3 class="font-bold text-lg mb-4 text-gray-800">رؤى الذكاء الاصطناعي</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="border-l-4 border-blue-500 pl-3 py-2 bg-blue-50 rounded-r">
+                                    <h4 class="font-semibold text-gray-800"><i class="fas fa-clock text-blue-500 mr-2"></i>أفضل وقت للنشر</h4>
+                                    <p class="text-sm text-gray-600 mt-1">2:00 م - 4:00 م (توقيت دبي)</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-green-500 pl-3 py-2 bg-green-50 rounded-r">
+                                    <h4 class="font-semibold text-gray-800"><i class="fas fa-hashtag text-green-500 mr-2"></i>الهاشتاغات الرائجة</h4>
+                                    <p class="text-sm text-gray-600 mt-1">#تسويق #إبداع #محتوى #SocialHubPro</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-yellow-500 pl-3 py-2 bg-yellow-50 rounded-r">
+                                    <h4 class="font-semibold text-gray-800"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i>توصيات المحتوى</h4>
+                                    <p class="text-sm text-gray-600 mt-1">ركز على المحتوى المرئي لزيادة التفاعل</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                            <div class="bg-white rounded-xl shadow-md p-5">
+                                <h3 class="font-bold text-lg mb-4 text-gray-800">أعلى المنشورات أداءً</h3>
+                                <div id="topPerformingPosts">
+                                    <div class="flex flex-col items-center justify-center h-48">
+                                        <div class="loading-spinner mb-3"></div>
+                                        <p class="text-gray-500">جاري تحميل المنشورات...</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-xl shadow-md p-5">
+                                <h3 class="font-bold text-lg mb-4 text-gray-800">الحسابات المتصلة</h3>
+                                <div id="connectedAccountsWidget">
+                                    <div class="flex flex-col items-center justify-center h-48">
+                                        <div class="loading-spinner mb-3"></div>
+                                        <p class="text-gray-500">جاري تحميل الحسابات...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Bulk Import Section -->
+                    <section id="bulk-import-section" class="content-section hidden">
+                        <div class="bg-white rounded-xl shadow-md p-5 mb-6">
+                            <h3 class="font-bold text-lg mb-4 text-gray-800">استيراد المحتوى بالجملة</h3>
+                            
+                            <div class="upload-area mb-5" id="bulkUploadArea">
+                                <i class="fas fa-file-upload text-4xl text-gray-400 mb-3"></i>
+                                <h4 class="font-semibold">اسحب وأسقط ملف JSON هنا</h4>
+                                <p class="text-gray-500 mt-1">أو <span class="text-blue-500 cursor-pointer" id="browseFiles">استعرض الملفات</span> من جهازك</p>
+                                <input type="file" id="bulkFileInput" class="hidden" accept=".json">
+                                <p class="text-sm text-gray-400 mt-3">الحد الأقصى 1000 منشور في الملف الواحد</p>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-lg p-4 mb-5">
+                                <h4 class="font-semibold mb-3">هيكل ملف JSON المطلوب:</h4>
+                                <pre class="bg-gray-100 p-3 rounded overflow-x-auto text-sm">
+{
+  "posts": [
+    {
+      "socialTitle": "عنوان المنشور",
+      "socialDescription": "وصف المنشور",
+      "shortUrl": "https://example.com/page",
+      "linkType": "article",
+      "socialImage": "https://example.com/image.jpg",
+      "category": "series",
+      "postTime": "09:30",
+      "postDay": "Monday"
+    },
+    ...
+  ]
+}
+                                </pre>
+                                
+                                <div class="mt-4 grid grid-cols-2 gap-4">
+                                    <div>
+                                        <h5 class="font-medium mb-2">الأنواع المتاحة:</h5>
+                                        <ul class="list-disc list-inside text-sm text-gray-600">
+                                            <li>series</li>
+                                            <li>movie</li>
+                                            <li>match</li>
+                                            <li>recipe</li>
+                                            <li>game</li>
+                                            <li>app</li>
+                                            <li>channel</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div>
+                                        <h5 class="font-medium mb-2">أوقات النشر:</h5>
+                                        <ul class="list-disc list-inside text-sm text-gray-600">
+                                            <li>صباح: 9:30, 10:05, 10:55</li>
+                                            <li>ظهر: 12:45, 13:15, 14:05</li>
+                                            <li>مساء: 16:30, 17:17, 18:34</li>
+                                            <li>ليل: 20:30, 22:45, 23:15</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="hidden" id="importProgressSection">
+                                <h4 class="font-semibold mb-3">تقدم الاستيراد:</h4>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-3">
+                                    <div id="importProgressBar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                                <p id="importStatus" class="text-sm text-gray-600">جاري معالجة البيانات...</p>
+                            </div>
+                            
+                            <div class="flex justify-end mt-6">
+                                <button id="startImportBtn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">بدء الاستيراد</button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-md p-5">
+                            <h3 class="font-bold text-lg mb-4 text-gray-800">المنشورات المستوردة</h3>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left text-gray-600">
+                                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-3">العنوان</th>
+                                            <th class="px-4 py-3">النوع</th>
+                                            <th class="px-4 py-3">الوقت</th>
+                                            <th class="px-4 py-3">اليوم</th>
+                                            <th class="px-4 py-3">الحالة</th>
+                                            <th class="px-4 py-3">الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="importedPostsTable">
+                                        <tr>
+                                            <td colspan="6" class="px-4 py-4 text-center text-gray-500">لا توجد منشورات مستوردة</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="mt-4 flex items-center justify-between">
+                                <div class="text-sm text-gray-500">عرض <span id="currentItems">0</span> من <span id="totalItems">0</span> منشور</div>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50" id="prevPageBtn" disabled>السابق</button>
+                                    <button class="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50" id="nextPageBtn" disabled>التالي</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Auto Posting Section -->
+                    <section id="auto-posting-section" class="content-section hidden">
+                        <div class="bg-white rounded-xl shadow-md p-5 mb-6">
+                            <h3 class="font-bold text-lg mb-4 text-gray-800">إعدادات النشر التلقائي</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">الحسابات الشخصية على فيسبوك</label>
+                                    <div class="border border-gray-300 rounded-lg p-3 max-h-48 overflow-y-auto">
+                                        <div id="facebookProfilesList">
+                                            <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                                                <div class="flex items-center">
+                                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-2">
+                                                        <i class="fas fa-user text-blue-500"></i>
+                                                    </div>
+                                                    <span>لم يتم إضافة حسابات بعد</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="mt-2 text-blue-600 text-sm flex items-center" id="addFacebookProfileBtn">
+                                        <i class="fas fa-plus mr-1"></i> إضافة حساب فيسبوك شخصي
+                                    </button>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">صفحات فيسبوك</label>
+                                    <div class="border border-gray-300 rounded-lg p-3 max-h-48 overflow-y-auto">
+                                        <div id="facebookPagesList">
+                                            <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                                                <div class="flex items-center">
+                                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-2">
+                                                        <i class="fas fa-flag text-blue-500"></i>
+                                                    </div>
+                                                    <span>لم يتم إضافة صفحات بعد</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="mt-2 text-blue-600 text-sm flex items-center" id="addFacebookPageBtn">
+                                        <i class="fas fa-plus mr-1"></i> إضافة صفحة فيسبوك
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-5">
+                                <label class="block text-gray-700 mb-2">حسابات إنستغرام</label>
+                                <div class="border border-gray-300 rounded-lg p-3 max-h-48 overflow-y-auto">
+                                    <div id="instagramAccountsList">
+                                        <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                                            <div class="flex items-center">
+                                                <div class="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center mr-2">
+                                                    <i class="fab fa-instagram text-pink-500"></i>
+                                                </div>
+                                                <span>لم يتم إضافة حسابات بعد</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="mt-2 text-blue-600 text-sm flex items-center" id="addInstagramAccountBtn">
+                                    <i class="fas fa-plus mr-1"></i> إضافة حساب إنستغرام
+                                </button>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-lg p-4 mb-5">
+                                <h4 class="font-semibold mb-3">إعدادات النشر التلقائي</h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded text-blue-600 mr-2" id="enableAutoPosting" checked>
+                                            <span>تفعيل النشر التلقائي</span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded text-blue-600 mr-2" id="enableRandomTimes" checked>
+                                            <span>تفعيل الأوقات العشوائية لتجنب الحظر</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="block text-gray-700 mb-2">فترات النشر:</label>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                        <label class="flex items-center bg-white p-3 rounded border">
+                                            <input type="checkbox" class="rounded text-blue-600 mr-2" checked>
+                                            <span>صباح (9:30 - 10:55)</span>
+                                        </label>
+                                        <label class="flex items-center bg-white p-3 rounded border">
+                                            <input type="checkbox" class="rounded text-blue-600 mr-2" checked>
+                                            <span>ظهر (12:45 - 14:05)</span>
+                                        </label>
+                                        <label class="flex items-center bg-white p-3 rounded border">
+                                            <input type="checkbox" class="rounded text-blue-600 mr-2" checked>
+                                            <span>مساء (16:30 - 18:34)</span>
+                                        </label>
+                                        <label class="flex items-center bg-white p-3 rounded border">
+                                            <input type="checkbox" class="rounded text-blue-600 mr-2" checked>
+                                            <span>ليل (20:30 - 23:15)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="block text-gray-700 mb-2">عدد المنشورات في كل فترة:</label>
+                                    <select class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        <option>1 منشور</option>
+                                        <option selected>2 منشور</option>
+                                        <option>3 منشور</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">أيام النشر:</label>
+                                    <div class="grid grid-cols-7 gap-2">
+                                        <label class="flex items-center justify-center bg-white p-2 rounded border">
+                                            <input type="checkbox" class="rounded text-blue-600 mr-1" checked>
+                                            <span>السبت</span>
+                                        </label>
+                                        <label class="flex items-center justify-center bg-white p-2 rounded border">
+                                            <input type="checkbox" class="rounded text-blue-600 mr-1" checked>
+                                            <span>الأحد</span>
+                                        </label>
+                                        <label class="flex items-center justify-center bg-white p-2 rounded border">
+                                            <input type="checkbox" class="rounded text-blue-600 mr-1" checked>
+                                            <span>الإثنين</span>
+                                        </label>
+                                        <label class="flex items-center justify-center bg-white p-2 rounded border">
+                                            <input type="checkbox" class="rounded text-blue-600 mr-1" checked>
+                                            <span>الثلاثاء</span>
+                                        </label>
+                                        <label class="flex items-center justify-center bg-white p-2 rounded border">
+                                            <input type="checkbox" class="rounded text-blue-600 mr-1" checked>
+                                            <span>الأربعاء</span>
+                                        </label>
+                                        <label class="flex items-center justify-center bg-white p-2 rounded border">
+                                            <input type="checkbox" class="rounded text-blue-600 mr-1" checked>
+                                            <span>الخميس</span>
+                                        </label>
+                                        <label class="flex items-center justify-center bg-white p-2 rounded border">
+                                            <input type="checkbox" class="rounded text-blue-600 mr-1" checked>
+                                            <span>الجمعة</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end">
+                                <button class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">حفظ الإعدادات</button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-md p-5">
+                            <h3 class="font-bold text-lg mb-4 text-gray-800">سجل النشر التلقائي</h3>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left text-gray-600">
+                                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-3">التاريخ</th>
+                                            <th class="px-4 py-3">المنشور</th>
+                                            <th class="px-4 py-3">الحساب</th>
+                                            <th class="px-4 py-3">الحالة</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="autoPostingLogs">
+                                        <tr>
+                                            <td colspan="4" class="px-4 py-4 text-center text-gray-500">لا توجد سجلات نشر حتى الآن</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <!-- Notification Container -->
+        <div id="notificationContainer" class="fixed top-20 left-4 z-50"></div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Facebook Profile Modal -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="addFacebookProfileModal">
+        <div class="bg-white rounded-xl w-full max-w-md mx-4">
+            <div class="p-5 border-b border-gray-200">
+                <h3 class="font-bold text-lg text-gray-800">إضافة حساب فيسبوك شخصي</h3>
+            </div>
+            
+            <div class="p-5">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">اسم الحساب</label>
+                    <input type="text" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="أدخل اسم الحساب">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">معرف المستخدم</label>
+                    <input type="text" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="أدخل المعرف أو الرابط">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">كلمة المرور للتطبيق</label>
+                    <input type="password" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="أدخل كلمة المرور للتطبيق">
+                    <p class="text-xs text-gray-500 mt-1">كلمة المرور الخاصة بالتطبيق وليس كلمة مرور حسابك</p>
+                </div>
+            </div>
+            
+            <div class="p-5 border-t border-gray-200 flex justify-end space-x-3">
+                <button class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700" onclick="closeModal('addFacebookProfileModal')">إلغاء</button>
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">إضافة الحساب</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase initialization
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // Global variables
+        let currentUser = null;
+        let currentTheme = 'light';
+        let importedPosts = [];
+        let currentPage = 1;
+        const postsPerPage = 10;
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication state
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    currentUser = user;
+                    showApp();
+                    initializeApp();
+                } else {
+                    showLogin();
+                }
+            });
+            
+            // Set up event listeners
+            setupEventListeners();
+        });
+        
+        // Show login screen
+        function showLogin() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appContainer').classList.add('hidden');
+        }
+        
+        // Show main application
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            document.getElementById('userName').textContent = currentUser.displayName || currentUser.email;
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Theme toggle
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                auth.signOut().then(() => {
+                    showNotification('تم تسجيل الخروج بنجاح', 'success');
+                });
+            });
+            
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                auth.signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        showNotification('تم تسجيل الدخول بنجاح', 'success');
+                    })
+                    .catch((error) => {
+                        showNotification('خطأ في تسجيل الدخول: ' + error.message, 'error');
+                    });
+            });
+            
+            // Register form
+            document.getElementById('registerForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('registerName').value;
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('registerConfirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    showNotification('كلمات المرور غير متطابقة', 'error');
+                    return;
+                }
+                
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        // Update user profile
+                        return userCredential.user.updateProfile({
+                            displayName: name
+                        });
+                    })
+                    .then(() => {
+                        showNotification('تم إنشاء الحساب بنجاح', 'success');
+                        showLoginForm();
+                    })
+                    .catch((error) => {
+                        showNotification('خطأ في إنشاء الحساب: ' + error.message, 'error');
+                    });
+            });
+            
+            // Forgot password form
+            document.getElementById('forgotPasswordForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('forgotEmail').value;
+                
+                auth.sendPasswordResetEmail(email)
+                    .then(() => {
+                        showNotification('تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني', 'success');
+                        showLoginForm();
+                    })
+                    .catch((error) => {
+                        showNotification('خطأ في إرسال رابط إعادة التعيين: ' + error.message, 'error');
+                    });
+            });
+            
+            // Form navigation
+            document.getElementById('showRegister').addEventListener('click', (e) => {
+                e.preventDefault();
+                showRegisterForm();
+            });
+            
+            document.getElementById('showLogin').addEventListener('click', (e) => {
+                e.preventDefault();
+                showLoginForm();
+            });
+            
+            document.getElementById('showForgotPassword').addEventListener('click', (e) => {
+                e.preventDefault();
+                showForgotPasswordForm();
+            });
+            
+            document.getElementById('showLoginFromForgot').addEventListener('click', (e) => {
+                e.preventDefault();
+                showLoginForm();
+            });
+            
+            // Bulk import
+            document.getElementById('browseFiles').addEventListener('click', () => {
+                document.getElementById('bulkFileInput').click();
+            });
+            
+            document.getElementById('bulkFileInput').addEventListener('change', handleBulkFileSelect);
+            
+            document.getElementById('bulkUploadArea').addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.add('border-blue-500', 'bg-blue-50');
+            });
+            
+            document.getElementById('bulkUploadArea').addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('border-blue-500', 'bg-blue-50');
+            });
+            
+            document.getElementById('bulkUploadArea').addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('border-blue-500', 'bg-blue-50');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    document.getElementById('bulkFileInput').files = e.dataTransfer.files;
+                    handleBulkFileSelect(e);
+                }
+            });
+            
+            document.getElementById('startImportBtn').addEventListener('click', startBulkImport);
+            
+            // Auto posting modals
+            document.getElementById('addFacebookProfileBtn').addEventListener('click', () => {
+                document.getElementById('addFacebookProfileModal').classList.remove('hidden');
+            });
+        }
+        
+        // Show login form
+        function showLoginForm() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('forgotPasswordForm').classList.add('hidden');
+        }
+        
+        // Show register form
+        function showRegisterForm() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('forgotPasswordForm').classList.add('hidden');
+        }
+        
+        // Show forgot password form
+        function showForgotPasswordForm() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('forgotPasswordForm').classList.remove('hidden');
+        }
+        
+        // Toggle theme
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            if (currentTheme === 'light') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                currentTheme = 'dark';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                themeIcon.className = 'fas fa-moon';
+                currentTheme = 'light';
+            }
+            
+            localStorage.setItem('theme', currentTheme);
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type} mb-3`;
+            
+            let icon = 'fa-info-circle';
+            let bgColor = 'bg-blue-100';
+            let borderColor = 'border-blue-500';
+            let textColor = 'text-blue-800';
+            
+            if (type === 'success') {
+                icon = 'fa-check-circle';
+                bgColor = 'bg-green-100';
+                borderColor = 'border-green-500';
+                textColor = 'text-green-800';
+            } else if (type === 'error') {
+                icon = 'fa-exclamation-circle';
+                bgColor = 'bg-red-100';
+                borderColor = 'border-red-500';
+                textColor = 'text-red-800';
+            } else if (type === 'warning') {
+                icon = 'fa-exclamation-triangle';
+                bgColor = 'bg-yellow-100';
+                borderColor = 'border-yellow-500';
+                textColor = 'text-yellow-800';
+            }
+            
+            notification.innerHTML = `
+                <div class="flex items-center ${bgColor} ${borderColor} ${textColor} border-l-4 p-4 rounded">
+                    <i class="fas ${icon} mr-3"></i>
+                    <span>${message}</span>
+                    <button class="ml-auto text-${textColor.split('-')[1]}-600" onclick="this.parentElement.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('notificationContainer').appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+        
+        // Handle bulk file selection
+        function handleBulkFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (file.type !== 'application/json') {
+                showNotification('يرجى اختيار ملف JSON فقط', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!data.posts || !Array.isArray(data.posts)) {
+                        showNotification('هيكل الملف غير صحيح. يجب أن يحتوي على مصفوفة posts', 'error');
+                        return;
+                    }
+                    
+                    if (data.posts.length > 1000) {
+                        showNotification('الحد الأقصى للمنشورات في الملف هو 1000 منشور', 'error');
+                        return;
+                    }
+                    
+                    // Validate each post
+                    for (let i = 0; i < data.posts.length; i++) {
+                        const post = data.posts[i];
+                        
+                        if (!post.socialTitle || !post.socialDescription || !post.shortUrl || !post.linkType || !post.socialImage) {
+                            showNotification(`المنشور رقم ${i+1} لا يحتوي على جميع الحقول المطلوبة`, 'error');
+                            return;
+                        }
+                        
+                        // Validate category if provided
+                        if (post.category && !['series', 'movie', 'match', 'recipe', 'game', 'app', 'channel'].includes(post.category)) {
+                            showNotification(`الفئة في المنشور رقم ${i+1} غير صالحة`, 'error');
+                            return;
+                        }
+                    }
+                    
+                    importedPosts = data.posts;
+                    showNotification(`تم تحميل ${importedPosts.length} منشور بنجاح`, 'success');
+                    
+                    // Show import button
+                    document.getElementById('startImportBtn').classList.remove('hidden');
+                    
+                    // Update preview table
+                    updateImportedPostsTable();
+                    
+                } catch (error) {
+                    showNotification('خطأ في تحليل ملف JSON: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Update imported posts table
+        function updateImportedPostsTable() {
+            const tableBody = document.getElementById('importedPostsTable');
+            tableBody.innerHTML = '';
+            
+            if (importedPosts.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-4 py-4 text-center text-gray-500">لا توجد منشورات مستوردة</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Calculate pagination
+            const startIndex = (currentPage - 1) * postsPerPage;
+            const endIndex = Math.min(startIndex + postsPerPage, importedPosts.length);
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                const post = importedPosts[i];
+                
+                const row = document.createElement('tr');
+                row.className = 'bg-white border-b hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-4 py-3 font-medium text-gray-900 max-w-xs truncate">${post.socialTitle}</td>
+                    <td class="px-4 py-3">${post.category || 'عام'}</td>
+                    <td class="px-4 py-3">${post.postTime || 'غير محدد'}</td>
+                    <td class="px-4 py-3">${post.postDay || 'غير محدد'}</td>
+                    <td class="px-4 py-3"><span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">بانتظار الاستيراد</span></td>
+                    <td class="px-4 py-3">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editPost(${i})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-red-600 hover:text-red-800" onclick="deletePost(${i})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            }
+            
+            // Update pagination info
+            document.getElementById('currentItems').textContent = `${startIndex + 1}-${endIndex}`;
+            document.getElementById('totalItems').textContent = importedPosts.length;
+            
+            // Update pagination buttons
+            document.getElementById('prevPageBtn').disabled = currentPage === 1;
+            document.getElementById('nextPageBtn').disabled = endIndex >= importedPosts.length;
+        }
+        
+        // Start bulk import
+        function startBulkImport() {
+            if (importedPosts.length === 0) {
+                showNotification('لا توجد منشورات لاستيرادها', 'error');
+                return;
+            }
+            
+            // Show progress section
+            document.getElementById('importProgressSection').classList.remove('hidden');
+            
+            const totalPosts = importedPosts.length;
+            let importedCount = 0;
+            
+            // Simulate import process (in a real app, this would be actual Firebase operations)
+            const importInterval = setInterval(() => {
+                importedCount += 5;
+                if (importedCount > totalPosts) importedCount = totalPosts;
+                
+                // Update progress bar
+                const progressPercent = (importedCount / totalPosts) * 100;
+                document.getElementById('importProgressBar').style.width = `${progressPercent}%`;
+                document.getElementById('importStatus').textContent = `جاري استيراد ${importedCount} من ${totalPosts} منشور`;
+                
+                // Update table status
+                const tableRows = document.getElementById('importedPostsTable').querySelectorAll('tr');
+                for (let i = 0; i < Math.min(importedCount, tableRows.length); i++) {
+                    const statusCell = tableRows[i].querySelector('td:nth-child(5)');
+                    if (statusCell) {
+                        statusCell.innerHTML = '<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">تم الاستيراد</span>';
+                    }
+                }
+                
+                // Check if import is complete
+                if (importedCount >= totalPosts) {
+                    clearInterval(importInterval);
+                    showNotification(`تم استيراد ${totalPosts} منشور بنجاح`, 'success');
+                    
+                    // Schedule posts for auto-posting
+                    schedulePostsForAutoPosting(importedPosts);
+                }
+            }, 300);
+        }
+        
+        // Schedule posts for auto-posting
+        function schedulePostsForAutoPosting(posts) {
+            // In a real app, this would schedule posts in Firebase with their respective times
+            showNotification(`تم جدولة ${posts.length} منشور للنشر التلقائي`, 'success');
+            
+            // Update scheduled posts count
+            document.getElementById('scheduledPosts').textContent = posts.length;
+            document.getElementById('sidebarScheduled').textContent = posts.length;
+        }
+        
+        // Initialize the app
+        function initializeApp() {
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.body.setAttribute('data-theme', savedTheme);
+                document.getElementById('themeIcon').className = savedTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+                currentTheme = savedTheme;
+            }
+            
+            // Load user data
+            loadUserData();
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Load connected accounts
+            loadConnectedAccounts();
+            
+            // Set up section navigation
+            setupSectionNavigation();
+        }
+        
+        // Load user data
+        function loadUserData() {
+            // In a real app, this would load data from Firebase
+            document.getElementById('totalPosts').textContent = '1,247';
+            document.getElementById('totalEngagement').textContent = '12,847';
+            document.getElementById('totalReach').textContent = '89,542';
+            document.getElementById('scheduledPosts').textContent = '38';
+            
+            document.getElementById('postsGrowth').textContent = '+12%';
+            document.getElementById('engagementGrowth').textContent = '+8%';
+            document.getElementById('reachGrowth').textContent = '+15%';
+            
+            document.getElementById('sidebarTotalPosts').textContent = '1,247';
+            document.getElementById('sidebarConnectedAccounts').textContent = '3';
+            document.getElementById('sidebarScheduled').textContent = '38';
+        }
+        
+        // Initialize charts
+        function initializeCharts() {
+            // In a real app, this would initialize real charts with real data
+            console.log('Charts initialized');
+        }
+        
+        // Load connected accounts
+        function loadConnectedAccounts() {
+            // In a real app, this would load connected accounts from Firebase
+            console.log('Connected accounts loaded');
+        }
+        
+        // Set up section navigation
+        function setupSectionNavigation() {
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            const contentSections = document.querySelectorAll('.content-section');
+            
+            sidebarItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Remove active class from all items
+                    sidebarItems.forEach(i => i.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    item.classList.add('active');
+                    
+                    // Hide all content sections
+                    contentSections.forEach(section => section.classList.add('hidden'));
+                    
+                    // Show the selected section
+                    const sectionId = item.getAttribute('data-section') + '-section';
+                    document.getElementById(sectionId).classList.remove('hidden');
+                });
+            });
+        }
+        
+        // Edit post
+        function editPost(index) {
+            const post = importedPosts[index];
+            showNotification(`تعديل المنشور: ${post.socialTitle}`, 'info');
+            // In a real app, this would open an edit modal
+        }
+        
+        // Delete post
+        function deletePost(index) {
+            if (confirm('هل أنت متأكد من حذف هذا المنشور؟')) {
+                importedPosts.splice(index, 1);
+                updateImportedPostsTable();
+                showNotification('تم حذف المنشور', 'success');
+            }
+        }
+        
+        // Next page
+        function nextPage() {
+            const totalPages = Math.ceil(importedPosts.length / postsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateImportedPostsTable();
+            }
+        }
+        
+        // Previous page
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updateImportedPostsTable();
+            }
+        }
+        
+        // Add event listeners for pagination
+        document.getElementById('nextPageBtn').addEventListener('click', nextPage);
+        document.getElementById('prevPageBtn').addEventListener('click', prevPage);
+    </script>
+</body>
+</html>
