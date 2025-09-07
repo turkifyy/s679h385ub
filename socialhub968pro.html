@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialHub Pro v12.1 - Production System</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Arabic Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-secondary: linear-gradient(135deg, var(--accent-color), #06d6a0);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #3b82f6;
+            --secondary-color: #60a5fa;
+            --dark-color: #0f172a;
+            --light-color: #1e293b;
+            --border-color: #374151;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Tajawal', 'Segoe UI', sans-serif;
+            background-color: var(--light-color);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+        
+        body[data-theme="dark"] {
+             background-color: var(--dark-color);
+        }
+
+        .header {
+            background: var(--gradient-primary);
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            background: var(--gradient-primary);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .stats-card {
+            background: var(--gradient-secondary);
+            color: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .stats-card:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .upload-area {
+            border: 3px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(30, 58, 138, 0.05);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .modal {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        .modal.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="font-arabic" data-theme="light">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] transition-opacity duration-300">
+        <div class="bg-white rounded-lg p-6 flex flex-col items-center shadow-lg">
+            <div class="loading-spinner mb-4"></div>
+            <p class="text-gray-700" id="loadingText">جاري التحميل...</p>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-600 p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+            <div class="p-8">
+                <div class="text-center mb-6">
+                    <i class="fas fa-share-alt text-4xl text-blue-600 mb-3"></i>
+                    <h2 class="text-2xl font-bold text-gray-800">SocialHub Pro</h2>
+                    <p class="text-gray-600">منصة إدارة وسائل التواصل الاجتماعي المتقدمة</p>
+                </div>
+                
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label for="loginEmail" class="block text-gray-700 mb-2">البريد الإلكتروني</label>
+                        <input type="email" id="loginEmail" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="loginPassword" class="block text-gray-700 mb-2">كلمة المرور</label>
+                        <input type="password" id="loginPassword" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition mb-4">تسجيل الدخول</button>
+                    
+                    <div class="text-center">
+                        <a href="#" id="showRegister" class="text-blue-600 text-sm hover:underline">إنشاء حساب جديد</a> | 
+                        <a href="#" id="showForgotPassword" class="text-blue-600 text-sm hover:underline">نسيت كلمة المرور؟</a>
+                    </div>
+                </form>
+                
+                <form id="registerForm" class="hidden">
+                    <div class="mb-4">
+                        <label for="registerName" class="block text-gray-700 mb-2">الاسم الكامل</label>
+                        <input type="text" id="registerName" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="registerEmail" class="block text-gray-700 mb-2">البريد الإلكتروني</label>
+                        <input type="email" id="registerEmail" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="registerPassword" class="block text-gray-700 mb-2">كلمة المرور</label>
+                        <input type="password" id="registerPassword" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition mb-4">إنشاء حساب</button>
+                    
+                    <div class="text-center">
+                        <a href="#" id="showLogin" class="text-blue-600 text-sm hover:underline">العودة لتسجيل الدخول</a>
+                    </div>
+                </form>
+                
+                <form id="forgotPasswordForm" class="hidden"><!-- ... --></form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="appContainer" class="hidden">
+        <header class="header"><!-- ... --></header>
+
+        <main class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row gap-6">
+                <!-- Sidebar -->
+                <aside class="w-full md:w-1/4 bg-white rounded-xl shadow-md p-5 dark:bg-gray-800">
+                     <h3 class="font-bold text-lg mb-4 text-gray-800 dark:text-gray-200">القوائم الرئيسية</h3>
+                    <div class="space-y-2">
+                        <a href="#dashboard" class="sidebar-item active flex items-center p-3 rounded-lg text-gray-600 dark:text-gray-400 transition" data-section="dashboard"><i class="fas fa-tachometer-alt ml-3"></i><span>لوحة التحكم</span></a>
+                        <a href="#bulk-import" class="sidebar-item flex items-center p-3 rounded-lg text-gray-600 dark:text-gray-400 transition" data-section="bulk-import"><i class="fas fa-upload ml-3"></i><span>استيراد المحتوى</span></a>
+                    </div>
+                </aside>
+
+                <!-- Content Area -->
+                <div class="w-full md:w-3/4">
+                    <!-- Dashboard Section -->
+                    <section id="dashboard-section" class="content-section">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+                            <div class="stats-card"><div class="text-3xl font-bold mb-1" id="totalPosts">0</div><div class="text-sm opacity-90">إجمالي المنشورات</div></div>
+                            <div class="stats-card" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6);"><div class="text-3xl font-bold mb-1" id="totalEngagement">0</div><div class="text-sm opacity-90">إجمالي التفاعل</div></div>
+                            <div class="stats-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);"><div class="text-3xl font-bold mb-1" id="totalReach">0</div><div class="text-sm opacity-90">إجمالي الوصول</div></div>
+                            <div class="stats-card" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);"><div class="text-3xl font-bold mb-1" id="scheduledPosts">0</div><div class="text-sm opacity-90">المنشورات المجدولة</div></div>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5">
+                            <h3 class="font-bold text-lg mb-4 text-gray-800 dark:text-gray-200">أداء المنصات</h3>
+                            <div class="h-80"><canvas id="performanceChart"></canvas></div>
+                        </div>
+                    </section>
+                    
+                    <!-- Bulk Import Section -->
+                    <section id="bulk-import-section" class="content-section hidden">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 mb-6">
+                             <h3 class="font-bold text-lg mb-4 text-gray-800 dark:text-gray-200">استيراد المحتوى بالجملة</h3>
+                            <div class="upload-area mb-5" id="bulkUploadArea">
+                                 <i class="fas fa-file-upload text-4xl text-gray-400 mb-3"></i>
+                                 <h4 class="font-semibold dark:text-gray-300">اسحب وأسقط ملف JSON هنا</h4>
+                                 <p class="text-gray-500 mt-1">أو <span class="text-blue-500 cursor-pointer" id="browseFiles">استعرض الملفات</span></p>
+                                <input type="file" id="bulkFileInput" class="hidden" accept=".json">
+                            </div>
+                            <div class="hidden" id="importProgressSection">
+                                <h4 class="font-semibold mb-3 dark:text-gray-300">تقدم الاستيراد:</h4>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-3"><div id="importProgressBar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div></div>
+                                <p id="importStatus" class="text-sm text-gray-600 dark:text-gray-400">جاري معالجة البيانات...</p>
+                            </div>
+                            <div class="flex justify-end mt-6">
+                                <button id="startImportBtn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition hidden">بدء الاستيراد</button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5">
+                             <h3 class="font-bold text-lg mb-4 text-gray-800 dark:text-gray-200">المنشورات المستوردة (معاينة)</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left text-gray-600 dark:text-gray-400">
+                                    <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-700">
+                                        <tr>
+                                            <th class="px-4 py-3">العنوان</th>
+                                            <th class="px-4 py-3">الحالة</th>
+                                            <th class="px-4 py-3">الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="importedPostsTable">
+                                        <tr><td colspan="3" class="px-4 py-4 text-center">لم يتم تحديد ملف.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <!-- Notification Container -->
+        <div id="notificationContainer" class="fixed top-20 left-4 z-[90]"></div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-sm mx-4">
+            <h3 class="text-lg font-bold mb-4 dark:text-white" id="modalTitle">هل أنت متأكد؟</h3>
+            <p class="text-gray-600 dark:text-gray-300 mb-6" id="modalMessage">لا يمكن التراجع عن هذا الإجراء.</p>
+            <div class="flex justify-end space-x-3">
+                <button id="modalCancelBtn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-300 dark:border-gray-500">إلغاء</button>
+                <button id="modalConfirmBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">تأكيد</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, addDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Firebase Configuration - REPLACE WITH YOUR CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKD3QIxJdHw__UG2TEqf0TqyYCnw8wJf8",
+            authDomain: "socialhub-1370d.firebaseapp.com",
+            projectId: "socialhub-1370d",
+            storageBucket: "socialhub-1370d.firebasestorage.app",
+            messagingSenderId: "84815590328",
+            appId: "1:84815590328:web:2f12340380b37c2562d54d"
+        };
+        
+        // Initialize Firebase
+        const firebaseApp = initializeApp(firebaseConfig);
+        const auth = getAuth(firebaseApp);
+        const db = getFirestore(firebaseApp);
+
+        // --- App State ---
+        let currentUser = null;
+        let importedPosts = [];
+        let performanceChart = null;
+
+        // --- UI Elements ---
+        const ui = {
+            loadingOverlay: document.getElementById('loadingOverlay'),
+            loginScreen: document.getElementById('loginScreen'),
+            appContainer: document.getElementById('appContainer'),
+            loginForm: document.getElementById('loginForm'),
+            registerForm: document.getElementById('registerForm'),
+            notificationContainer: document.getElementById('notificationContainer'),
+            totalPosts: document.getElementById('totalPosts'),
+            bulkUploadArea: document.getElementById('bulkUploadArea'),
+            browseFilesBtn: document.getElementById('browseFiles'),
+            bulkFileInput: document.getElementById('bulkFileInput'),
+            startImportBtn: document.getElementById('startImportBtn'),
+            importProgressSection: document.getElementById('importProgressSection'),
+            importProgressBar: document.getElementById('importProgressBar'),
+            importStatus: document.getElementById('importStatus'),
+            importedPostsTable: document.getElementById('importedPostsTable'),
+            confirmationModal: {
+                el: document.getElementById('confirmationModal'),
+                title: document.getElementById('modalTitle'),
+                message: document.getElementById('modalMessage'),
+                confirmBtn: document.getElementById('modalConfirmBtn'),
+                cancelBtn: document.getElementById('modalCancelBtn'),
+            }
+        };
+
+        // --- Utility Functions ---
+        const showLoading = (text = 'جاري التحميل...') => {
+            document.getElementById('loadingText').textContent = text;
+            ui.loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
+            ui.loadingOverlay.classList.add('opacity-100');
+        };
+        const hideLoading = () => {
+            ui.loadingOverlay.classList.remove('opacity-100');
+            ui.loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+        };
+
+        const showNotification = (message, type = 'info') => {
+            // ... Notification logic from previous version ...
+        };
+        
+        const showConfirmationModal = (title, message) => {
+            ui.confirmationModal.title.textContent = title;
+            ui.confirmationModal.message.textContent = message;
+            ui.confirmationModal.el.classList.remove('hidden');
+            return new Promise((resolve) => {
+                ui.confirmationModal.confirmBtn.onclick = () => {
+                    ui.confirmationModal.el.classList.add('hidden');
+                    resolve(true);
+                };
+                ui.confirmationModal.cancelBtn.onclick = () => {
+                    ui.confirmationModal.el.classList.add('hidden');
+                    resolve(false);
+                };
+            });
+        };
+
+        // --- Firebase Logic ---
+        const authHandler = {
+            init: () => {
+                onAuthStateChanged(auth, user => {
+                    if (user) {
+                        currentUser = { uid: user.uid, email: user.email, displayName: user.displayName };
+                        ui.loginScreen.classList.add('hidden');
+                        ui.appContainer.classList.remove('hidden');
+                        socialHubApp.init();
+                    } else {
+                        currentUser = null;
+                        ui.appContainer.classList.add('hidden');
+                        ui.loginScreen.classList.remove('hidden');
+                        hideLoading();
+                    }
+                });
+            },
+            login: (email, password) => {
+                showLoading('جاري تسجيل الدخول...');
+                signInWithEmailAndPassword(auth, email, password)
+                    .catch(err => showNotification(`خطأ: ${err.message}`, 'error'))
+                    .finally(hideLoading);
+            },
+            register: (name, email, password) => {
+                showLoading('جاري إنشاء الحساب...');
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then(cred => {
+                        updateProfile(cred.user, { displayName: name });
+                        return setDoc(doc(db, "users", cred.user.uid), {
+                            name: name,
+                            email: email,
+                            createdAt: new Date()
+                        });
+                    })
+                    .then(() => {
+                        showNotification('تم إنشاء الحساب بنجاح!', 'success');
+                        ui.registerForm.classList.add('hidden');
+                        ui.loginForm.classList.remove('hidden');
+                    })
+                    .catch(err => showNotification(`خطأ: ${err.message}`, 'error'))
+                    .finally(hideLoading);
+            },
+            logout: () => signOut(auth),
+        };
+
+        const dbHandler = {
+            listenToPosts: (callback) => {
+                if (!currentUser) return;
+                const postsCol = collection(db, 'users', currentUser.uid, 'posts');
+                return onSnapshot(postsCol, (snapshot) => {
+                    const postCount = snapshot.size;
+                    callback(postCount);
+                });
+            },
+            addPostsBatch: async (posts) => {
+                if (!currentUser || posts.length === 0) return;
+                const postsCol = collection(db, 'users', currentUser.uid, 'posts');
+                let count = 0;
+                for (const post of posts) {
+                    await addDoc(postsCol, { ...post, createdAt: new Date(), status: 'scheduled' });
+                    count++;
+                    const progress = (count / posts.length) * 100;
+                    ui.importProgressBar.style.width = `${progress}%`;
+                    ui.importStatus.textContent = `تم استيراد ${count} من ${posts.length} منشور`;
+                }
+            },
+            deletePost: async (postId) => {
+                 if (!currentUser) return;
+                 const postDoc = doc(db, 'users', currentUser.uid, 'imported_posts', postId);
+                 await deleteDoc(postDoc);
+            }
+        };
+
+        // --- Application Logic ---
+        const socialHubApp = {
+            init: () => {
+                console.log('App Initialized for user:', currentUser.uid);
+                // Setup UI listeners
+                document.getElementById('logoutBtn')?.addEventListener('click', authHandler.logout);
+                socialHubApp.setupSectionNavigation();
+                socialHubApp.initDashboard();
+                socialHubApp.initBulkImport();
+            },
+            initDashboard: () => {
+                dbHandler.listenToPosts((postCount) => {
+                    ui.totalPosts.textContent = postCount;
+                    socialHubApp.renderPerformanceChart();
+                });
+            },
+            initBulkImport: () => {
+                ui.browseFilesBtn.addEventListener('click', () => ui.bulkFileInput.click());
+                ui.bulkFileInput.addEventListener('change', socialHubApp.handleFileSelect);
+                
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    ui.bulkUploadArea.addEventListener(eventName, e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }, false);
+                });
+                ['dragenter', 'dragover'].forEach(eventName => {
+                     ui.bulkUploadArea.addEventListener(eventName, () => ui.bulkUploadArea.classList.add('border-blue-500'), false);
+                });
+                ['dragleave', 'drop'].forEach(eventName => {
+                     ui.bulkUploadArea.addEventListener(eventName, () => ui.bulkUploadArea.classList.remove('border-blue-500'), false);
+                });
+                
+                ui.bulkUploadArea.addEventListener('drop', socialHubApp.handleFileDrop, false);
+                ui.startImportBtn.addEventListener('click', socialHubApp.startBulkImport);
+            },
+            handleFileDrop: (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if(files.length > 0) {
+                     socialHubApp.processFile(files[0]);
+                }
+            },
+            handleFileSelect: (e) => {
+                if(e.target.files.length > 0){
+                    socialHubApp.processFile(e.target.files[0]);
+                }
+            },
+            processFile: (file) => {
+                if (file.type !== 'application/json') {
+                    return showNotification('يرجى اختيار ملف JSON فقط', 'error');
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!data.posts || !Array.isArray(data.posts)) {
+                           return showNotification('هيكل الملف غير صحيح.', 'error');
+                        }
+                        importedPosts = data.posts.map((p, i) => ({ ...p, localId: `local_${i}` }));
+                        socialHubApp.renderImportedPostsTable();
+                        ui.startImportBtn.classList.remove('hidden');
+                        showNotification(`تم تحميل ${importedPosts.length} منشور للمعاينة.`, 'success');
+                    } catch (err) {
+                        showNotification('خطأ في تحليل ملف JSON.', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            },
+            renderImportedPostsTable: () => {
+                ui.importedPostsTable.innerHTML = '';
+                if(importedPosts.length === 0) {
+                     ui.importedPostsTable.innerHTML = `<tr><td colspan="3" class="px-4 py-4 text-center">لا توجد منشورات.</td></tr>`;
+                     return;
+                }
+                importedPosts.forEach(post => {
+                    const row = document.createElement('tr');
+                    row.className = 'bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600';
+                    row.innerHTML = `
+                        <td class="px-4 py-3 font-medium text-gray-900 dark:text-white max-w-xs truncate">${post.socialTitle}</td>
+                        <td class="px-4 py-3"><span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">جاهز للاستيراد</span></td>
+                        <td class="px-4 py-3">
+                            <button class="text-red-600 hover:text-red-800" data-id="${post.localId}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    row.querySelector('button').addEventListener('click', async (e) => {
+                        const id = e.currentTarget.dataset.id;
+                        const confirmed = await showConfirmationModal('حذف المنشور؟', 'سيتم إزالة هذا المنشور من قائمة الاستيراد.');
+                        if(confirmed) {
+                           importedPosts = importedPosts.filter(p => p.localId !== id);
+                           socialHubApp.renderImportedPostsTable();
+                           showNotification('تم حذف المنشور من القائمة.', 'success');
+                        }
+                    });
+                    ui.importedPostsTable.appendChild(row);
+                });
+            },
+            startBulkImport: async () => {
+                if (importedPosts.length === 0) {
+                    return showNotification('لا توجد منشورات لاستيرادها', 'warning');
+                }
+                const confirmed = await showConfirmationModal('بدء الاستيراد؟', `سيتم استيراد ${importedPosts.length} منشور إلى قاعدة البيانات.`);
+                if (!confirmed) return;
+
+                ui.importProgressSection.classList.remove('hidden');
+                ui.startImportBtn.classList.add('hidden');
+                
+                await dbHandler.addPostsBatch(importedPosts);
+                
+                showNotification('اكتمل الاستيراد بنجاح!', 'success');
+                importedPosts = [];
+                socialHubApp.renderImportedPostsTable();
+                ui.bulkFileInput.value = ''; // Reset file input
+                setTimeout(() => {
+                    ui.importProgressSection.classList.add('hidden');
+                    ui.importProgressBar.style.width = '0%';
+                }, 2000);
+            },
+            renderPerformanceChart: () => {
+                const ctx = document.getElementById('performanceChart').getContext('2d');
+                const data = {
+                    labels: ['فيسبوك', 'انستغرام', 'تويتر', 'لينكدإن'],
+                    datasets: [{
+                        label: 'التفاعل الأسبوعي',
+                        data: [1200, 1900, 800, 500],
+                        backgroundColor: ['#1877f2', '#c13584', '#1da1f2', '#0077b5'],
+                        borderColor: 'rgba(255, 255, 255, 0.5)',
+                        borderWidth: 1
+                    }]
+                };
+                if(performanceChart) {
+                    performanceChart.data = data;
+                    performanceChart.update();
+                } else {
+                    performanceChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: data,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    });
+                }
+            },
+            setupSectionNavigation: () => {
+                 const sidebarItems = document.querySelectorAll('.sidebar-item');
+                 const contentSections = document.querySelectorAll('.content-section');
+                 sidebarItems.forEach(item => {
+                     item.addEventListener('click', (e) => {
+                         e.preventDefault();
+                         sidebarItems.forEach(i => i.classList.remove('active'));
+                         item.classList.add('active');
+                         contentSections.forEach(s => s.classList.add('hidden'));
+                         document.getElementById(item.dataset.section + '-section').classList.remove('hidden');
+                     });
+                 });
+            },
+        };
+
+        // --- Event Listeners ---
+        ui.loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            authHandler.login(ui.loginForm.loginEmail.value, ui.loginForm.loginPassword.value);
+        });
+        ui.registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            authHandler.register(ui.registerForm.registerName.value, ui.registerForm.registerEmail.value, ui.registerForm.registerPassword.value);
+        });
+        
+        document.getElementById('showRegister').addEventListener('click', e => {
+            e.preventDefault();
+            ui.loginForm.classList.add('hidden');
+            ui.registerForm.classList.remove('hidden');
+        });
+
+        document.getElementById('showLogin').addEventListener('click', e => {
+            e.preventDefault();
+            ui.registerForm.classList.add('hidden');
+            ui.loginForm.classList.remove('hidden');
+        });
+        
+        // --- App Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showLoading();
+            authHandler.init();
+        });
+
+    </script>
+</body>
+</html>
