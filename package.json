@@ -1,0 +1,704 @@
+{
+  "name": "@socialhub/pro-platform",
+  "version": "11.0.0",
+  "description": "SocialHub Pro v11.0 - Production-optimized social media management platform with Firebase integration, multi-platform API support including TikTok Business API, advanced automation capabilities, and real-world deployment readiness. Enterprise-grade solution for managing Facebook, Instagram, Twitter/X, LinkedIn, and TikTok platforms at scale.",
+  "keywords": [
+    "social-media",
+    "automation",
+    "firebase",
+    "typescript",
+    "enterprise",
+    "production-ready",
+    "oauth",
+    "facebook-api",
+    "instagram-api",
+    "twitter-api",
+    "linkedin-api",
+    "tiktok-api",
+    "tiktok-business-api",
+    "github-actions",
+    "ci-cd",
+    "docker",
+    "microservices",
+    "real-time",
+    "analytics",
+    "performance-optimized",
+    "security-focused",
+    "scalable"
+  ],
+  "homepage": "https://socialhub.pro",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/socialhub/pro-platform.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/socialhub/pro-platform/issues",
+    "email": "support@socialhub.pro"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "SocialHub Pro Team",
+    "email": "team@socialhub.pro",
+    "url": "https://socialhub.pro"
+  },
+  "maintainers": [
+    {
+      "name": "Lead Developer",
+      "email": "dev@socialhub.pro",
+      "url": "https://github.com/socialhub-pro"
+    },
+    {
+      "name": "DevOps Engineer", 
+      "email": "devops@socialhub.pro"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "API Integration Team",
+      "email": "api@socialhub.pro"
+    }
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=20.18.0",
+    "npm": ">=10.9.0",
+    "yarn": ">=4.0.0"
+  },
+  "packageManager": "npm@10.9.0",
+  "volta": {
+    "node": "20.18.0",
+    "npm": "10.9.0"
+  },
+  "os": ["linux", "darwin", "win32"],
+  "cpu": ["x64", "arm64"],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs", 
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "socialhub": "./bin/cli.js",
+    "socialhub-server": "./bin/server.js",
+    "socialhub-migrate": "./bin/migrate.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "browser": "./dist/browser.js",
+      "node": "./dist/node.js",
+      "default": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.mjs",
+      "require": "./dist/core/index.js"
+    },
+    "./api": {
+      "types": "./dist/api/index.d.ts",
+      "import": "./dist/api/index.mjs", 
+      "require": "./dist/api/index.js"
+    },
+    "./platforms": {
+      "types": "./dist/platforms/index.d.ts",
+      "import": "./dist/platforms/index.mjs",
+      "require": "./dist/platforms/index.js"
+    },
+    "./auth": {
+      "types": "./dist/auth/index.d.ts",
+      "import": "./dist/auth/index.mjs",
+      "require": "./dist/auth/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.mjs",
+      "require": "./dist/utils/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/",
+    "bin/",
+    "types/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "SECURITY.md"
+  ],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "sideEffects": false,
+  "preferGlobal": false,
+  "private": false,
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public",
+    "tag": "latest"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/socialhub-pro"
+    },
+    {
+      "type": "opencollective",
+      "url": "https://opencollective.com/socialhub-pro"
+    }
+  ],
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11",
+    "not op_mini all",
+    "Chrome >= 90",
+    "Firefox >= 88",
+    "Safari >= 14",
+    "Edge >= 90"
+  ],
+  "dependencies": {
+    "firebase": "^12.8.1",
+    "firebase-admin": "^12.8.1",
+    "firebase-functions": "^6.1.1",
+    "@google-cloud/firestore": "^7.12.1",
+    "@google-cloud/storage": "^7.14.0",
+    "dotenv": "^16.4.7",
+    "cors": "^2.8.5",
+    "helmet": "^9.0.1",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.7.1",
+    "express-slow-down": "^2.0.3",
+    "express-validator": "^7.2.0",
+    "express-mongo-sanitize": "^2.2.0",
+    "compression": "^1.7.4",
+    "joi": "^17.13.3",
+    "validator": "^13.12.0",
+    "date-fns": "^4.1.0",
+    "lodash-es": "^4.17.21",
+    "uuid": "^11.0.3",
+    "crypto-js": "^4.2.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-facebook": "^3.0.0",
+    "passport-twitter": "^1.0.4",
+    "passport-linkedin-oauth2": "^2.0.0",
+    "@panva/oauth4webapi": "^3.1.2",
+    "simple-oauth2": "^5.1.0",
+    "facebook-business-sdk": "^18.0.2",
+    "@facebook/business-sdk": "^18.0.2",
+    "instagram-basic-display": "^3.2.1",
+    "twitter-api-v2": "^1.18.2",
+    "@twitter/api-sdk": "^2.0.1",
+    "linkedin-api-v2": "^3.1.0",
+    "@linkedin/marketing-api": "^2.4.1",
+    "tiktok-business-api": "^2.1.0",
+    "@tiktok/business-sdk": "^3.0.1",
+    "axios": "^1.7.9",
+    "got": "^14.4.5",
+    "node-fetch": "^3.3.2",
+    "bottleneck": "^2.19.5",
+    "p-limit": "^6.1.0",
+    "rate-limiter-flexible": "^5.1.0",
+    "ioredis": "^5.4.1",
+    "redis-lock": "^0.1.4",
+    "node-cache": "^5.1.2",
+    "bull": "^4.16.3",
+    "agenda": "^5.0.0",
+    "node-cron": "^3.0.3",
+    "mongoose": "^8.8.3",
+    "prisma": "^6.1.0",
+    "@prisma/client": "^6.1.0",
+    "pino": "^9.5.0",
+    "pino-http": "^11.0.0",
+    "winston": "^3.17.0",
+    "@sentry/node": "^8.46.0",
+    "@sentry/express": "^8.46.0",
+    "newrelic": "^12.6.0",
+    "prometheus-client": "^15.1.4",
+    "web-vitals": "^4.2.4",
+    "perfume.js": "^9.5.0",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.33.5",
+    "csv-parser": "^3.0.0",
+    "fast-csv": "^5.0.1",
+    "json2csv": "^6.1.0",
+    "dompurify": "^3.2.0",
+    "xss": "^1.0.15",
+    "sanitize-html": "^2.14.0",
+    "csurf": "^1.11.0",
+    "hpp": "^0.2.3",
+    "ws": "^8.18.0",
+    "socket.io": "^4.8.1",
+    "@godaddy/terminus": "^4.12.1",
+    "stoppable": "^1.1.0",
+    "@google-analytics/gtag": "^1.0.0",
+    "mixpanel": "^0.18.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "rollup": "^4.28.1",
+    "esbuild": "^0.24.2",
+    "vite-plugin-dts": "^4.3.0",
+    "vite-tsconfig-paths": "^5.1.3",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-node-resolve": "^15.3.0",
+    "rollup-plugin-commonjs": "^26.0.3",
+    "rollup-plugin-analyzer": "^4.0.0",
+    "@types/node": "^22.10.2",
+    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.17",
+    "@types/compression": "^1.7.5",
+    "@types/uuid": "^10.0.0",
+    "@types/lodash-es": "^4.17.12",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/passport": "^1.0.16",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/passport-google-oauth20": "^2.0.16",
+    "@types/passport-facebook": "^3.0.3",
+    "@types/multer": "^1.4.12",
+    "@types/ws": "^8.5.14",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
+    "eslint": "^9.17.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.1",
+    "@typescript-eslint/parser": "^8.18.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-security": "^3.0.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-promise": "^7.1.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-sonarjs": "^2.0.4",
+    "eslint-plugin-no-secrets": "^1.0.2",
+    "prettier": "^3.4.2",
+    "@prettier/plugin-typescript": "^3.4.2",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
+    "vitest": "^2.1.8",
+    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/ui": "^2.1.8",
+    "vitest-mock": "^2.1.8",
+    "@playwright/test": "^1.49.1",
+    "playwright": "^1.49.1",
+    "supertest": "^7.0.0",
+    "nock": "^14.0.0",
+    "@faker-js/faker": "^9.2.0",
+    "msw": "^2.7.0",
+    "sinon": "^19.0.2",
+    "snyk": "^1.1294.0",
+    "audit-ci": "^7.1.0",
+    "better-npm-audit": "^3.8.0",
+    "license-checker": "^25.0.1",
+    "secretlint": "^8.4.0",
+    "clinic": "^13.0.0",
+    "0x": "^5.7.0",
+    "autocannon": "^7.15.0",
+    "lighthouse": "^12.2.1",
+    "bundlesize": "^0.18.2",
+    "size-limit": "^11.1.6",
+    "webpack-bundle-analyzer": "^4.10.2",
+    "pm2": "^5.4.3",
+    "nodemon": "^3.1.7",
+    "concurrently": "^9.1.0",
+    "wait-on": "^8.0.1",
+    "cross-env": "^7.0.3",
+    "rimraf": "^6.0.1",
+    "typedoc": "^0.27.5",
+    "@microsoft/api-extractor": "^7.48.0",
+    "jsdoc": "^4.0.4",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "openapi-typescript": "^7.4.3",
+    "json-schema-to-typescript": "^15.0.3",
+    "workbox-webpack-plugin": "^7.1.0",
+    "pwa-asset-generator": "^6.3.2",
+    "web-app-manifest": "^1.0.0",
+    "@formatjs/cli": "^6.2.15",
+    "@formatjs/intl": "^2.10.7",
+    "babel-plugin-formatjs": "^10.5.18",
+    "semantic-release": "^24.18.0",
+    "conventional-changelog-cli": "^5.0.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^61.0.2",
+    "dockerode": "^4.0.2",
+    "sort-package-json": "^2.10.1"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "vue": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    }
+  },
+  "optionalDependencies": {
+    "fsevents": "^2.3.3",
+    "@swc/core": "^1.9.2"
+  },
+  "overrides": {
+    "semver": "^7.6.3",
+    "minimist": "^1.2.8",
+    "axios": "^1.7.9",
+    "lodash": "^4.17.21"
+  },
+  "resolutions": {
+    "semver": "^7.6.3",
+    "minimist": "^1.2.8"
+  },
+  "scripts": {
+    "prepare": "husky install && npm run setup:hooks",
+    "postinstall": "npm run setup:env && npm run build:deps",
+    "prestart": "npm run build",
+    "start": "cross-env NODE_ENV=production node dist/index.js",
+    "start:dev": "cross-env NODE_ENV=development tsx watch src/index.ts",
+    "start:prod": "cross-env NODE_ENV=production pm2 start ecosystem.config.js",
+    "start:cluster": "pm2 start ecosystem.config.js --env production",
+    "start:docker": "docker-compose up -d --build",
+    "dev": "vite --host 0.0.0.0 --port 3000 --open",
+    "dev:https": "vite --https --host 0.0.0.0 --port 3443",
+    "dev:debug": "cross-env NODE_OPTIONS='--inspect' tsx src/index.ts",
+    "watch": "tsx watch src/index.ts",
+    "serve": "vite preview --port 3000",
+    "build": "npm run build:clean && npm run build:types && npm run build:compile",
+    "build:clean": "rimraf dist coverage .nyc_output reports artifacts",
+    "build:types": "tsc --noEmit",
+    "build:compile": "tsc -p tsconfig.build.json && vite build",
+    "build:analyze": "cross-env ANALYZE=true vite build",
+    "build:docker": "docker build -t socialhub-pro:v11.0 .",
+    "build:deps": "node scripts/build-deps.js",
+    "preview": "vite preview --port 3000",
+    "deploy": "npm run build && node scripts/deploy.js",
+    "test": "vitest",
+    "test:unit": "vitest run --reporter=verbose --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:coverage": "vitest run --coverage --reporter=html",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui --open",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --cache --max-warnings 0",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix --cache",
+    "format": "prettier --write . --cache",
+    "format:check": "prettier --check . --cache",
+    "typecheck": "tsc --noEmit --incremental",
+    "validate": "npm run typecheck && npm run lint && npm run test:unit",
+    "security:audit": "npm audit --audit-level=moderate",
+    "security:scan": "snyk test --all-projects --severity-threshold=medium",
+    "security:fix": "snyk fix",
+    "security:secrets": "secretlint '**/*' --format table",
+    "monitor": "pm2 monit",
+    "health": "node scripts/health-check.js",
+    "update": "npm update && npm audit fix",
+    "clean": "rimraf node_modules dist coverage .nyc_output reports artifacts tmp",
+    "reset": "npm run clean && npm install",
+    "setup": "npm run setup:env && npm run setup:hooks && npm run build:deps",
+    "setup:env": "node scripts/setup-environment.js",
+    "setup:hooks": "husky add .husky/pre-commit 'lint-staged' && husky add .husky/commit-msg 'commitlint --edit'",
+    "perf:profile": "0x -- node dist/index.js",
+    "perf:clinic": "clinic doctor -- node dist/index.js",
+    "perf:load": "autocannon -c 100 -d 30 http://localhost:3000",
+    "docker:build": "docker build --target production -t socialhub-pro:latest .",
+    "docker:run": "docker run -p 3000:3000 --env-file .env socialhub-pro:latest",
+    "docker:compose": "docker-compose up -d --build",
+    "docker:health": "docker inspect --format='{{json .State.Health}}' socialhub-pro",
+    "docs:build": "typedoc --out docs/api src/",
+    "docs:api": "swagger-jsdoc -d swaggerDef.js src/**/*.ts -o docs/swagger.json",
+    "docs:serve": "npx http-server docs/api -p 8080",
+    "pwa:build": "workbox generateSW workbox-config.js",
+    "pwa:manifest": "pwa-asset-generator public/icon.svg public/icons --manifest public/manifest.json",
+    "i18n:extract": "formatjs extract 'src/**/*.ts' --out-file locales/messages.json",
+    "i18n:compile": "formatjs compile-folder --ast locales translations",
+    "size:analyze": "npm run build && webpack-bundle-analyzer dist/stats.json",
+    "size:check": "bundlesize",
+    "size:limit": "size-limit",
+    "release": "semantic-release",
+    "release:dry": "semantic-release --dry-run",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
+    "version:patch": "npm version patch && git push --follow-tags",
+    "version:minor": "npm version minor && git push --follow-tags", 
+    "version:major": "npm version major && git push --follow-tags"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "commitlint": {
+    "extends": ["@commitlint/config-conventional"],
+    "rules": {
+      "type-enum": [
+        2,
+        "always",
+        [
+          "feat",
+          "fix", 
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "chore",
+          "ci",
+          "build",
+          "revert"
+        ]
+      ],
+      "scope-enum": [
+        2,
+        "always", 
+        [
+          "api",
+          "auth",
+          "core",
+          "platforms",
+          "ui",
+          "build",
+          "ci",
+          "deps",
+          "security",
+          "performance",
+          "docs",
+          "tests"
+        ]
+      ]
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix --cache",
+      "prettier --write --cache"
+    ],
+    "*.{css,scss,less}": [
+      "prettier --write --cache"
+    ],
+    "*.{md,json,yaml,yml}": [
+      "prettier --write --cache"
+    ],
+    "package.json": [
+      "sort-package-json"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-push": "npm run validate",
+      "post-merge": "npm install",
+      "post-checkout": "npm install",
+      "post-rewrite": "npm install"
+    }
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true,
+      "browser": true,
+      "es2024": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "@typescript-eslint/recommended",
+      "@typescript-eslint/recommended-requiring-type-checking",
+      "plugin:security/recommended",
+      "plugin:import/errors",
+      "plugin:import/warnings",
+      "plugin:import/typescript",
+      "plugin:promise/recommended",
+      "plugin:sonarjs/recommended",
+      "prettier"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module",
+      "project": "./tsconfig.json"
+    },
+    "plugins": [
+      "@typescript-eslint",
+      "security",
+      "import",
+      "promise",
+      "sonarjs",
+      "no-secrets"
+    ],
+    "rules": {
+      "no-console": "warn",
+      "no-debugger": "error",
+      "prefer-const": "error",
+      "no-var": "error",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/explicit-function-return-type": "warn",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/prefer-nullish-coalescing": "error",
+      "@typescript-eslint/prefer-optional-chain": "error",
+      "security/detect-object-injection": "error",
+      "security/detect-non-literal-regexp": "error",
+      "import/order": "error",
+      "import/no-unresolved": "error",
+      "import/no-duplicates": "error",
+      "promise/always-return": "error",
+      "promise/no-return-wrap": "error",
+      "promise/catch-or-return": "error",
+      "sonarjs/cognitive-complexity": ["error", 15],
+      "sonarjs/no-duplicate-string": "error",
+      "no-secrets/no-secrets": "error"
+    },
+    "ignorePatterns": [
+      "dist",
+      "node_modules",
+      "coverage",
+      "reports",
+      "artifacts",
+      "*.config.js"
+    ]
+  },
+  "prettier": {
+    "semi": true,
+    "trailingComma": "es5",
+    "singleQuote": true,
+    "printWidth": 100,
+    "tabWidth": 2,
+    "useTabs": false,
+    "quoteProps": "as-needed",
+    "bracketSpacing": true,
+    "arrowParens": "always",
+    "endOfLine": "lf",
+    "embeddedLanguageFormatting": "auto",
+    "htmlWhitespaceSensitivity": "css",
+    "insertPragma": false,
+    "jsxBracketSameLine": false,
+    "jsxSingleQuote": true,
+    "proseWrap": "preserve",
+    "requirePragma": false,
+    "vueIndentScriptAndStyle": false
+  },
+  "bundlesize": [
+    {
+      "path": "./dist/assets/*.js",
+      "maxSize": "300 kB",
+      "compression": "gzip"
+    },
+    {
+      "path": "./dist/assets/*.css",
+      "maxSize": "30 kB", 
+      "compression": "gzip"
+    }
+  ],
+  "size-limit": [
+    {
+      "name": "Main Bundle",
+      "path": "dist/index.js",
+      "limit": "300 KB"
+    },
+    {
+      "name": "API Bundle", 
+      "path": "dist/api/index.js",
+      "limit": "150 KB"
+    },
+    {
+      "name": "Platforms Bundle",
+      "path": "dist/platforms/index.js", 
+      "limit": "200 KB"
+    }
+  ],
+  "vitest": {
+    "environment": "node",
+    "testTimeout": 30000,
+    "globals": true,
+    "coverage": {
+      "provider": "v8",
+      "reporter": ["text", "json", "html", "lcov"],
+      "exclude": [
+        "node_modules/",
+        "dist/",
+        "coverage/",
+        "**/*.d.ts",
+        "**/*.test.{ts,tsx}",
+        "**/*.spec.{ts,tsx}",
+        "**/test/**",
+        "**/tests/**",
+        "**/__tests__/**"
+      ],
+      "thresholds": {
+        "global": {
+          "branches": 85,
+          "functions": 85,
+          "lines": 85,
+          "statements": 85
+        }
+      }
+    }
+  },
+  "nodemonConfig": {
+    "watch": ["src"],
+    "ext": "ts,js,json",
+    "ignore": [
+      "src/**/*.test.ts",
+      "src/**/*.spec.ts",
+      "dist/",
+      "node_modules/"
+    ],
+    "exec": "tsx src/index.ts",
+    "env": {
+      "NODE_ENV": "development"
+    }
+  },
+  "release": {
+    "branches": [
+      "main",
+      {
+        "name": "develop",
+        "prerelease": "beta"
+      },
+      {
+        "name": "next",
+        "prerelease": "alpha"
+      }
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/github",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json",
+            "package-lock.json"
+          ],
+          "message": "chore(release): ${nextRelease.version} [skip ci]\\n\\n${nextRelease.notes}"
+        }
+      ]
+    ]
+  },
+  "snyk": {
+    "language-settings": {
+      "javascript": {
+        "includeDevDependencies": false
+      }
+    }
+  },
+  "engineStrict": true,
+  "stability": "stable",
+  "beta": false,
+  "experimental": false
+}
