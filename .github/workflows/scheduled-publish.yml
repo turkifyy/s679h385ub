@@ -1,0 +1,2543 @@
+# ==================================================================================
+# SocialHub Pro v11.0 - Enhanced Scheduled Publishing Workflow
+# Bulk Import Integrated - Production Grade - Auto File Cleanup
+# 🚀 Real Production Environment - No Demo Data - No Single Post Publishing
+# Focus: Bulk Import Integration with Automatic File Cleanup After Publishing
+# ==================================================================================
+
+name: 'Scheduled Publishing v11.0 - Bulk Import Integrated'
+
+# ==================================================================================
+# WORKFLOW TRIGGERS & INPUTS (BULK IMPORT FOCUSED)
+# ==================================================================================
+
+on:
+  # Production Scheduling - Every 3 minutes for optimal responsiveness
+  schedule:
+    - cron: '*/3 * * * *'  # Every 3 minutes - optimized for bulk imports
+    - cron: '0 */1 * * *'  # Hourly health checks
+    - cron: '0 0 * * *'    # Daily analytics compilation and cleanup maintenance
+
+  # Bulk Import Integration - Called by bulk-import.yml
+  workflow_call:
+    inputs:
+      importId:
+        description: '🆔 Import ID from bulk import operation'
+        required: true
+        type: string
+      uid:
+        description: '👤 User ID from bulk import'
+        required: true
+        type: string
+      correlationId:
+        description: '🔗 Correlation ID for tracking'
+        required: true
+        type: string
+      enableCleanup:
+        description: '🗑️ Enable automatic file cleanup after publishing'
+        required: false
+        type: boolean
+        default: true
+      priority:
+        description: '⚡ Priority level for this import'
+        required: false
+        type: string
+        default: 'normal'
+      source:
+        description: '📝 Source of the workflow trigger'
+        required: false
+        type: string
+        default: 'bulk-import'
+
+  # Manual Trigger with Enhanced Bulk Import Parameters
+  workflow_dispatch:
+    inputs:
+      importId:
+        description: '🆔 Import ID (for manual bulk processing)'
+        required: false
+        type: string
+      uid:
+        description: '👤 User ID (for user-specific processing)'
+        required: false
+        type: string
+      batchSize:
+        description: '📦 Batch Size (10-500, default: 100)'
+        required: false
+        default: '100'
+        type: choice
+        options: ['10', '25', '50', '100', '200', '300', '500']
+      maxConcurrency:
+        description: '⚡ Max Concurrent Workers (1-15, default: 10)'
+        required: false
+        default: '10'
+        type: choice
+        options: ['1', '2', '4', '6', '8', '10', '12', '15']
+      priorityLevel:
+        description: '🎯 Priority Level (default: normal)'
+        required: false
+        default: 'normal'
+        type: choice
+        options: ['low', 'normal', 'high', 'urgent']
+      platformFilter:
+        description: '📱 Platform Filter (default: all)'
+        required: false
+        default: 'all'
+        type: choice
+        options: ['all', 'facebook', 'instagram', 'twitter', 'linkedin', 'tiktok']
+      enableCleanup:
+        description: '🗑️ Enable File Cleanup After Publishing'
+        required: false
+        default: true
+        type: boolean
+      validationLevel:
+        description: '🔍 Validation Level (default: strict)'
+        required: false
+        default: 'strict'
+        type: choice
+        options: ['standard', 'strict', 'enterprise']
+      debugMode:
+        description: '🐛 Debug Mode (default: false)'
+        required: false
+        default: false
+        type: boolean
+      retryStrategy:
+        description: '🔄 Retry Strategy (default: exponential)'
+        required: false
+        default: 'exponential'
+        type: choice
+        options: ['linear', 'exponential', 'adaptive']
+      notificationChannels:
+        description: '🔔 Notification Channels (default: slack,webhook)'
+        required: false
+        default: 'slack,webhook'
+        type: string
+
+# ==================================================================================
+# ENVIRONMENT VARIABLES & CONFIGURATION (ENHANCED FOR BULK IMPORT)
+# ==================================================================================
+
+env:
+  # Core System Configuration
+  NODE_VERSION: '20.10.0'
+  TIMEZONE: 'Asia/Dubai'
+  WORKFLOW_VERSION: 'v11.0-bulk-integrated'
+  EXECUTION_ID: ${{ github.run_number }}-${{ github.run_attempt }}
+  CORRELATION_ID: ${{ github.event.inputs.correlationId || github.run_id }}
+  
+  # Bulk Import Integration
+  IMPORT_ID: ${{ github.event.inputs.importId || '' }}
+  TARGET_UID: ${{ github.event.inputs.uid || '' }}
+  ENABLE_CLEANUP: ${{ github.event.inputs.enableCleanup || 'true' }}
+  SOURCE_WORKFLOW: ${{ github.event.inputs.source || 'scheduled' }}
+  
+  # Dynamic Processing Parameters
+  BATCH_SIZE: ${{ github.event.inputs.batchSize || '100' }}
+  MAX_CONCURRENCY: ${{ github.event.inputs.maxConcurrency || '10' }}
+  PRIORITY_LEVEL: ${{ github.event.inputs.priorityLevel || 'normal' }}
+  PLATFORM_FILTER: ${{ github.event.inputs.platformFilter || 'all' }}
+  VALIDATION_LEVEL: ${{ github.event.inputs.validationLevel || 'strict' }}
+  RETRY_STRATEGY: ${{ github.event.inputs.retryStrategy || 'exponential' }}
+  DEBUG_MODE: ${{ github.event.inputs.debugMode || 'false' }}
+  NOTIFICATION_CHANNELS: ${{ github.event.inputs.notificationChannels || 'slack,webhook' }}
+  
+  # Enhanced Retry & Performance Configuration
+  MAX_RETRIES: 5
+  BASE_RETRY_DELAY: 8
+  MAX_RETRY_DELAY: 300
+  CIRCUIT_BREAKER_THRESHOLD: 8
+  CIRCUIT_BREAKER_TIMEOUT: 180
+  PROCESSING_TIMEOUT: 7200
+  
+  # Platform Rate Limits (Optimized for Bulk)
+  FACEBOOK_RATE_LIMIT: 300
+  INSTAGRAM_RATE_LIMIT: 300
+  TWITTER_RATE_LIMIT: 450
+  LINKEDIN_RATE_LIMIT: 150
+  TIKTOK_RATE_LIMIT: 120
+  
+  # Performance & Resource Settings
+  MEMORY_LIMIT: '6144MB'
+  CPU_LIMIT: '4000m'
+  CONNECTION_POOL_SIZE: 25
+  CACHE_TTL: 600
+  BULK_PROCESSING_CHUNK_SIZE: 50
+  
+  # Firebase & Database Configuration
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+  FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+  FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+  FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+  
+  # Platform API Credentials (Enhanced Security)
+  FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID }}
+  FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}
+  TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+  TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+  TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
+  LINKEDIN_CLIENT_ID: ${{ secrets.LINKEDIN_CLIENT_ID }}
+  LINKEDIN_CLIENT_SECRET: ${{ secrets.LINKEDIN_CLIENT_SECRET }}
+  TIKTOK_APP_ID: ${{ secrets.TIKTOK_APP_ID }}
+  TIKTOK_APP_SECRET: ${{ secrets.TIKTOK_APP_SECRET }}
+  
+  # Notification & Monitoring Services
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  WEBHOOK_NOTIFICATION_URL: ${{ secrets.WEBHOOK_NOTIFICATION_URL }}
+  EMAIL_SERVICE_KEY: ${{ secrets.EMAIL_SERVICE_KEY }}
+  MONITORING_API_KEY: ${{ secrets.MONITORING_API_KEY }}
+  
+  # Security & Compliance
+  ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  AUDIT_LOG_ENDPOINT: ${{ secrets.AUDIT_LOG_ENDPOINT }}
+
+# ==================================================================================
+# ENHANCED PRODUCTION JOBS PIPELINE
+# ==================================================================================
+
+jobs:
+
+  # ================================================================================
+  # PHASE 1: BULK IMPORT INTEGRATION & VALIDATION
+  # ================================================================================
+
+  bulk-import-validation:
+    name: '🔗 Bulk Import Integration & Enhanced Validation'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      import-validated: ${{ steps.import-validation.outputs.validated }}
+      posts-count: ${{ steps.import-validation.outputs.posts_count }}
+      user-validated: ${{ steps.user-validation.outputs.validated }}
+      cleanup-enabled: ${{ steps.import-validation.outputs.cleanup_enabled }}
+      processing-mode: ${{ steps.import-validation.outputs.processing_mode }}
+
+    steps:
+      - name: '🏁 Initialize Bulk Import Integration'
+        run: |
+          echo "🔗 Starting Bulk Import Integration for SocialHub Pro v11.0"
+          echo "⏰ Timestamp: $(date -u '+%Y-%m-%dT%H:%M:%S.%3NZ')"
+          echo "🆔 Execution ID: ${{ env.EXECUTION_ID }}"
+          echo "🔗 Correlation ID: ${{ env.CORRELATION_ID }}"
+          echo "📝 Source Workflow: ${{ env.SOURCE_WORKFLOW }}"
+          echo "🎯 Focus: Bulk Import Processing Only"
+          
+          # Processing mode determination
+          if [ -n "${{ env.IMPORT_ID }}" ]; then
+            echo "🔗 Mode: Bulk Import Processing"
+            echo "📋 Import ID: ${{ env.IMPORT_ID }}"
+            echo "👤 User ID: ${{ env.TARGET_UID }}"
+          else
+            echo "📅 Mode: Scheduled Processing"
+            echo "🔍 Searching for ready-to-publish posts"
+          fi
+
+      - name: '🔧 Setup Enhanced Node.js Environment'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: '📦 Install Enhanced Dependencies'
+        run: |
+          echo "📦 Installing production-optimized dependencies..."
+          npm install -g --production \
+            firebase-admin@12.1.0 \
+            moment-timezone@0.5.44 \
+            ajv@8.12.0 \
+            ajv-formats@2.1.1 \
+            validator@13.11.0 \
+            p-limit@4.0.0 \
+            p-retry@6.0.0 \
+            bottleneck@2.19.5 \
+            uuid@9.0.1 \
+            crypto-js@4.2.0 \
+            lodash@4.17.21 \
+            axios@1.6.0
+          
+          echo "✅ Dependencies installed successfully"
+
+      - name: '🔥 Firebase Admin SDK Enhanced Initialization'
+        run: |
+          echo "🔥 Initializing Firebase Admin SDK for bulk operations..."
+          
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          
+          try {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            
+            admin.initializeApp({
+              credential: admin.credential.cert(serviceAccount),
+              databaseURL: process.env.FIREBASE_DATABASE_URL,
+              storageBucket: process.env.FIREBASE_STORAGE_BUCKET
+            });
+            
+            const db = admin.firestore();
+            db.settings({
+              ignoreUndefinedProperties: true,
+              maxIdleChannels: 15,
+              keepAlive: true
+            });
+            
+            // Test connectivity with bulk operations focus
+            await db.doc('system/health').set({
+              service: 'scheduled-publishing-v11.0',
+              bulkIntegration: true,
+              timestamp: admin.firestore.FieldValue.serverTimestamp(),
+              correlationId: process.env.CORRELATION_ID,
+              capabilities: {
+                bulkImportProcessing: true,
+                fileCleanupIntegration: true,
+                enhancedColumnSupport: true,
+                multiPlatformPublishing: true
+              }
+            });
+            
+            console.log('✅ Firebase Admin SDK initialized for bulk operations');
+            console.log('🔗 Bulk import integration: Ready');
+            console.log('🗑️ File cleanup integration: Ready');
+            console.log('📊 Enhanced analytics: Ready');
+            
+          } catch (error) {
+            console.error('❌ Firebase initialization failed:', error.message);
+            process.exit(1);
+          }
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+
+      - name: '🔍 Enhanced Import & User Validation'
+        id: import-validation
+        run: |
+          echo "🔍 Performing enhanced bulk import validation..."
+          
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          const db = admin.firestore();
+          
+          async function validateImportAndUser() {
+            try {
+              const importId = process.env.IMPORT_ID;
+              const targetUid = process.env.TARGET_UID;
+              const sourceWorkflow = process.env.SOURCE_WORKFLOW;
+              
+              console.log(`🔍 Validation Parameters:`);
+              console.log(`  Import ID: ${importId || 'Not specified'}`);
+              console.log(`  User ID: ${targetUid || 'Not specified'}`);
+              console.log(`  Source: ${sourceWorkflow}`);
+              
+              let processingMode = 'scheduled';
+              let postsCount = 0;
+              let userValidated = true;
+              let cleanupEnabled = process.env.ENABLE_CLEANUP === 'true';
+              
+              if (importId && targetUid) {
+                console.log('🔗 Bulk Import Mode: Validating import operation...');
+                processingMode = 'bulk_import';
+                
+                // Validate import operation exists
+                const importDoc = await db.collection('import_operations').doc(importId).get();
+                if (!importDoc.exists) {
+                  throw new Error(`Import operation ${importId} not found`);
+                }
+                
+                const importData = importDoc.data();
+                console.log(`📋 Import Operation Found:`);
+                console.log(`  Status: ${importData.status}`);
+                console.log(`  Total Records: ${importData.statistics?.totalRecords || 0}`);
+                console.log(`  Created: ${importData.startedAt?.toDate?.()?.toISOString() || 'Unknown'}`);
+                
+                // Validate user permissions
+                if (importData.uid !== targetUid) {
+                  throw new Error(`User ${targetUid} is not authorized for import ${importId}`);
+                }
+                
+                // Count posts for this import
+                const postsSnapshot = await db.collection('posts')
+                  .where('importMetadata.importId', '==', importId)
+                  .where('status', 'in', ['scheduled', 'processing'])
+                  .get();
+                
+                postsCount = postsSnapshot.size;
+                console.log(`📊 Posts ready for publishing: ${postsCount}`);
+                
+                if (postsCount === 0) {
+                  console.log('⚠️ No posts found for publishing - may have been processed already');
+                }
+                
+                // Verify user exists and has permissions
+                const userDoc = await db.collection('users').doc(targetUid).get();
+                if (!userDoc.exists) {
+                  throw new Error(`User ${targetUid} not found`);
+                }
+                
+                const userData = userDoc.data();
+                if (!userData.permissions?.scheduledPublishing) {
+                  throw new Error(`User ${targetUid} lacks scheduled publishing permissions`);
+                }
+                
+                console.log(`✅ User Validation Passed:`);
+                console.log(`  Email: ${userData.email || 'N/A'}`);
+                console.log(`  Status: ${userData.status}`);
+                console.log(`  Permissions: Publishing Enabled`);
+                
+              } else {
+                console.log('📅 Scheduled Mode: Processing all ready posts...');
+                
+                // Count all scheduled posts ready for publishing
+                const now = new Date();
+                const readyPostsSnapshot = await db.collection('posts')
+                  .where('status', '==', 'scheduled')
+                  .where('scheduledAt', '<=', now)
+                  .limit(parseInt(process.env.BATCH_SIZE) * 2) // Reasonable limit
+                  .get();
+                
+                postsCount = readyPostsSnapshot.size;
+                console.log(`📊 Scheduled posts ready: ${postsCount}`);
+              }
+              
+              // Set GitHub outputs
+              console.log(`validated=true`);
+              console.log(`posts_count=${postsCount}`);
+              console.log(`user_validated=${userValidated}`);
+              console.log(`cleanup_enabled=${cleanupEnabled}`);
+              console.log(`processing_mode=${processingMode}`);
+              
+              console.log(`\n✅ Enhanced validation completed successfully`);
+              console.log(`🔗 Processing Mode: ${processingMode}`);
+              console.log(`📊 Posts to Process: ${postsCount}`);
+              console.log(`🗑️ Cleanup Enabled: ${cleanupEnabled}`);
+              
+            } catch (error) {
+              console.error('❌ Enhanced validation failed:', error.message);
+              console.log(`validated=false`);
+              console.log(`posts_count=0`);
+              console.log(`user_validated=false`);
+              console.log(`cleanup_enabled=false`);
+              console.log(`processing_mode=error`);
+              process.exit(1);
+            }
+          }
+          
+          validateImportAndUser();
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+
+      - name: '📊 Validation Results Summary'
+        run: |
+          echo "📊 Bulk Import Validation Results Summary"
+          echo "════════════════════════════════════════"
+          echo "✅ Import Validated: ${{ steps.import-validation.outputs.validated }}"
+          echo "📋 Posts Count: ${{ steps.import-validation.outputs.posts_count }}"
+          echo "👤 User Validated: ${{ steps.import-validation.outputs.user_validated }}"
+          echo "🗑️ Cleanup Enabled: ${{ steps.import-validation.outputs.cleanup_enabled }}"
+          echo "🔧 Processing Mode: ${{ steps.import-validation.outputs.processing_mode }}"
+          echo "════════════════════════════════════════"
+
+  # ================================================================================
+  # PHASE 2: ENHANCED POST PROCESSING & CONTENT ADAPTATION
+  # ================================================================================
+
+  enhanced-post-processing:
+    name: '📝 Enhanced Post Processing & Content Adaptation'
+    runs-on: ubuntu-latest
+    needs: bulk-import-validation
+    if: needs.bulk-import-validation.outputs.import-validated == 'true' && needs.bulk-import-validation.outputs.posts-count > 0
+    timeout-minutes: 30
+    outputs:
+      processed-posts: ${{ steps.content-processing.outputs.processed_posts }}
+      valid-posts: ${{ steps.content-processing.outputs.valid_posts }}
+      processing-stats: ${{ steps.content-processing.outputs.processing_stats }}
+
+    steps:
+      - name: '🔧 Setup Enhanced Processing Environment'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: '📦 Install Processing Dependencies'
+        run: |
+          echo "📦 Installing enhanced content processing dependencies..."
+          npm install -g --production \
+            firebase-admin@12.1.0 \
+            moment-timezone@0.5.44 \
+            ajv@8.12.0 \
+            ajv-formats@2.1.1 \
+            validator@13.11.0 \
+            sharp@0.33.0 \
+            html-to-text@9.0.5 \
+            natural@6.7.0 \
+            crypto-js@4.2.0
+
+      - name: '🔥 Initialize Firebase for Processing'
+        run: |
+          echo "🔥 Initializing Firebase for content processing..."
+          
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          
+          const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+          admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            databaseURL: process.env.FIREBASE_DATABASE_URL
+          });
+          
+          console.log('✅ Firebase initialized for content processing');
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+
+      - name: '📋 Fetch & Validate Posts with Enhanced Schema'
+        id: content-processing
+        run: |
+          echo "📋 Fetching and processing posts with enhanced validation..."
+          
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          const Ajv = require('ajv');
+          const addFormats = require('ajv-formats');
+          const validator = require('validator');
+          const moment = require('moment-timezone');
+          const crypto = require('crypto-js');
+          const natural = require('natural');
+          
+          const db = admin.firestore();
+          
+          // Enhanced validation schema with new columns
+          const enhancedPostSchema = {
+            type: 'object',
+            required: ['id', 'status', 'scheduledAt', 'platforms'],
+            properties: {
+              id: { type: 'string', minLength: 1 },
+              status: { type: 'string', enum: ['scheduled', 'processing'] },
+              scheduledAt: { type: 'string', format: 'date-time' },
+              platforms: {
+                type: 'array',
+                items: {
+                  type: 'string',
+                  enum: ['facebook', 'instagram', 'twitter', 'linkedin', 'tiktok']
+                },
+                minItems: 1,
+                maxItems: 5
+              },
+              
+              // Enhanced new columns support
+              socialTitle: {
+                type: 'string',
+                minLength: 1,
+                maxLength: 280,
+                pattern: '^[^<>"\';\\\\]*$'
+              },
+              socialDescription: {
+                type: 'string',
+                minLength: 1,
+                maxLength: 2000,
+                pattern: '^[^<>"\';\\\\]*$'
+              },
+              shortUrl: {
+                type: 'string',
+                format: 'uri',
+                pattern: '^https://'
+              },
+              linkType: {
+                type: 'string',
+                enum: ['article', 'video', 'image', 'link', 'event']
+              },
+              socialImageurl: {
+                type: 'string',
+                format: 'uri',
+                pattern: '^https://.*\\.(jpg|jpeg|png|gif|webp)($|\\?)'
+              },
+              socialhachtags: {
+                type: 'string',
+                pattern: '^#[a-zA-Z0-9_]{1,30}(,#[a-zA-Z0-9_]{1,30})*$'
+              },
+              day: {
+                type: 'string',
+                format: 'date'
+              },
+              hour: {  // Fixed from 'houre'
+                type: 'string',
+                pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$'
+              },
+              platform: {  // Legacy support, converted to platforms array
+                type: 'string',
+                pattern: '^(facebook|instagram|twitter|linkedin|tiktok)(,(facebook|instagram|twitter|linkedin|tiktok))*$'
+              },
+              
+              // Optional fields for backward compatibility
+              content: { type: 'string', maxLength: 4000 },
+              imageUrl: { type: 'string', format: 'uri' },
+              priority: { type: 'number', minimum: 0, maximum: 10 }
+            }
+          };
+          
+          // Platform-specific content processors
+          const platformProcessors = {
+            facebook: (post) => {
+              const content = [
+                post.socialTitle,
+                post.socialDescription,
+                post.socialhachtags
+              ].filter(Boolean).join('\n\n');
+              
+              return {
+                message: content,
+                link: post.shortUrl,
+                picture: post.socialImageurl,
+                type: post.linkType || 'link'
+              };
+            },
+            
+            instagram: (post) => {
+              if (!post.socialImageurl) {
+                throw new Error('Instagram requires an image URL');
+              }
+              
+              const content = [
+                post.socialTitle,
+                post.socialDescription,
+                post.socialhachtags
+              ].filter(Boolean).join('\n\n');
+              
+              return {
+                caption: content.substring(0, 2200), // Instagram limit
+                image_url: post.socialImageurl,
+                link_in_bio: post.shortUrl
+              };
+            },
+            
+            twitter: (post) => {
+              const maxLength = 280;
+              let content = post.socialTitle;
+              
+              if (post.socialDescription) {
+                const remainingSpace = maxLength - content.length - (post.shortUrl ? 24 : 0) - 2;
+                if (remainingSpace > 10) {
+                  const description = post.socialDescription.length > remainingSpace 
+                    ? post.socialDescription.substring(0, remainingSpace - 3) + '...'
+                    : post.socialDescription;
+                  content += '\n\n' + description;
+                }
+              }
+              
+              if (post.shortUrl && (content.length + 24) <= maxLength) {
+                content += '\n' + post.shortUrl;
+              }
+              
+              // Add hashtags if space allows
+              if (post.socialhachtags) {
+                const hashtagsLength = post.socialhachtags.length;
+                if ((content.length + hashtagsLength + 1) <= maxLength) {
+                  content += '\n' + post.socialhachtags;
+                } else {
+                  // Try to fit at least one hashtag
+                  const firstHashtag = post.socialhachtags.split(',')[0];
+                  if (firstHashtag && (content.length + firstHashtag.length + 1) <= maxLength) {
+                    content += '\n' + firstHashtag;
+                  }
+                }
+              }
+              
+              return {
+                text: content,
+                media: post.socialImageurl ? [{ url: post.socialImageurl }] : []
+              };
+            },
+            
+            linkedin: (post) => {
+              const content = [
+                post.socialTitle,
+                post.socialDescription,
+                post.socialhachtags
+              ].filter(Boolean).join('\n\n');
+              
+              return {
+                commentary: content.substring(0, 1300), // LinkedIn limit
+                content: post.shortUrl ? {
+                  contentEntities: [{
+                    entityLocation: post.shortUrl,
+                    thumbnails: post.socialImageurl ? [{ 
+                      resolvedUrl: post.socialImageurl 
+                    }] : []
+                  }]
+                } : undefined
+              };
+            },
+            
+            tiktok: (post) => {
+              const content = [
+                post.socialTitle,
+                post.socialDescription,
+                post.socialhachtags
+              ].filter(Boolean).join('\n\n');
+              
+              return {
+                text: content.substring(0, 2200),
+                video_url: post.linkType === 'video' ? post.shortUrl : null,
+                cover_image: post.socialImageurl
+              };
+            }
+          };
+          
+          // Content quality analyzer
+          function analyzeContentQuality(post) {
+            const issues = [];
+            const warnings = [];
+            
+            // Check for spam patterns
+            const spamPatterns = [
+              /\b(buy now|click here|urgent|limited time|act now)\b/gi,
+              /(.)\\1{4,}/g,  // Repeated characters
+              /[A-Z]{10,}/    // Too many capitals
+            ];
+            
+            const allContent = [post.socialTitle, post.socialDescription].join(' ');
+            
+            spamPatterns.forEach(pattern => {
+              if (pattern.test(allContent)) {
+                warnings.push(`Potential spam pattern detected: ${pattern.source}`);
+              }
+            });
+            
+            // Check content length appropriateness
+            if (post.socialTitle && post.socialTitle.length < 5) {
+              issues.push('Title is too short (minimum 5 characters recommended)');
+            }
+            
+            if (post.socialDescription && post.socialDescription.length < 10) {
+              warnings.push('Description is quite short (minimum 10 characters recommended)');
+            }
+            
+            // Check hashtag quality
+            if (post.socialhachtags) {
+              const hashtags = post.socialhachtags.split(',');
+              if (hashtags.length > 10) {
+                warnings.push('More than 10 hashtags may reduce engagement');
+              }
+              
+              hashtags.forEach(hashtag => {
+                if (hashtag.replace('#', '').length < 3) {
+                  warnings.push(`Hashtag "${hashtag}" is too short`);
+                }
+              });
+            }
+            
+            return { issues, warnings };
+          }
+          
+          async function processPostsWithEnhancedValidation() {
+            try {
+              const processingMode = process.env.PROCESSING_MODE || 'scheduled';
+              const importId = process.env.IMPORT_ID;
+              const batchSize = parseInt(process.env.BATCH_SIZE) || 100;
+              
+              console.log(`📋 Processing Mode: ${processingMode}`);
+              console.log(`📦 Batch Size: ${batchSize}`);
+              
+              // Set up validation
+              const ajv = new Ajv({ allErrors: true, verbose: true });
+              addFormats(ajv);
+              const validate = ajv.compile(enhancedPostSchema);
+              
+              let postsQuery;
+              
+              if (processingMode === 'bulk_import' && importId) {
+                console.log(`🔗 Fetching posts for import: ${importId}`);
+                postsQuery = db.collection('posts')
+                  .where('importMetadata.importId', '==', importId)
+                  .where('status', 'in', ['scheduled', 'processing'])
+                  .limit(batchSize);
+              } else {
+                console.log('📅 Fetching scheduled posts ready for publishing');
+                const now = new Date();
+                postsQuery = db.collection('posts')
+                  .where('status', '==', 'scheduled')
+                  .where('scheduledAt', '<=', now)
+                  .limit(batchSize);
+              }
+              
+              const snapshot = await postsQuery.get();
+              console.log(`📊 Found ${snapshot.size} posts to process`);
+              
+              if (snapshot.empty) {
+                console.log('ℹ️ No posts found for processing');
+                console.log(`processed_posts=0`);
+                console.log(`valid_posts=0`);
+                console.log(`processing_stats={}`);
+                return;
+              }
+              
+              const stats = {
+                total: snapshot.size,
+                valid: 0,
+                invalid: 0,
+                warnings: 0,
+                platformBreakdown: {},
+                contentTypes: {},
+                processingTime: Date.now()
+              };
+              
+              const validPosts = [];
+              const invalidPosts = [];
+              
+              console.log('🔍 Processing posts with enhanced validation...');
+              
+              for (const doc of snapshot.docs) {
+                const postData = doc.data();
+                const post = {
+                  id: doc.id,
+                  ...postData,
+                  // Convert legacy fields to new format
+                  platforms: postData.platforms || (postData.platform ? postData.platform.split(',').map(p => p.trim()) : []),
+                  socialTitle: postData.socialTitle || postData.title || postData.content?.substring(0, 100) || 'Untitled Post',
+                  socialDescription: postData.socialDescription || postData.description || postData.content || '',
+                  shortUrl: postData.shortUrl || postData.url || postData.link,
+                  linkType: postData.linkType || 'link',
+                  socialImageurl: postData.socialImageurl || postData.imageUrl,
+                  socialhachtags: postData.socialhachtags || postData.hashtags,
+                  day: postData.day || moment(postData.scheduledAt).format('YYYY-MM-DD'),
+                  hour: postData.hour || moment(postData.scheduledAt).format('HH:mm')
+                };
+                
+                // Schema validation
+                const isValid = validate(post);
+                
+                if (!isValid) {
+                  console.log(`❌ Post ${post.id} failed schema validation:`, validate.errors);
+                  invalidPosts.push({
+                    id: post.id,
+                    errors: validate.errors,
+                    type: 'schema_validation'
+                  });
+                  stats.invalid++;
+                  continue;
+                }
+                
+                // Content quality analysis
+                const qualityAnalysis = analyzeContentQuality(post);
+                
+                if (qualityAnalysis.issues.length > 0) {
+                  console.log(`⚠️ Post ${post.id} has quality issues:`, qualityAnalysis.issues);
+                  invalidPosts.push({
+                    id: post.id,
+                    errors: qualityAnalysis.issues,
+                    type: 'content_quality'
+                  });
+                  stats.invalid++;
+                  continue;
+                }
+                
+                if (qualityAnalysis.warnings.length > 0) {
+                  console.log(`⚠️ Post ${post.id} has warnings:`, qualityAnalysis.warnings);
+                  stats.warnings++;
+                }
+                
+                // Platform-specific content processing
+                const platformContent = {};
+                for (const platform of post.platforms) {
+                  try {
+                    platformContent[platform] = platformProcessors[platform](post);
+                    
+                    // Update platform stats
+                    stats.platformBreakdown[platform] = (stats.platformBreakdown[platform] || 0) + 1;
+                  } catch (error) {
+                    console.log(`❌ Platform processing failed for ${post.id} on ${platform}:`, error.message);
+                    invalidPosts.push({
+                      id: post.id,
+                      errors: [`${platform}: ${error.message}`],
+                      type: 'platform_processing'
+                    });
+                    stats.invalid++;
+                    continue;
+                  }
+                }
+                
+                // Content type stats
+                const contentType = post.linkType || 'unknown';
+                stats.contentTypes[contentType] = (stats.contentTypes[contentType] || 0) + 1;
+                
+                // Add processing metadata
+                const processedPost = {
+                  ...post,
+                  platformContent,
+                  processingMetadata: {
+                    processedAt: new Date().toISOString(),
+                    correlationId: process.env.CORRELATION_ID,
+                    workflowVersion: process.env.WORKFLOW_VERSION,
+                    contentQuality: {
+                      score: Math.max(0, 100 - (qualityAnalysis.warnings.length * 10)),
+                      warnings: qualityAnalysis.warnings
+                    }
+                  }
+                };
+                
+                validPosts.push(processedPost);
+                stats.valid++;
+                
+                if ((stats.valid + stats.invalid) % 25 === 0) {
+                  console.log(`📊 Progress: ${stats.valid + stats.invalid}/${stats.total} posts processed`);
+                }
+              }
+              
+              stats.processingTime = Date.now() - stats.processingTime;
+              stats.successRate = ((stats.valid / stats.total) * 100).toFixed(2);
+              
+              console.log('\\n📊 Enhanced Processing Results:');
+              console.log(` Total Posts: ${stats.total}`);
+              console.log(` ✅ Valid: ${stats.valid}`);
+              console.log(` ❌ Invalid: ${stats.invalid}`);
+              console.log(` ⚠️ Warnings: ${stats.warnings}`);
+              console.log(` 📈 Success Rate: ${stats.successRate}%`);
+              console.log(` ⏱️ Processing Time: ${stats.processingTime}ms`);
+              
+              console.log('\\n📱 Platform Breakdown:');
+              Object.entries(stats.platformBreakdown).forEach(([platform, count]) => {
+                console.log(` ${platform}: ${count} posts`);
+              });
+              
+              // Save processed data to environment variables
+              console.log(`processed_posts=${stats.total}`);
+              console.log(`valid_posts=${stats.valid}`);
+              console.log(`processing_stats=${JSON.stringify(stats)}`);
+              
+              // Mark posts as processing to prevent double-processing
+              if (stats.valid > 0) {
+                const batch = db.batch();
+                validPosts.forEach(post => {
+                  const postRef = db.collection('posts').doc(post.id);
+                  batch.update(postRef, {
+                    status: 'processing',
+                    processingStarted: admin.firestore.FieldValue.serverTimestamp(),
+                    processingMetadata: post.processingMetadata
+                  });
+                });
+                
+                await batch.commit();
+                console.log(`✅ Marked ${stats.valid} posts as processing`);
+              }
+              
+              console.log('\\n✅ Enhanced post processing completed successfully');
+              
+            } catch (error) {
+              console.error('❌ Enhanced post processing failed:', error.message);
+              console.log(`processed_posts=0`);
+              console.log(`valid_posts=0`);
+              console.log(`processing_stats={}`);
+              process.exit(1);
+            }
+          }
+          
+          processPostsWithEnhancedValidation();
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          PROCESSING_MODE: ${{ needs.bulk-import-validation.outputs.processing-mode }}
+          IMPORT_ID: ${{ env.IMPORT_ID }}
+          BATCH_SIZE: ${{ env.BATCH_SIZE }}
+          CORRELATION_ID: ${{ env.CORRELATION_ID }}
+          WORKFLOW_VERSION: ${{ env.WORKFLOW_VERSION }}
+
+      - name: '📊 Processing Results Summary'
+        run: |
+          echo "📊 Enhanced Post Processing Results"
+          echo "═══════════════════════════════════"
+          echo "📋 Processed Posts: ${{ steps.content-processing.outputs.processed_posts }}"
+          echo "✅ Valid Posts: ${{ steps.content-processing.outputs.valid_posts }}"
+          echo "📈 Processing Stats: ${{ steps.content-processing.outputs.processing_stats }}"
+          echo "═══════════════════════════════════"
+
+  # ================================================================================
+  # PHASE 3: MULTI-PLATFORM PUBLISHING ENGINE WITH CLEANUP TRACKING
+  # ================================================================================
+
+  enhanced-publishing-engine:
+    name: '🚀 Enhanced Multi-Platform Publishing Engine'
+    runs-on: ubuntu-latest
+    needs: [bulk-import-validation, enhanced-post-processing]
+    if: needs.enhanced-post-processing.outputs.valid-posts > 0
+    timeout-minutes: 60
+    outputs:
+      total-published: ${{ steps.publishing-results.outputs.total_published }}
+      total-failed: ${{ steps.publishing-results.outputs.total_failed }}
+      success-rate: ${{ steps.publishing-results.outputs.success_rate }}
+      platform-results: ${{ steps.publishing-results.outputs.platform_results }}
+      cleanup-ready: ${{ steps.publishing-results.outputs.cleanup_ready }}
+
+    steps:
+      - name: '🔧 Setup Enhanced Publishing Environment'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: '📦 Install Publishing Dependencies'
+        run: |
+          echo "📦 Installing enhanced publishing dependencies..."
+          npm install -g --production \
+            firebase-admin@12.1.0 \
+            axios@1.6.0 \
+            p-limit@4.0.0 \
+            p-retry@6.0.0 \
+            bottleneck@2.19.5 \
+            sharp@0.33.0 \
+            form-data@4.0.0 \
+            uuid@9.0.1 \
+            moment-timezone@0.5.44
+
+      - name: '🔥 Initialize Firebase for Publishing'
+        run: |
+          echo "🔥 Initializing Firebase for enhanced publishing..."
+          
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          
+          const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+          admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            databaseURL: process.env.FIREBASE_DATABASE_URL,
+            storageBucket: process.env.FIREBASE_STORAGE_BUCKET
+          });
+          
+          const db = admin.firestore();
+          db.settings({
+            ignoreUndefinedProperties: true,
+            maxIdleChannels: 20,
+            keepAlive: true
+          });
+          
+          console.log('✅ Firebase initialized for enhanced publishing');
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+
+      - name: '🚀 Execute Enhanced Multi-Platform Publishing'
+        id: publishing-execution
+        run: |
+          echo "🚀 Starting enhanced multi-platform publishing engine..."
+          
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          const axios = require('axios');
+          const pLimit = require('p-limit');
+          const pRetry = require('p-retry');
+          const Bottleneck = require('bottleneck');
+          const moment = require('moment-timezone');
+          const { v4: uuidv4 } = require('uuid');
+          
+          const db = admin.firestore();
+          
+          // Enhanced configuration
+          const config = {
+            maxConcurrency: parseInt(process.env.MAX_CONCURRENCY) || 10,
+            maxRetries: parseInt(process.env.MAX_RETRIES) || 5,
+            baseRetryDelay: parseInt(process.env.BASE_RETRY_DELAY) || 8,
+            maxRetryDelay: parseInt(process.env.MAX_RETRY_DELAY) || 300,
+            retryStrategy: process.env.RETRY_STRATEGY || 'exponential',
+            correlationId: process.env.CORRELATION_ID,
+            debugMode: process.env.DEBUG_MODE === 'true',
+            enableCleanup: process.env.ENABLE_CLEANUP === 'true',
+            importId: process.env.IMPORT_ID
+          };
+          
+          // Enhanced rate limiters per platform
+          const rateLimiters = {
+            facebook: new Bottleneck({ 
+              minTime: 200, 
+              maxConcurrent: 8,
+              reservoir: 300,
+              reservoirRefreshAmount: 300,
+              reservoirRefreshInterval: 60 * 1000
+            }),
+            instagram: new Bottleneck({ 
+              minTime: 200, 
+              maxConcurrent: 8,
+              reservoir: 300,
+              reservoirRefreshAmount: 300,
+              reservoirRefreshInterval: 60 * 1000
+            }),
+            twitter: new Bottleneck({ 
+              minTime: 133, 
+              maxConcurrent: 10,
+              reservoir: 450,
+              reservoirRefreshAmount: 450,
+              reservoirRefreshInterval: 60 * 1000
+            }),
+            linkedin: new Bottleneck({ 
+              minTime: 400, 
+              maxConcurrent: 5,
+              reservoir: 150,
+              reservoirRefreshAmount: 150,
+              reservoirRefreshInterval: 60 * 1000
+            }),
+            tiktok: new Bottleneck({ 
+              minTime: 500, 
+              maxConcurrent: 3,
+              reservoir: 120,
+              reservoirRefreshAmount: 120,
+              reservoirRefreshInterval: 60 * 1000
+            })
+          };
+          
+          // Global statistics tracking
+          const publishingStats = {
+            startTime: Date.now(),
+            totalPosts: 0,
+            totalPublished: 0,
+            totalFailed: 0,
+            platformStats: {},
+            errorStats: {},
+            publishingTimes: [],
+            cleanup: {
+              enabled: config.enableCleanup,
+              importId: config.importId,
+              postsTracked: 0,
+              cleanupReady: false
+            }
+          };
+          
+          // Initialize platform stats
+          ['facebook', 'instagram', 'twitter', 'linkedin', 'tiktok'].forEach(platform => {
+            publishingStats.platformStats[platform] = {
+              attempted: 0,
+              successful: 0,
+              failed: 0,
+              avgDuration: 0
+            };
+          });
+          
+          // Enhanced Publishing Engine Class
+          class EnhancedPublishingEngine {
+            constructor() {
+              this.concurrencyLimiter = pLimit(config.maxConcurrency);
+              this.publishingResults = [];
+              this.circuitBreakers = new Map();
+              this.progressInterval = null;
+            }
+            
+            async initialize() {
+              console.log('🔧 Initializing Enhanced Publishing Engine...');
+              console.log(` Configuration:`);
+              console.log(`  Max Concurrency: ${config.maxConcurrency}`);
+              console.log(`  Max Retries: ${config.maxRetries}`);
+              console.log(`  Retry Strategy: ${config.retryStrategy}`);
+              console.log(`  Debug Mode: ${config.debugMode}`);
+              console.log(`  Cleanup Enabled: ${config.enableCleanup}`);
+              console.log(`  Import ID: ${config.importId || 'N/A'}`);
+              
+              // Initialize circuit breakers
+              ['facebook', 'instagram', 'twitter', 'linkedin', 'tiktok'].forEach(platform => {
+                this.circuitBreakers.set(platform, {
+                  failures: 0,
+                  lastFailure: null,
+                  isOpen: false
+                });
+              });
+              
+              // Start progress reporting
+              this.startProgressReporting();
+              
+              console.log('✅ Enhanced Publishing Engine initialized');
+            }
+            
+            startProgressReporting() {
+              this.progressInterval = setInterval(() => {
+                const elapsed = Date.now() - publishingStats.startTime;
+                const processed = publishingStats.totalPublished + publishingStats.totalFailed;
+                const rate = processed > 0 ? (processed / (elapsed / 1000)).toFixed(2) : '0';
+                
+                console.log(`📊 Progress: ${processed}/${publishingStats.totalPosts} posts (${rate} posts/sec)`);
+              }, 30000); // Every 30 seconds
+            }
+            
+            async fetchProcessingPosts() {
+              console.log('📋 Fetching posts ready for publishing...');
+              
+              try {
+                let postsQuery;
+                
+                if (config.importId) {
+                  console.log(`🔗 Fetching posts for import: ${config.importId}`);
+                  postsQuery = db.collection('posts')
+                    .where('importMetadata.importId', '==', config.importId)
+                    .where('status', '==', 'processing')
+                    .limit(parseInt(process.env.BATCH_SIZE) || 100);
+                } else {
+                  console.log('📅 Fetching all processing posts');
+                  postsQuery = db.collection('posts')
+                    .where('status', '==', 'processing')
+                    .limit(parseInt(process.env.BATCH_SIZE) || 100);
+                }
+                
+                const snapshot = await postsQuery.get();
+                
+                if (snapshot.empty) {
+                  console.log('ℹ️ No posts found for publishing');
+                  return [];
+                }
+                
+                const posts = [];
+                snapshot.forEach(doc => {
+                  const data = doc.data();
+                  posts.push({
+                    id: doc.id,
+                    ...data,
+                    scheduledAt: data.scheduledAt?.toDate?.() || new Date(data.scheduledAt),
+                    createdAt: data.createdAt?.toDate?.() || new Date(),
+                    updatedAt: data.updatedAt?.toDate?.() || new Date()
+                  });
+                });
+                
+                publishingStats.totalPosts = posts.length;
+                
+                console.log(`📊 Found ${posts.length} posts ready for publishing`);
+                
+                return posts;
+                
+              } catch (error) {
+                console.error('❌ Error fetching posts:', error.message);
+                throw error;
+              }
+            }
+            
+            async publishAllPosts() {
+              try {
+                const posts = await this.fetchProcessingPosts();
+                
+                if (posts.length === 0) {
+                  console.log('ℹ️ No posts to publish');
+                  return [];
+                }
+                
+                console.log(`🚀 Starting batch publication of ${posts.length} posts`);
+                
+                // Create publishing promises with concurrency control
+                const publishingPromises = posts.map((post, index) =>
+                  this.concurrencyLimiter(async () => {
+                    const startTime = Date.now();
+                    const result = await this.publishSinglePost(post, index + 1, posts.length);
+                    const duration = Date.now() - startTime;
+                    publishingStats.publishingTimes.push(duration);
+                    
+                    return result;
+                  })
+                );
+                
+                // Execute all publishing operations
+                const results = await Promise.allSettled(publishingPromises);
+                
+                // Process results
+                for (const result of results) {
+                  if (result.status === 'fulfilled') {
+                    this.publishingResults.push(result.value);
+                    
+                    if (result.value.success) {
+                      publishingStats.totalPublished++;
+                    } else {
+                      publishingStats.totalFailed++;
+                    }
+                  } else {
+                    publishingStats.totalFailed++;
+                    console.error('❌ Publishing promise rejected:', result.reason?.message);
+                  }
+                }
+                
+                // Stop progress reporting
+                if (this.progressInterval) {
+                  clearInterval(this.progressInterval);
+                }
+                
+                console.log('✅ Batch publication completed');
+                return this.publishingResults;
+                
+              } catch (error) {
+                console.error('💥 Critical error in publishAllPosts:', error);
+                throw error;
+              }
+            }
+            
+            async publishSinglePost(post, index, total) {
+              const operationId = uuidv4();
+              console.log(`📝 [${index}/${total}] Publishing post ${post.id} (${operationId})`);
+              
+              const result = {
+                postId: post.id,
+                operationId: operationId,
+                success: false,
+                platformResults: {},
+                errors: [],
+                startTime: Date.now(),
+                endTime: null,
+                duration: null
+              };
+              
+              try {
+                // Publish to each platform
+                const platformPromises = post.platforms.map(platform =>
+                  this.publishToPlatform(post, platform, operationId)
+                );
+                
+                const platformResults = await Promise.allSettled(platformPromises);
+                
+                let successfulPlatforms = 0;
+                
+                // Process platform results
+                platformResults.forEach((platformResult, index) => {
+                  const platform = post.platforms[index];
+                  publishingStats.platformStats[platform].attempted++;
+                  
+                  if (platformResult.status === 'fulfilled' && platformResult.value.success) {
+                    result.platformResults[platform] = platformResult.value;
+                    successfulPlatforms++;
+                    publishingStats.platformStats[platform].successful++;
+                  } else {
+                    const error = platformResult.status === 'fulfilled' 
+                      ? platformResult.value.error 
+                      : platformResult.reason;
+                      
+                    result.platformResults[platform] = {
+                      success: false,
+                      error: error?.message || error,
+                      platform: platform
+                    };
+                    
+                    result.errors.push(`${platform}: ${error?.message || error}`);
+                    publishingStats.platformStats[platform].failed++;
+                    
+                    // Update error statistics
+                    const errorType = this.classifyError(error);
+                    publishingStats.errorStats[errorType] = (publishingStats.errorStats[errorType] || 0) + 1;
+                  }
+                });
+                
+                // Determine overall success
+                result.success = successfulPlatforms > 0;
+                
+                // Update post status in database
+                await this.updatePostStatus(post, result, successfulPlatforms);
+                
+                // Track for cleanup if enabled
+                if (config.enableCleanup && config.importId) {
+                  await this.trackForCleanup(config.importId, post.id, post.platforms, result);
+                }
+                
+                result.endTime = Date.now();
+                result.duration = result.endTime - result.startTime;
+                
+                const statusEmoji = result.success ? '✅' : '❌';
+                console.log(`${statusEmoji} [${index}/${total}] Post ${post.id}: ${successfulPlatforms}/${post.platforms.length} platforms (${result.duration}ms)`);
+                
+                return result;
+                
+              } catch (error) {
+                result.endTime = Date.now();
+                result.duration = result.endTime - result.startTime;
+                result.errors.push(`Critical error: ${error.message}`);
+                
+                console.error(`💥 [${index}/${total}] Critical error publishing post ${post.id}:`, error);
+                return result;
+              }
+            }
+            
+            async publishToPlatform(post, platform, operationId) {
+              const startTime = Date.now();
+              
+              try {
+                // Check circuit breaker
+                if (this.isCircuitBreakerOpen(platform)) {
+                  throw new Error(`Circuit breaker is open for ${platform}`);
+                }
+                
+                // Apply rate limiting and execute with retry
+                const publishResult = await rateLimiters[platform].schedule(() =>
+                  this.executePublishWithRetry(post, platform, operationId)
+                );
+                
+                // Reset circuit breaker on success
+                this.resetCircuitBreaker(platform);
+                
+                const duration = Date.now() - startTime;
+                const currentAvg = publishingStats.platformStats[platform].avgDuration;
+                publishingStats.platformStats[platform].avgDuration = 
+                  currentAvg === 0 ? duration : (currentAvg + duration) / 2;
+                
+                return {
+                  success: true,
+                  platform: platform,
+                  publishResult: publishResult,
+                  duration: duration,
+                  operationId: operationId
+                };
+                
+              } catch (error) {
+                // Update circuit breaker
+                this.updateCircuitBreaker(platform, error);
+                
+                const duration = Date.now() - startTime;
+                
+                return {
+                  success: false,
+                  platform: platform,
+                  error: error,
+                  duration: duration,
+                  operationId: operationId
+                };
+              }
+            }
+            
+            async executePublishWithRetry(post, platform, operationId) {
+              const retryConfig = {
+                retries: config.maxRetries,
+                factor: config.retryStrategy === 'exponential' ? 2.5 : 1.5,
+                minTimeout: config.baseRetryDelay * 1000,
+                maxTimeout: config.maxRetryDelay * 1000,
+                randomize: true,
+                onRetry: (error, attempt) => {
+                  console.log(`🔄 Retry ${attempt}/${config.maxRetries} for ${platform} post ${post.id}: ${error.message}`);
+                }
+              };
+              
+              return pRetry(async () => {
+                return await this.platformPublishers[platform](post, operationId);
+              }, retryConfig);
+            }
+            
+            get platformPublishers() {
+              return {
+                facebook: this.publishToFacebook.bind(this),
+                instagram: this.publishToInstagram.bind(this),
+                twitter: this.publishToTwitter.bind(this),
+                linkedin: this.publishToLinkedIn.bind(this),
+                tiktok: this.publishToTikTok.bind(this)
+              };
+            }
+            
+            async publishToFacebook(post, operationId) {
+              console.log(`📘 Publishing to Facebook: ${post.id}`);
+              
+              // Get Facebook account info
+              const accountDoc = await db.collection('accounts')
+                .where('platform', '==', 'facebook')
+                .where('uid', '==', post.uid || process.env.TARGET_UID)
+                .limit(1)
+                .get();
+              
+              if (accountDoc.empty) {
+                throw new Error('Facebook account not connected');
+              }
+              
+              const account = accountDoc.docs[0].data();
+              const platformContent = post.platformContent?.facebook;
+              
+              if (!platformContent) {
+                throw new Error('No Facebook content prepared');
+              }
+              
+              // Prepare Facebook post data
+              const postData = {
+                message: platformContent.message,
+                access_token: account.accessToken
+              };
+              
+              if (platformContent.picture) {
+                postData.picture = platformContent.picture;
+              }
+              
+              if (platformContent.link) {
+                postData.link = platformContent.link;
+              }
+              
+              const url = `https://graph.facebook.com/v19.0/${account.pageId}/feed`;
+              
+              const response = await axios.post(url, new URLSearchParams(postData), {
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'User-Agent': `SocialHub-Pro/${process.env.WORKFLOW_VERSION}`,
+                  'X-Correlation-ID': operationId
+                },
+                timeout: 30000
+              });
+              
+              if (!response.data?.id) {
+                throw new Error(`Facebook API error: ${JSON.stringify(response.data)}`);
+              }
+              
+              console.log(`✅ Facebook publish successful: ${response.data.id}`);
+              
+              return {
+                platformPostId: response.data.id,
+                platform: 'facebook',
+                publishedAt: new Date().toISOString(),
+                operationId: operationId
+              };
+            }
+            
+            async publishToInstagram(post, operationId) {
+              console.log(`📷 Publishing to Instagram: ${post.id}`);
+              
+              const accountDoc = await db.collection('accounts')
+                .where('platform', '==', 'instagram')
+                .where('uid', '==', post.uid || process.env.TARGET_UID)
+                .limit(1)
+                .get();
+              
+              if (accountDoc.empty) {
+                throw new Error('Instagram account not connected');
+              }
+              
+              const account = accountDoc.docs[0].data();
+              const platformContent = post.platformContent?.instagram;
+              
+              if (!platformContent?.image_url) {
+                throw new Error('Instagram requires an image URL');
+              }
+              
+              // Step 1: Create media container
+              const containerData = {
+                image_url: platformContent.image_url,
+                caption: platformContent.caption,
+                access_token: account.accessToken
+              };
+              
+              const containerUrl = `https://graph.facebook.com/v19.0/${account.instagramAccountId}/media`;
+              
+              const containerResponse = await axios.post(containerUrl, new URLSearchParams(containerData), {
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-Correlation-ID': operationId
+                },
+                timeout: 30000
+              });
+              
+              if (!containerResponse.data?.id) {
+                throw new Error(`Instagram container creation error: ${JSON.stringify(containerResponse.data)}`);
+              }
+              
+              // Step 2: Publish the media container
+              const publishData = {
+                creation_id: containerResponse.data.id,
+                access_token: account.accessToken
+              };
+              
+              const publishUrl = `https://graph.facebook.com/v19.0/${account.instagramAccountId}/media_publish`;
+              
+              const publishResponse = await axios.post(publishUrl, new URLSearchParams(publishData), {
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-Correlation-ID': operationId
+                },
+                timeout: 30000
+              });
+              
+              if (!publishResponse.data?.id) {
+                throw new Error(`Instagram publish error: ${JSON.stringify(publishResponse.data)}`);
+              }
+              
+              console.log(`✅ Instagram publish successful: ${publishResponse.data.id}`);
+              
+              return {
+                platformPostId: publishResponse.data.id,
+                containerId: containerResponse.data.id,
+                platform: 'instagram',
+                publishedAt: new Date().toISOString(),
+                operationId: operationId
+              };
+            }
+            
+            async publishToTwitter(post, operationId) {
+              console.log(`🐦 Publishing to Twitter: ${post.id}`);
+              
+              const accountDoc = await db.collection('accounts')
+                .where('platform', '==', 'twitter')
+                .where('uid', '==', post.uid || process.env.TARGET_UID)
+                .limit(1)
+                .get();
+              
+              if (accountDoc.empty) {
+                throw new Error('Twitter account not connected');
+              }
+              
+              const account = accountDoc.docs[0].data();
+              const platformContent = post.platformContent?.twitter;
+              
+              if (!platformContent) {
+                throw new Error('No Twitter content prepared');
+              }
+              
+              // Prepare tweet data
+              const tweetData = {
+                text: platformContent.text
+              };
+              
+              // Add media if available
+              if (platformContent.media && platformContent.media.length > 0) {
+                // Note: For production, you'd need to upload media first
+                // This is a simplified version
+                console.log('📷 Note: Media upload for Twitter not fully implemented in this version');
+              }
+              
+              const url = 'https://api.twitter.com/2/tweets';
+              
+              const response = await axios.post(url, tweetData, {
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${account.accessToken}`,
+                  'X-Correlation-ID': operationId
+                },
+                timeout: 30000
+              });
+              
+              if (!response.data?.data?.id) {
+                throw new Error(`Twitter API error: ${JSON.stringify(response.data)}`);
+              }
+              
+              console.log(`✅ Twitter publish successful: ${response.data.data.id}`);
+              
+              return {
+                platformPostId: response.data.data.id,
+                platform: 'twitter',
+                publishedAt: new Date().toISOString(),
+                operationId: operationId
+              };
+            }
+            
+            async publishToLinkedIn(post, operationId) {
+              console.log(`💼 Publishing to LinkedIn: ${post.id}`);
+              
+              const accountDoc = await db.collection('accounts')
+                .where('platform', '==', 'linkedin')
+                .where('uid', '==', post.uid || process.env.TARGET_UID)
+                .limit(1)
+                .get();
+              
+              if (accountDoc.empty) {
+                throw new Error('LinkedIn account not connected');
+              }
+              
+              const account = accountDoc.docs[0].data();
+              const platformContent = post.platformContent?.linkedin;
+              
+              if (!platformContent) {
+                throw new Error('No LinkedIn content prepared');
+              }
+              
+              const shareData = {
+                author: `urn:li:person:${account.personId}`,
+                lifecycleState: 'PUBLISHED',
+                specificContent: {
+                  'com.linkedin.ugc.ShareContent': {
+                    shareCommentary: {
+                      text: platformContent.commentary
+                    },
+                    shareMediaCategory: 'NONE'
+                  }
+                },
+                visibility: {
+                  'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC'
+                }
+              };
+              
+              // Add media if available
+              if (platformContent.content) {
+                shareData.specificContent['com.linkedin.ugc.ShareContent'].shareMediaCategory = 'ARTICLE';
+                shareData.specificContent['com.linkedin.ugc.ShareContent'].media = [platformContent.content];
+              }
+              
+              const url = 'https://api.linkedin.com/v2/ugcPosts';
+              
+              const response = await axios.post(url, shareData, {
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${account.accessToken}`,
+                  'X-Correlation-ID': operationId,
+                  'X-Restli-Protocol-Version': '2.0.0'
+                },
+                timeout: 30000
+              });
+              
+              if (!response.data?.id) {
+                throw new Error(`LinkedIn API error: ${JSON.stringify(response.data)}`);
+              }
+              
+              console.log(`✅ LinkedIn publish successful: ${response.data.id}`);
+              
+              return {
+                platformPostId: response.data.id,
+                platform: 'linkedin',
+                publishedAt: new Date().toISOString(),
+                operationId: operationId
+              };
+            }
+            
+            async publishToTikTok(post, operationId) {
+              console.log(`🎵 Publishing to TikTok: ${post.id} (Enterprise feature)`);
+              
+              // TikTok Business API implementation
+              // This would require complex video processing and upload
+              throw new Error('TikTok Business API requires specialized video processing - contact support for enterprise setup');
+            }
+            
+            async updatePostStatus(post, result, successfulPlatforms) {
+              try {
+                const updateData = {
+                  updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                  lastPublishAttempt: admin.firestore.FieldValue.serverTimestamp(),
+                  publishingResult: {
+                    operationId: result.operationId,
+                    correlationId: config.correlationId,
+                    successfulPlatforms: successfulPlatforms,
+                    totalPlatforms: post.platforms.length,
+                    duration: result.duration,
+                    errors: result.errors,
+                    platformResults: result.platformResults
+                  }
+                };
+                
+                if (successfulPlatforms === post.platforms.length) {
+                  // Full success
+                  updateData.status = 'published';
+                  updateData.publishedAt = admin.firestore.FieldValue.serverTimestamp();
+                  updateData.publishedPlatforms = post.platforms;
+                } else if (successfulPlatforms > 0) {
+                  // Partial success
+                  updateData.status = 'partial';
+                  updateData.publishedPlatforms = Object.keys(result.platformResults)
+                    .filter(platform => result.platformResults[platform].success);
+                  updateData.failedPlatforms = Object.keys(result.platformResults)
+                    .filter(platform => !result.platformResults[platform].success);
+                } else {
+                  // Complete failure
+                  updateData.status = 'failed';
+                  updateData.failedPlatforms = post.platforms;
+                  updateData.lastError = result.errors.join('; ');
+                  updateData.retryCount = (post.retryCount || 0) + 1;
+                }
+                
+                await db.collection('posts').doc(post.id).update(updateData);
+                
+              } catch (error) {
+                console.error(`❌ Error updating post status for ${post.id}:`, error);
+              }
+            }
+            
+            async trackForCleanup(importId, postId, platforms, result) {
+              try {
+                if (!importId) return;
+                
+                const cleanupRef = db.collection('cleanup_tracking').doc(importId);
+                
+                await cleanupRef.set({
+                  [`posts.${postId}`]: {
+                    platforms: platforms,
+                    publishedPlatforms: Object.keys(result.platformResults)
+                      .filter(platform => result.platformResults[platform].success),
+                    failedPlatforms: Object.keys(result.platformResults)
+                      .filter(platform => !result.platformResults[platform].success),
+                    status: result.success ? 'published' : 'failed',
+                    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                    operationId: result.operationId
+                  },
+                  lastUpdate: admin.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                
+                publishingStats.cleanup.postsTracked++;
+                
+              } catch (error) {
+                console.error(`❌ Error tracking cleanup for ${postId}:`, error);
+              }
+            }
+            
+            isCircuitBreakerOpen(platform) {
+              const breaker = this.circuitBreakers.get(platform);
+              const threshold = parseInt(process.env.CIRCUIT_BREAKER_THRESHOLD) || 8;
+              const timeout = parseInt(process.env.CIRCUIT_BREAKER_TIMEOUT) * 1000 || 180000;
+              
+              if (breaker.failures >= threshold) {
+                if (breaker.lastFailure && (Date.now() - breaker.lastFailure) < timeout) {
+                  return true;
+                } else {
+                  this.resetCircuitBreaker(platform);
+                }
+              }
+              
+              return false;
+            }
+            
+            updateCircuitBreaker(platform, error) {
+              const breaker = this.circuitBreakers.get(platform);
+              breaker.failures++;
+              breaker.lastFailure = Date.now();
+              
+              if (breaker.failures >= parseInt(process.env.CIRCUIT_BREAKER_THRESHOLD) || 8) {
+                console.log(`⚡ Circuit breaker opened for ${platform}: ${breaker.failures} failures`);
+              }
+            }
+            
+            resetCircuitBreaker(platform) {
+              const breaker = this.circuitBreakers.get(platform);
+              breaker.failures = 0;
+              breaker.lastFailure = null;
+              breaker.isOpen = false;
+            }
+            
+            classifyError(error) {
+              const errorMessage = error?.message || error?.toString() || '';
+              
+              if (errorMessage.includes('rate limit') || errorMessage.includes('429')) return 'rate_limit';
+              if (errorMessage.includes('authentication') || errorMessage.includes('401')) return 'auth_error';
+              if (errorMessage.includes('permission') || errorMessage.includes('403')) return 'permission_error';
+              if (errorMessage.includes('network') || errorMessage.includes('timeout') || errorMessage.includes('ENOTFOUND')) return 'network_error';
+              if (errorMessage.includes('validation') || errorMessage.includes('400')) return 'validation_error';
+              if (errorMessage.includes('500') || errorMessage.includes('502') || errorMessage.includes('503')) return 'server_error';
+              
+              return 'unknown_error';
+            }
+          }
+          
+          // Main execution function
+          async function main() {
+            try {
+              console.log('🚀 Starting Enhanced Multi-Platform Publishing Engine...');
+              
+              const engine = new EnhancedPublishingEngine();
+              await engine.initialize();
+              
+              const results = await engine.publishAllPosts();
+              
+              // Calculate final statistics
+              const endTime = Date.now();
+              const totalDuration = endTime - publishingStats.startTime;
+              const avgProcessingTime = publishingStats.publishingTimes.length > 0
+                ? publishingStats.publishingTimes.reduce((a, b) => a + b, 0) / publishingStats.publishingTimes.length
+                : 0;
+              
+              // Check cleanup readiness
+              let cleanupReady = false;
+              if (config.enableCleanup && config.importId && publishingStats.cleanup.postsTracked > 0) {
+                const processed = publishingStats.totalPublished + publishingStats.totalFailed;
+                cleanupReady = processed === publishingStats.totalPosts;
+                publishingStats.cleanup.cleanupReady = cleanupReady;
+              }
+              
+              const finalStats = {
+                correlationId: config.correlationId,
+                timestamp: moment().tz(process.env.TIMEZONE).format(),
+                summary: {
+                  totalPosts: publishingStats.totalPosts,
+                  totalPublished: publishingStats.totalPublished,
+                  totalFailed: publishingStats.totalFailed,
+                  successRate: publishingStats.totalPosts > 0 
+                    ? ((publishingStats.totalPublished / publishingStats.totalPosts) * 100).toFixed(2) + '%'
+                    : '0%',
+                  totalDuration: totalDuration,
+                  avgProcessingTime: Math.round(avgProcessingTime),
+                  postsPerSecond: publishingStats.totalPosts > 0 
+                    ? (publishingStats.totalPosts / (totalDuration / 1000)).toFixed(2)
+                    : '0'
+                },
+                platformStats: publishingStats.platformStats,
+                errorStats: publishingStats.errorStats,
+                cleanup: publishingStats.cleanup,
+                performance: {
+                  processingTimes: publishingStats.publishingTimes,
+                  minTime: publishingStats.publishingTimes.length > 0 ? Math.min(...publishingStats.publishingTimes) : 0,
+                  maxTime: publishingStats.publishingTimes.length > 0 ? Math.max(...publishingStats.publishingTimes) : 0,
+                  medianTime: publishingStats.publishingTimes.length > 0 
+                    ? publishingStats.publishingTimes.sort((a, b) => a - b)[Math.floor(publishingStats.publishingTimes.length / 2)]
+                    : 0
+                }
+              };
+              
+              console.log('\\n📊 Enhanced Publishing Engine Final Report:');
+              console.log(` Total Posts: ${finalStats.summary.totalPosts}`);
+              console.log(` Published: ${finalStats.summary.totalPublished}`);
+              console.log(` Failed: ${finalStats.summary.totalFailed}`);
+              console.log(` Success Rate: ${finalStats.summary.successRate}`);
+              console.log(` Total Duration: ${finalStats.summary.totalDuration}ms`);
+              console.log(` Avg Processing Time: ${finalStats.summary.avgProcessingTime}ms`);
+              console.log(` Processing Speed: ${finalStats.summary.postsPerSecond} posts/sec`);
+              console.log(` Cleanup Ready: ${cleanupReady}`);
+              
+              console.log('\\n📱 Platform Breakdown:');
+              Object.entries(finalStats.platformStats).forEach(([platform, stats]) => {
+                if (stats.attempted > 0) {
+                  const successRate = ((stats.successful / stats.attempted) * 100).toFixed(1);
+                  console.log(` ${platform}: ${stats.successful}/${stats.attempted} (${successRate}%)`);
+                }
+              });
+              
+              // Set GitHub outputs
+              console.log(`total_published=${finalStats.summary.totalPublished}`);
+              console.log(`total_failed=${finalStats.summary.totalFailed}`);
+              console.log(`success_rate=${finalStats.summary.successRate}`);
+              console.log(`platform_results=${JSON.stringify(finalStats.platformStats)}`);
+              console.log(`cleanup_ready=${cleanupReady}`);
+              
+              console.log('\\n✅ Enhanced Multi-Platform Publishing Engine completed successfully');
+              
+            } catch (error) {
+              console.error('💥 Critical error in Enhanced Publishing Engine:', error);
+              
+              // Set error outputs
+              console.log(`total_published=0`);
+              console.log(`total_failed=0`);
+              console.log(`success_rate=0%`);
+              console.log(`platform_results={}`);
+              console.log(`cleanup_ready=false`);
+              
+              process.exit(1);
+            }
+          }
+          
+          // Execute the main function
+          main();
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          CORRELATION_ID: ${{ env.CORRELATION_ID }}
+          WORKFLOW_VERSION: ${{ env.WORKFLOW_VERSION }}
+          IMPORT_ID: ${{ env.IMPORT_ID }}
+          TARGET_UID: ${{ env.TARGET_UID }}
+          ENABLE_CLEANUP: ${{ env.ENABLE_CLEANUP }}
+          BATCH_SIZE: ${{ env.BATCH_SIZE }}
+          MAX_CONCURRENCY: ${{ env.MAX_CONCURRENCY }}
+          MAX_RETRIES: ${{ env.MAX_RETRIES }}
+          BASE_RETRY_DELAY: ${{ env.BASE_RETRY_DELAY }}
+          MAX_RETRY_DELAY: ${{ env.MAX_RETRY_DELAY }}
+          RETRY_STRATEGY: ${{ env.RETRY_STRATEGY }}
+          DEBUG_MODE: ${{ env.DEBUG_MODE }}
+          CIRCUIT_BREAKER_THRESHOLD: ${{ env.CIRCUIT_BREAKER_THRESHOLD }}
+          CIRCUIT_BREAKER_TIMEOUT: ${{ env.CIRCUIT_BREAKER_TIMEOUT }}
+          TIMEZONE: ${{ env.TIMEZONE }}
+          FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID }}
+          FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
+          LINKEDIN_CLIENT_ID: ${{ secrets.LINKEDIN_CLIENT_ID }}
+          LINKEDIN_CLIENT_SECRET: ${{ secrets.LINKEDIN_CLIENT_SECRET }}
+          TIKTOK_APP_ID: ${{ secrets.TIKTOK_APP_ID }}
+          TIKTOK_APP_SECRET: ${{ secrets.TIKTOK_APP_SECRET }}
+
+      - name: '📊 Publishing Results Summary'
+        id: publishing-results
+        run: |
+          echo "📊 Enhanced Publishing Engine Results Summary"
+          echo "═══════════════════════════════════════════"
+          echo "✅ Total Published: ${{ steps.publishing-execution.outputs.total_published }}"
+          echo "❌ Total Failed: ${{ steps.publishing-execution.outputs.total_failed }}"
+          echo "📈 Success Rate: ${{ steps.publishing-execution.outputs.success_rate }}"
+          echo "🗑️ Cleanup Ready: ${{ steps.publishing-execution.outputs.cleanup_ready }}"
+          echo "═══════════════════════════════════════════"
+          
+          # Set job outputs
+          echo "total_published=${{ steps.publishing-execution.outputs.total_published }}" >> $GITHUB_OUTPUT
+          echo "total_failed=${{ steps.publishing-execution.outputs.total_failed }}" >> $GITHUB_OUTPUT
+          echo "success_rate=${{ steps.publishing-execution.outputs.success_rate }}" >> $GITHUB_OUTPUT
+          echo "platform_results=${{ steps.publishing-execution.outputs.platform_results }}" >> $GITHUB_OUTPUT
+          echo "cleanup_ready=${{ steps.publishing-execution.outputs.cleanup_ready }}" >> $GITHUB_OUTPUT
+
+  # ================================================================================
+  # PHASE 4: FILE CLEANUP INTEGRATION & TRIGGERING
+  # ================================================================================
+
+  file-cleanup-integration:
+    name: '🗑️ File Cleanup Integration & Service Triggering'
+    runs-on: ubuntu-latest
+    needs: [bulk-import-validation, enhanced-publishing-engine]
+    if: |
+      always() && 
+      needs.bulk-import-validation.outputs.cleanup-enabled == 'true' && 
+      needs.enhanced-publishing-engine.outputs.cleanup-ready == 'true' &&
+      needs.bulk-import-validation.outputs.import-validated == 'true'
+    timeout-minutes: 10
+
+    steps:
+      - name: '🗑️ Initialize File Cleanup Integration'
+        run: |
+          echo "🗑️ Initializing File Cleanup Integration"
+          echo "════════════════════════════════════════"
+          echo "🆔 Import ID: ${{ env.IMPORT_ID }}"
+          echo "👤 User ID: ${{ env.TARGET_UID }}"
+          echo "🔗 Correlation ID: ${{ env.CORRELATION_ID }}"
+          echo "📊 Total Published: ${{ needs.enhanced-publishing-engine.outputs.total-published }}"
+          echo "❌ Total Failed: ${{ needs.enhanced-publishing-engine.outputs.total-failed }}"
+          echo "📈 Success Rate: ${{ needs.enhanced-publishing-engine.outputs.success-rate }}"
+          echo "✅ Cleanup Ready: ${{ needs.enhanced-publishing-engine.outputs.cleanup-ready }}"
+          echo "════════════════════════════════════════"
+
+      - name: '🚀 Trigger File Cleanup Service'
+        if: env.IMPORT_ID != ''
+        run: |
+          echo "🚀 Triggering File Cleanup Service for completed import..."
+          
+          curl -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --fail \
+            --silent \
+            --show-error \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/file-cleanup-service-v11.yml/dispatches" \
+            --data "{
+              \"ref\": \"main\",
+              \"inputs\": {
+                \"importId\": \"${{ env.IMPORT_ID }}\",
+                \"uid\": \"${{ env.TARGET_UID }}\",
+                \"correlationId\": \"${{ env.CORRELATION_ID }}\",
+                \"verifyPublishing\": \"true\"
+              }
+            }"
+          
+          echo "✅ File Cleanup Service triggered successfully"
+          echo "🔗 Import ID: ${{ env.IMPORT_ID }}"
+          echo "📊 Publishing Results: ${{ needs.enhanced-publishing-engine.outputs.total-published }}/${{ needs.enhanced-publishing-engine.outputs.total-published + needs.enhanced-publishing-engine.outputs.total-failed }} published"
+
+      - name: '📋 Update Import Operation Status'
+        if: env.IMPORT_ID != ''
+        run: |
+          echo "📋 Updating import operation status..."
+          
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          
+          try {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            admin.initializeApp({
+              credential: admin.credential.cert(serviceAccount),
+              databaseURL: process.env.FIREBASE_DATABASE_URL
+            });
+            
+            const db = admin.firestore();
+            const importId = process.env.IMPORT_ID;
+            
+            if (importId) {
+              await db.collection('import_operations').doc(importId).update({
+                publishingCompleted: true,
+                publishingCompletedAt: admin.firestore.FieldValue.serverTimestamp(),
+                publishingResults: {
+                  totalPublished: parseInt(process.env.TOTAL_PUBLISHED) || 0,
+                  totalFailed: parseInt(process.env.TOTAL_FAILED) || 0,
+                  successRate: process.env.SUCCESS_RATE || '0%',
+                  correlationId: process.env.CORRELATION_ID
+                },
+                cleanupTriggered: true,
+                cleanupTriggeredAt: admin.firestore.FieldValue.serverTimestamp(),
+                status: 'cleanup_initiated'
+              });
+              
+              console.log(`✅ Import operation ${importId} status updated`);
+              console.log(`📊 Publishing completed with ${process.env.SUCCESS_RATE} success rate`);
+              console.log(`🗑️ Cleanup service has been triggered`);
+            }
+            
+          } catch (error) {
+            console.error('❌ Error updating import status:', error.message);
+          }
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          IMPORT_ID: ${{ env.IMPORT_ID }}
+          TOTAL_PUBLISHED: ${{ needs.enhanced-publishing-engine.outputs.total-published }}
+          TOTAL_FAILED: ${{ needs.enhanced-publishing-engine.outputs.total-failed }}
+          SUCCESS_RATE: ${{ needs.enhanced-publishing-engine.outputs.success-rate }}
+          CORRELATION_ID: ${{ env.CORRELATION_ID }}
+
+      - name: '📊 Cleanup Integration Summary'
+        run: |
+          echo "📊 File Cleanup Integration Summary"
+          echo "═══════════════════════════════════"
+          echo "🗑️ Cleanup Service: Triggered Successfully"
+          echo "📋 Import Status: Updated"
+          echo "🔄 Next Step: File cleanup service will verify publishing completion"
+          echo "🗂️ Expected Action: Automatic file deletion after verification"
+          echo "📧 Notifications: Cleanup completion will be reported"
+          echo "═══════════════════════════════════"
+
+  # ================================================================================
+  # PHASE 5: ENHANCED NOTIFICATION & COMPREHENSIVE REPORTING
+  # ================================================================================
+
+  enhanced-notification-reporting:
+    name: '📢 Enhanced Notification & Comprehensive Reporting'
+    runs-on: ubuntu-latest
+    needs: [bulk-import-validation, enhanced-post-processing, enhanced-publishing-engine, file-cleanup-integration]
+    if: always() && needs.bulk-import-validation.result == 'success'
+    timeout-minutes: 15
+
+    steps:
+      - name: '🔧 Setup Notification Environment'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: '📦 Install Notification Dependencies'
+        run: |
+          echo "📦 Installing notification dependencies..."
+          npm install -g --production \
+            axios@1.6.0 \
+            moment-timezone@0.5.44
+
+      - name: '📊 Generate Comprehensive Workflow Report'
+        id: generate-report
+        run: |
+          echo "📊 Generating comprehensive workflow report..."
+          
+          node <<'EOF'
+          const moment = require('moment-timezone');
+          
+          // Collect workflow results
+          const workflowReport = {
+            metadata: {
+              workflowVersion: process.env.WORKFLOW_VERSION || 'v11.0',
+              executionId: process.env.EXECUTION_ID,
+              correlationId: process.env.CORRELATION_ID,
+              timestamp: moment().tz(process.env.TIMEZONE || 'UTC').format(),
+              timezone: process.env.TIMEZONE || 'UTC',
+              source: process.env.SOURCE_WORKFLOW || 'scheduled',
+              actor: process.env.GITHUB_ACTOR
+            },
+            
+            configuration: {
+              batchSize: parseInt(process.env.BATCH_SIZE) || 0,
+              maxConcurrency: parseInt(process.env.MAX_CONCURRENCY) || 0,
+              priorityLevel: process.env.PRIORITY_LEVEL,
+              platformFilter: process.env.PLATFORM_FILTER,
+              validationLevel: process.env.VALIDATION_LEVEL,
+              retryStrategy: process.env.RETRY_STRATEGY,
+              debugMode: process.env.DEBUG_MODE === 'true',
+              cleanupEnabled: process.env.ENABLE_CLEANUP === 'true'
+            },
+            
+            bulkImport: {
+              importId: process.env.IMPORT_ID || null,
+              userId: process.env.TARGET_UID || null,
+              importValidated: process.env.IMPORT_VALIDATED === 'true',
+              userValidated: process.env.USER_VALIDATED === 'true',
+              processingMode: process.env.PROCESSING_MODE || 'scheduled'
+            },
+            
+            processing: {
+              postsFound: parseInt(process.env.POSTS_COUNT) || 0,
+              postsProcessed: parseInt(process.env.PROCESSED_POSTS) || 0,
+              validPosts: parseInt(process.env.VALID_POSTS) || 0,
+              invalidPosts: (parseInt(process.env.PROCESSED_POSTS) || 0) - (parseInt(process.env.VALID_POSTS) || 0)
+            },
+            
+            publishing: {
+              totalPublished: parseInt(process.env.TOTAL_PUBLISHED) || 0,
+              totalFailed: parseInt(process.env.TOTAL_FAILED) || 0,
+              successRate: process.env.SUCCESS_RATE || '0%',
+              platformResults: process.env.PLATFORM_RESULTS ? JSON.parse(process.env.PLATFORM_RESULTS) : {}
+            },
+            
+            cleanup: {
+              enabled: process.env.ENABLE_CLEANUP === 'true',
+              cleanupReady: process.env.CLEANUP_READY === 'true',
+              cleanupTriggered: process.env.CLEANUP_TRIGGERED === 'true',
+              importId: process.env.IMPORT_ID || null
+            },
+            
+            jobResults: {
+              bulkImportValidation: process.env.BULK_IMPORT_VALIDATION_RESULT || 'unknown',
+              enhancedPostProcessing: process.env.POST_PROCESSING_RESULT || 'unknown', 
+              enhancedPublishingEngine: process.env.PUBLISHING_ENGINE_RESULT || 'unknown',
+              fileCleanupIntegration: process.env.CLEANUP_INTEGRATION_RESULT || 'unknown'
+            },
+            
+            performance: {
+              workflowDuration: 'calculated_at_end',
+              avgProcessingTime: 0,
+              postsPerSecond: 0,
+              memoryUsage: 'N/A',
+              successMetrics: {
+                overallSuccess: (parseInt(process.env.TOTAL_PUBLISHED) || 0) > 0,
+                validationSuccess: process.env.IMPORT_VALIDATED === 'true',
+                processingSuccess: (parseInt(process.env.VALID_POSTS) || 0) > 0,
+                publishingSuccess: parseFloat(process.env.SUCCESS_RATE || '0') > 80
+              }
+            }
+          };
+          
+          // Calculate derived metrics
+          const totalPosts = workflowReport.processing.postsFound;
+          const publishedPosts = workflowReport.publishing.totalPublished;
+          
+          if (totalPosts > 0) {
+            workflowReport.performance.overallSuccessRate = ((publishedPosts / totalPosts) * 100).toFixed(2) + '%';
+          }
+          
+          // Determine overall workflow status
+          let overallStatus = 'success';
+          let statusEmoji = '✅';
+          let statusMessage = 'Workflow completed successfully';
+          
+          if (workflowReport.bulkImport.importValidated && publishedPosts === 0) {
+            overallStatus = 'no_posts';
+            statusEmoji = 'ℹ️';
+            statusMessage = 'No posts were ready for publishing';
+          } else if (publishedPosts > 0 && parseFloat(workflowReport.publishing.successRate) < 50) {
+            overallStatus = 'partial_success';
+            statusEmoji = '⚠️';
+            statusMessage = `Partial success: ${workflowReport.publishing.successRate} success rate`;
+          } else if (publishedPosts === 0 && totalPosts > 0) {
+            overallStatus = 'failure';
+            statusEmoji = '❌';
+            statusMessage = 'Publishing failed for all posts';
+          }
+          
+          workflowReport.summary = {
+            status: overallStatus,
+            statusEmoji: statusEmoji,
+            statusMessage: statusMessage,
+            keyMetrics: {
+              postsProcessed: totalPosts,
+              postsPublished: publishedPosts,
+              successRate: workflowReport.publishing.successRate,
+              cleanupEnabled: workflowReport.cleanup.enabled
+            }
+          };
+          
+          console.log('📋 Workflow Report Generated');
+          console.log(`Status: ${statusEmoji} ${statusMessage}`);
+          console.log(`Posts: ${publishedPosts}/${totalPosts} published`);
+          console.log(`Success Rate: ${workflowReport.publishing.successRate}`);
+          console.log(`Cleanup: ${workflowReport.cleanup.enabled ? 'Enabled' : 'Disabled'}`);
+          
+          // Set environment variables for notifications
+          console.log(`echo "WORKFLOW_STATUS=${overallStatus}" >> $GITHUB_ENV`);
+          console.log(`echo "STATUS_EMOJI=${statusEmoji}" >> $GITHUB_ENV`);
+          console.log(`echo "STATUS_MESSAGE=${statusMessage}" >> $GITHUB_ENV`);
+          console.log(`echo "WORKFLOW_REPORT=${JSON.stringify(workflowReport).replace(/"/g, '\\"')}" >> $GITHUB_ENV`);
+          
+          EOF
+        env:
+          WORKFLOW_VERSION: ${{ env.WORKFLOW_VERSION }}
+          EXECUTION_ID: ${{ env.EXECUTION_ID }}
+          CORRELATION_ID: ${{ env.CORRELATION_ID }}
+          TIMEZONE: ${{ env.TIMEZONE }}
+          SOURCE_WORKFLOW: ${{ env.SOURCE_WORKFLOW }}
+          BATCH_SIZE: ${{ env.BATCH_SIZE }}
+          MAX_CONCURRENCY: ${{ env.MAX_CONCURRENCY }}
+          PRIORITY_LEVEL: ${{ env.PRIORITY_LEVEL }}
+          PLATFORM_FILTER: ${{ env.PLATFORM_FILTER }}
+          VALIDATION_LEVEL: ${{ env.VALIDATION_LEVEL }}
+          RETRY_STRATEGY: ${{ env.RETRY_STRATEGY }}
+          DEBUG_MODE: ${{ env.DEBUG_MODE }}
+          ENABLE_CLEANUP: ${{ env.ENABLE_CLEANUP }}
+          IMPORT_ID: ${{ env.IMPORT_ID }}
+          TARGET_UID: ${{ env.TARGET_UID }}
+          IMPORT_VALIDATED: ${{ needs.bulk-import-validation.outputs.import-validated }}
+          USER_VALIDATED: ${{ needs.bulk-import-validation.outputs.user-validated }}
+          PROCESSING_MODE: ${{ needs.bulk-import-validation.outputs.processing-mode }}
+          POSTS_COUNT: ${{ needs.bulk-import-validation.outputs.posts-count }}
+          PROCESSED_POSTS: ${{ needs.enhanced-post-processing.outputs.processed-posts }}
+          VALID_POSTS: ${{ needs.enhanced-post-processing.outputs.valid-posts }}
+          TOTAL_PUBLISHED: ${{ needs.enhanced-publishing-engine.outputs.total-published }}
+          TOTAL_FAILED: ${{ needs.enhanced-publishing-engine.outputs.total-failed }}
+          SUCCESS_RATE: ${{ needs.enhanced-publishing-engine.outputs.success-rate }}
+          PLATFORM_RESULTS: ${{ needs.enhanced-publishing-engine.outputs.platform-results }}
+          CLEANUP_READY: ${{ needs.enhanced-publishing-engine.outputs.cleanup-ready }}
+          CLEANUP_TRIGGERED: ${{ needs.file-cleanup-integration.result == 'success' }}
+          BULK_IMPORT_VALIDATION_RESULT: ${{ needs.bulk-import-validation.result }}
+          POST_PROCESSING_RESULT: ${{ needs.enhanced-post-processing.result }}
+          PUBLISHING_ENGINE_RESULT: ${{ needs.enhanced-publishing-engine.result }}
+          CLEANUP_INTEGRATION_RESULT: ${{ needs.file-cleanup-integration.result }}
+
+      - name: '📧 Send Enhanced Multi-Channel Notifications'
+        run: |
+          echo "📧 Sending enhanced multi-channel notifications..."
+          
+          node <<'EOF'
+          const axios = require('axios');
+          const moment = require('moment-timezone');
+          
+          async function sendNotifications() {
+            const channels = (process.env.NOTIFICATION_CHANNELS || 'slack,webhook').split(',');
+            console.log(`📧 Sending notifications to: ${channels.join(', ')}`);
+            
+            const notificationData = {
+              workflow: 'scheduled-publish-v11.0',
+              executionId: process.env.EXECUTION_ID,
+              correlationId: process.env.CORRELATION_ID,
+              timestamp: moment().tz(process.env.TIMEZONE).format(),
+              status: process.env.WORKFLOW_STATUS,
+              statusEmoji: process.env.STATUS_EMOJI,
+              statusMessage: process.env.STATUS_MESSAGE,
+              
+              summary: {
+                importId: process.env.IMPORT_ID || 'N/A',
+                postsProcessed: process.env.POSTS_COUNT || '0',
+                postsPublished: process.env.TOTAL_PUBLISHED || '0',
+                postsFailed: process.env.TOTAL_FAILED || '0',
+                successRate: process.env.SUCCESS_RATE || '0%',
+                cleanupEnabled: process.env.ENABLE_CLEANUP === 'true',
+                cleanupTriggered: process.env.CLEANUP_TRIGGERED === 'true'
+              },
+              
+              links: {
+                workflowRun: `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+                repository: `https://github.com/${process.env.GITHUB_REPOSITORY}`
+              }
+            };
+            
+            const notifications = [];
+            
+            for (const channel of channels) {
+              try {
+                switch (channel.trim()) {
+                  case 'slack':
+                    await sendSlackNotification(notificationData);
+                    notifications.push({ channel: 'slack', status: 'success' });
+                    break;
+                    
+                  case 'webhook':
+                    await sendWebhookNotification(notificationData);
+                    notifications.push({ channel: 'webhook', status: 'success' });
+                    break;
+                    
+                  case 'email':
+                    console.log('📧 Email notification prepared (service configuration required)');
+                    notifications.push({ channel: 'email', status: 'prepared' });
+                    break;
+                    
+                  default:
+                    console.log(`⚠️ Unknown notification channel: ${channel}`);
+                    notifications.push({ channel: channel, status: 'unknown' });
+                }
+                
+              } catch (error) {
+                console.error(`❌ Failed to send ${channel} notification:`, error.message);
+                notifications.push({ channel: channel, status: 'failed', error: error.message });
+              }
+            }
+            
+            console.log('📊 Notification Results:');
+            notifications.forEach(notif => {
+              const emoji = notif.status === 'success' ? '✅' : 
+                           notif.status === 'failed' ? '❌' : '⚠️';
+              console.log(` ${emoji} ${notif.channel}: ${notif.status}`);
+            });
+            
+            return notifications;
+          }
+          
+          async function sendSlackNotification(data) {
+            if (!process.env.SLACK_WEBHOOK_URL) {
+              console.log('⚠️ Slack webhook URL not configured');
+              return;
+            }
+            
+            const color = data.status === 'success' ? '#36a64f' :
+                         data.status === 'failure' ? '#ff0000' : '#ffaa00';
+            
+            const message = {
+              username: 'SocialHub Pro v11.0',
+              icon_emoji: ':rocket:',
+              attachments: [{
+                color: color,
+                title: `${data.statusEmoji} Scheduled Publishing Report - Bulk Import Integrated`,
+                title_link: data.links.workflowRun,
+                fields: [
+                  {
+                    title: 'Import ID',
+                    value: data.summary.importId,
+                    short: true
+                  },
+                  {
+                    title: 'Posts Published',
+                    value: `${data.summary.postsPublished}/${data.summary.postsProcessed}`,
+                    short: true
+                  },
+                  {
+                    title: 'Success Rate',
+                    value: data.summary.successRate,
+                    short: true
+                  },
+                  {
+                    title: 'Failed Posts',
+                    value: data.summary.postsFailed,
+                    short: true
+                  },
+                  {
+                    title: 'Auto Cleanup',
+                    value: data.summary.cleanupEnabled ? 
+                          (data.summary.cleanupTriggered ? '✅ Triggered' : '⏳ Pending') : 
+                          '❌ Disabled',
+                    short: true
+                  },
+                  {
+                    title: 'Correlation ID',
+                    value: data.correlationId,
+                    short: true
+                  }
+                ],
+                footer: 'SocialHub Pro Enterprise v11.0 - Bulk Import Integration',
+                footer_icon: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png',
+                ts: Math.floor(Date.now() / 1000)
+              }]
+            };
+            
+            await axios.post(process.env.SLACK_WEBHOOK_URL, message, {
+              headers: { 'Content-Type': 'application/json' },
+              timeout: 10000
+            });
+            
+            console.log('✅ Slack notification sent successfully');
+          }
+          
+          async function sendWebhookNotification(data) {
+            if (!process.env.WEBHOOK_NOTIFICATION_URL) {
+              console.log('⚠️ Webhook URL not configured');
+              return;
+            }
+            
+            const webhookPayload = {
+              event: 'scheduled_publishing_completed_v11',
+              timestamp: data.timestamp,
+              correlationId: data.correlationId,
+              executionId: data.executionId,
+              workflow: {
+                name: 'scheduled-publish-v11.0',
+                version: 'v11.0-bulk-integrated',
+                status: data.status,
+                message: data.statusMessage
+              },
+              bulkImport: {
+                importId: process.env.IMPORT_ID,
+                integration: 'enabled',
+                fileCleanup: process.env.ENABLE_CLEANUP === 'true'
+              },
+              results: data.summary,
+              links: data.links,
+              capabilities: {
+                bulkImportIntegration: true,
+                automaticFileCleanup: true,
+                enhancedColumnSupport: true,
+                multiPlatformPublishing: true,
+                realTimeProgress: true
+              }
+            };
+            
+            await axios.post(process.env.WEBHOOK_NOTIFICATION_URL, webhookPayload, {
+              headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': `SocialHub-Pro/${process.env.WORKFLOW_VERSION}`,
+                'X-Correlation-ID': data.correlationId
+              },
+              timeout: 10000
+            });
+            
+            console.log('✅ Webhook notification sent successfully');
+          }
+          
+          // Execute notifications
+          sendNotifications()
+            .then(notifications => {
+              const successCount = notifications.filter(n => n.status === 'success').length;
+              console.log(`✅ Enhanced notifications completed: ${successCount}/${notifications.length} successful`);
+            })
+            .catch(error => {
+              console.error('💥 Notification system failed:', error);
+            });
+          EOF
+        env:
+          NOTIFICATION_CHANNELS: ${{ env.NOTIFICATION_CHANNELS }}
+          EXECUTION_ID: ${{ env.EXECUTION_ID }}
+          CORRELATION_ID: ${{ env.CORRELATION_ID }}
+          TIMEZONE: ${{ env.TIMEZONE }}
+          WORKFLOW_VERSION: ${{ env.WORKFLOW_VERSION }}
+          IMPORT_ID: ${{ env.IMPORT_ID }}
+          POSTS_COUNT: ${{ needs.bulk-import-validation.outputs.posts-count }}
+          TOTAL_PUBLISHED: ${{ needs.enhanced-publishing-engine.outputs.total-published }}
+          TOTAL_FAILED: ${{ needs.enhanced-publishing-engine.outputs.total-failed }}
+          SUCCESS_RATE: ${{ needs.enhanced-publishing-engine.outputs.success-rate }}
+          ENABLE_CLEANUP: ${{ env.ENABLE_CLEANUP }}
+          CLEANUP_TRIGGERED: ${{ needs.file-cleanup-integration.result == 'success' }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          WEBHOOK_NOTIFICATION_URL: ${{ secrets.WEBHOOK_NOTIFICATION_URL }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+
+      - name: '📈 Final Workflow Status & Summary'
+        if: always()
+        run: |
+          echo "📈 SocialHub Pro v11.0 - Scheduled Publishing Workflow Final Status"
+          echo "═════════════════════════════════════════════════════════════════════"
+          echo ""
+          echo "🆔 Execution Details:"
+          echo " • Execution ID: ${{ env.EXECUTION_ID }}"
+          echo " • Correlation ID: ${{ env.CORRELATION_ID }}"
+          echo " • Workflow Version: v11.0 (Bulk Import Integrated)"
+          echo " • Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo " • Actor: ${{ github.actor }}"
+          echo " • Source: ${{ env.SOURCE_WORKFLOW }}"
+          echo ""
+          echo "🔧 Configuration:"
+          echo " • Processing Mode: ${{ needs.bulk-import-validation.outputs.processing-mode }}"
+          echo " • Import ID: ${{ env.IMPORT_ID || 'N/A (Scheduled Mode)' }}"
+          echo " • User ID: ${{ env.TARGET_UID || 'N/A (Scheduled Mode)' }}"
+          echo " • Batch Size: ${{ env.BATCH_SIZE }}"
+          echo " • Max Concurrency: ${{ env.MAX_CONCURRENCY }}"
+          echo " • Validation Level: ${{ env.VALIDATION_LEVEL }}"
+          echo " • Platform Filter: ${{ env.PLATFORM_FILTER }}"
+          echo " • Auto Cleanup: ${{ env.ENABLE_CLEANUP }}"
+          echo ""
+          echo "📊 Phase Results:"
+          echo " • Bulk Import Validation: ${{ needs.bulk-import-validation.result }} ${{ needs.bulk-import-validation.result == 'success' && '✅' || '❌' }}"
+          echo " • Enhanced Post Processing: ${{ needs.enhanced-post-processing.result }} ${{ needs.enhanced-post-processing.result == 'success' && '✅' || (needs.enhanced-post-processing.result == 'skipped' && '⏭️' || '❌') }}"
+          echo " • Enhanced Publishing Engine: ${{ needs.enhanced-publishing-engine.result }} ${{ needs.enhanced-publishing-engine.result == 'success' && '✅' || (needs.enhanced-publishing-engine.result == 'skipped' && '⏭️' || '❌') }}"
+          echo " • File Cleanup Integration: ${{ needs.file-cleanup-integration.result }} ${{ needs.file-cleanup-integration.result == 'success' && '✅' || (needs.file-cleanup-integration.result == 'skipped' && '⏭️' || '❌') }}"
+          echo ""
+          echo "📈 Processing Metrics:"
+          echo " • Posts Found: ${{ needs.bulk-import-validation.outputs.posts-count }}"
+          echo " • Posts Processed: ${{ needs.enhanced-post-processing.outputs.processed-posts }}"
+          echo " • Valid Posts: ${{ needs.enhanced-post-processing.outputs.valid-posts }}"
+          echo " • Posts Published: ${{ needs.enhanced-publishing-engine.outputs.total-published }}"
+          echo " • Posts Failed: ${{ needs.enhanced-publishing-engine.outputs.total-failed }}"
+          echo " • Success Rate: ${{ needs.enhanced-publishing-engine.outputs.success-rate }}"
+          echo ""
+          echo "🗑️ File Cleanup Status:"
+          echo " • Cleanup Enabled: ${{ needs.bulk-import-validation.outputs.cleanup-enabled }}"
+          echo " • Cleanup Ready: ${{ needs.enhanced-publishing-engine.outputs.cleanup-ready }}"
+          echo " • Cleanup Triggered: ${{ needs.file-cleanup-integration.result == 'success' && 'Yes' || 'No' }}"
+          echo ""
+          echo "✨ Enhanced Features Active:"
+          echo " • 🔗 Bulk Import Integration"
+          echo " • 📊 Enhanced Column Support (socialTitle, socialDescription, etc.)"
+          echo " • 🗑️ Automatic File Cleanup After Publishing"
+          echo " • 🚀 Multi-Platform Publishing Engine"
+          echo " • 📈 Real-Time Progress Tracking"
+          echo " • 🔒 Enterprise Security Validation"
+          echo " • 📢 Multi-Channel Notifications"
+          echo " • ⚡ Advanced Error Handling & Recovery"
+          echo ""
+          if [ "${{ needs.enhanced-publishing-engine.outputs.total-published }}" -gt 0 ]; then
+            echo "🎉 Publishing Success: ${{ needs.enhanced-publishing-engine.outputs.total-published }} posts published successfully!"
+            if [ "${{ env.ENABLE_CLEANUP }}" = "true" ] && [ "${{ needs.file-cleanup-integration.result }}" = "success" ]; then
+              echo "🗑️ File Cleanup: Initiated successfully - files will be cleaned up automatically"
+            fi
+          elif [ "${{ needs.bulk-import-validation.outputs.posts-count }}" -eq 0 ]; then
+            echo "ℹ️ No Action Needed: No posts were ready for publishing at this time"
+          else
+            echo "⚠️ Review Required: Check logs for publishing issues"
+          fi
+          echo ""
+          echo "═════════════════════════════════════════════════════════════════════"
+          echo "🎯 SocialHub Pro v11.0 - Enhanced Scheduled Publishing Workflow Complete!"
+          echo "🔗 Bulk Import Integration: Fully Operational"
+          echo "🗑️ Auto File Cleanup: Integrated and Active"
+
+# ==================================================================================
+# END OF ENHANCED SCHEDULED PUBLISHING WORKFLOW v11.0
+# ==================================================================================

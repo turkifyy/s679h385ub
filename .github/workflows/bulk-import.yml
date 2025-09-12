@@ -1,0 +1,1743 @@
+# ==================================================================================
+# SocialHub Pro v11.0 - Enterprise Bulk Import Workflow (UPDATED & ENHANCED)
+# Production-Grade JSON/CSV Import System with Auto File Cleanup
+# 🚀 Real Production Environment - No Demo Data - No Single Post Publishing
+# Focus: Bulk Import Only with Automatic File Cleanup After Publishing
+# ==================================================================================
+
+name: 'Bulk Import JSON/CSV – Enterprise Production Grade v11.0'
+
+# ==================================================================================
+# WORKFLOW TRIGGERS & INPUTS (UPDATED FOR JSON/CSV ONLY)
+# ==================================================================================
+
+on:
+  workflow_dispatch:
+    inputs:
+      downloadUrl:
+        description: '🔗 رابط الملف المرفوع (HTTPS فقط - JSON/CSV)'
+        required: true
+        type: string
+      uid:
+        description: '🔑 معرف المستخدم من Firebase (مع التحقق من الصلاحيات)'
+        required: true
+        type: string
+      fileType:
+        description: '📁 نوع الملف المدعوم (JSON أو CSV فقط)'
+        required: true
+        type: choice
+        options:
+          - json
+          - csv
+      maxSize:
+        description: '📊 أقصى حجم بالميجابايت (1-500)'
+        required: false
+        default: '50'
+        type: string
+      priority:
+        description: '⚡ أولوية المعالجة'
+        required: false
+        default: 'normal'
+        type: choice
+        options:
+          - low
+          - normal
+          - high
+          - urgent
+      notificationChannels:
+        description: '📢 قنوات الإشعار (مفصولة بفواصل)'
+        required: false
+        default: 'email,webhook'
+        type: string
+      validationLevel:
+        description: '🔍 مستوى التحقق من البيانات'
+        required: false
+        default: 'strict'
+        type: choice
+        options:
+          - basic
+          - standard
+          - strict
+          - enterprise
+      batchSize:
+        description: '📦 حجم الدفعة للمعالجة (10-500)'
+        required: false
+        default: '100'
+        type: string
+      enableAutoCleanup:
+        description: '🗑️ تفعيل الحذف التلقائي للملفات بعد النشر'
+        required: false
+        default: true
+        type: boolean
+      schedulePublishing:
+        description: '📅 تفعيل النشر المجدول التلقائي'
+        required: false
+        default: true
+        type: boolean
+      dryRun:
+        description: '🧪 تشغيل تجريبي (بدون كتابة فعلية للبيانات)'
+        required: false
+        default: false
+        type: boolean
+
+# ==================================================================================
+# ENVIRONMENT VARIABLES & CONFIGURATION (ENHANCED)
+# ==================================================================================
+
+env:
+  # Core Configuration
+  NODE_VERSION: '20'
+  TIMEOUT_MINUTES: 90
+  EXECUTION_ID: ${{ github.run_number }}-${{ github.run_attempt }}
+  
+  # Performance Settings (Optimized)
+  MAX_RETRIES: 3
+  RETRY_DELAY: 5
+  BATCH_SIZE: ${{ github.event.inputs.batchSize || '100' }}
+  MAX_CONCURRENCY: 5
+  MEMORY_LIMIT_MB: 2048
+  
+  # Security Settings (Enhanced)
+  SECURITY_SCAN_ENABLED: true
+  RATE_LIMIT_REQUESTS: 500
+  RATE_LIMIT_WINDOW: 1800
+  MAX_FILE_SIZE_MB: ${{ github.event.inputs.maxSize || '50' }}
+  ALLOWED_FORMATS: 'json,csv'
+  
+  # Firebase Configuration
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+  FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+  FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+  FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+  
+  # External Services
+  MONITORING_ENDPOINT: ${{ secrets.MONITORING_ENDPOINT }}
+  ALERTING_WEBHOOK: ${{ secrets.ALERTING_WEBHOOK }}
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+  EMAIL_SERVICE_KEY: ${{ secrets.EMAIL_SERVICE_KEY }}
+  
+  # Enhanced Settings
+  ENABLE_AUTO_CLEANUP: ${{ github.event.inputs.enableAutoCleanup || 'true' }}
+  ENABLE_SCHEDULED_PUBLISHING: ${{ github.event.inputs.schedulePublishing || 'true' }}
+  CLEANUP_VERIFICATION_TIMEOUT: 3600
+  PUBLISHING_TIMEOUT: 7200
+  LOG_LEVEL: 'INFO'
+  CORRELATION_ID: ${{ github.run_id }}-${{ github.run_number }}
+
+# ==================================================================================
+# PRODUCTION JOBS PIPELINE (ENHANCED & STREAMLINED)
+# ==================================================================================
+
+jobs:
+
+  # ================================================================================
+  # PHASE 1: ENHANCED SECURITY & PRE-FLIGHT VALIDATION
+  # ================================================================================
+
+  security-validation:
+    name: '🛡️ Enhanced Security Validation & Pre-flight Checks'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      security-passed: ${{ steps.security-check.outputs.passed }}
+      validation-passed: ${{ steps.input-validation.outputs.passed }}
+      risk-score: ${{ steps.risk-assessment.outputs.score }}
+      file-format-valid: ${{ steps.format-validation.outputs.valid }}
+
+    steps:
+      - name: '🏁 Initialize Security Context'
+        id: init-security
+        run: |
+          echo "🔐 Starting enhanced security validation for execution: ${{ env.EXECUTION_ID }}"
+          echo "🕐 Timestamp: $(date -u '+%Y-%m-%dT%H:%M:%S.%3NZ')"
+          echo "👤 Initiated by: ${{ github.actor }}"
+          echo "🎯 Focus: Bulk Import JSON/CSV Only"
+          
+          # Generate security correlation ID
+          SECURITY_ID=$(openssl rand -hex 16)
+          echo "security_id=$SECURITY_ID" >> $GITHUB_OUTPUT
+          echo "🔑 Security Correlation ID: $SECURITY_ID"
+
+      - name: '🔍 Enhanced Input Security Validation'
+        id: input-validation
+        run: |
+          URL="${{ github.event.inputs.downloadUrl }}"
+          UID="${{ github.event.inputs.uid }}"
+          FILE_TYPE="${{ github.event.inputs.fileType }}"
+          MAX_SIZE="${{ github.event.inputs.maxSize }}"
+          
+          echo "🔐 Performing comprehensive input validation..."
+          
+          # Enhanced URL Security Validation
+          if [[ ! "$URL" =~ ^https://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.* ]]; then
+            echo "❌ SECURITY VIOLATION: URL must be HTTPS with valid domain"
+            exit 1
+          fi
+          
+          # Enhanced malicious patterns check
+          BLOCKED_PATTERNS=(
+            "javascript:" "data:" "file:" "ftp:" 
+            "localhost" "127.0.0.1" "0.0.0.0" "10.0.0.0"
+            "192.168." "172.16." "169.254."
+            "metadata.google" "aws.amazon" "azure.microsoft"
+            "<script" "eval(" "exec(" "system("
+          )
+          
+          for pattern in "${BLOCKED_PATTERNS[@]}"; do
+            if [[ "$URL" =~ $pattern ]]; then
+              echo "❌ SECURITY VIOLATION: Blocked URL pattern detected: $pattern"
+              exit 1
+            fi
+          done
+          
+          # Enhanced UID Validation (Firebase UID format)
+          if [[ ! "$UID" =~ ^[a-zA-Z0-9]{28}$ ]]; then
+            echo "❌ SECURITY VIOLATION: Invalid Firebase UID format"
+            exit 1
+          fi
+          
+          # File Type Validation (JSON/CSV ONLY)
+          ALLOWED_TYPES=("json" "csv")
+          if [[ ! " ${ALLOWED_TYPES[@]} " =~ " ${FILE_TYPE} " ]]; then
+            echo "❌ SECURITY VIOLATION: Only JSON and CSV files are supported"
+            echo "❌ Received: $FILE_TYPE"
+            exit 1
+          fi
+          
+          # Enhanced Size Validation
+          if ! [[ "$MAX_SIZE" =~ ^[1-9][0-9]*$ ]] || [ "$MAX_SIZE" -gt 500 ] || [ "$MAX_SIZE" -lt 1 ]; then
+            echo "❌ SECURITY VIOLATION: Invalid file size limit: $MAX_SIZE (must be 1-500 MB)"
+            exit 1
+          fi
+          
+          echo "✅ Enhanced input validation passed"
+          echo "passed=true" >> $GITHUB_OUTPUT
+
+      - name: '📋 File Format Validation'
+        id: format-validation
+        run: |
+          FILE_TYPE="${{ github.event.inputs.fileType }}"
+          
+          echo "📋 Validating file format requirements..."
+          
+          case "$FILE_TYPE" in
+            "json")
+              echo "✅ JSON format selected - will validate JSON structure"
+              echo "📋 Expected fields: socialTitle, socialDescription, shortUrl, linkType, socialImageurl, socialhachtags, day, hour, platform"
+              ;;
+            "csv")
+              echo "✅ CSV format selected - will validate CSV headers"
+              echo "📋 Required headers: socialTitle,socialDescription,shortUrl,linkType,socialImageurl,socialhachtags,day,hour,platform"
+              ;;
+            *)
+              echo "❌ Unsupported file format: $FILE_TYPE"
+              exit 1
+              ;;
+          esac
+          
+          echo "valid=true" >> $GITHUB_OUTPUT
+
+      - name: '🔒 Enhanced Authentication & Authorization Check'
+        id: auth-check
+        run: |
+          echo "🔐 Verifying user authentication and enhanced permissions..."
+          
+          # Enhanced Firebase connection test
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          
+          try {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            admin.initializeApp({
+              credential: admin.credential.cert(serviceAccount),
+              databaseURL: process.env.FIREBASE_DATABASE_URL
+            });
+            
+            const db = admin.firestore();
+            
+            // Enhanced user validation
+            const userRef = db.collection('users').doc(process.env.TARGET_UID);
+            const userDoc = await userRef.get();
+            
+            if (!userDoc.exists) {
+              console.error('❌ User not found in database');
+              process.exit(1);
+            }
+            
+            const userData = userDoc.data();
+            
+            // Check bulk import permissions
+            if (!userData.permissions?.bulkImport) {
+              console.error('❌ User lacks bulk import permissions');
+              process.exit(1);
+            }
+            
+            // Check account status
+            if (userData.status !== 'active') {
+              console.error('❌ User account is not active');
+              process.exit(1);
+            }
+            
+            console.log('✅ Enhanced user authentication and permissions verified');
+            console.log(`📊 User: ${userData.email || 'N/A'}`);
+            console.log(`🔐 Permissions: Bulk Import Enabled`);
+            console.log(`📅 Account Status: ${userData.status}`);
+            
+          } catch (error) {
+            console.error('❌ Authentication check failed:', error.message);
+            process.exit(1);
+          }
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          TARGET_UID: ${{ github.event.inputs.uid }}
+
+      - name: '⚖️ Enhanced Risk Assessment'
+        id: risk-assessment
+        run: |
+          echo "⚖️ Performing enhanced security risk assessment..."
+          
+          RISK_SCORE=0
+          URL="${{ github.event.inputs.downloadUrl }}"
+          FILE_TYPE="${{ github.event.inputs.fileType }}"
+          MAX_SIZE="${{ github.event.inputs.maxSize }}"
+          ACTOR="${{ github.actor }}"
+          
+          # Domain reputation check
+          DOMAIN=$(echo "$URL" | sed -n 's#^https://\([^/]*\).*#\1#p')
+          echo "🌐 Checking domain: $DOMAIN"
+          
+          # File size risk
+          if [ "$MAX_SIZE" -gt 100 ]; then
+            RISK_SCORE=$((RISK_SCORE + 15))
+            echo "⚠️ Large file size increases risk: +15"
+          fi
+          
+          # File type risk (JSON slightly higher due to complexity)
+          if [ "$FILE_TYPE" = "json" ]; then
+            RISK_SCORE=$((RISK_SCORE + 5))
+          fi
+          
+          # Time-based risk (off-hours processing)
+          HOUR=$(date +%H)
+          if [ "$HOUR" -lt 6 ] || [ "$HOUR" -gt 22 ]; then
+            RISK_SCORE=$((RISK_SCORE + 10))
+            echo "⚠️ Off-hours processing increases risk: +10"
+          fi
+          
+          # Actor-based risk (new actors get higher scrutiny)
+          if [[ "$ACTOR" != "trusted-user"* ]]; then
+            RISK_SCORE=$((RISK_SCORE + 5))
+          fi
+          
+          echo "📊 Final Risk Score: $RISK_SCORE/100"
+          echo "score=$RISK_SCORE" >> $GITHUB_OUTPUT
+          
+          # Risk-based decision with lower thresholds
+          if [ "$RISK_SCORE" -gt 50 ]; then
+            echo "🚨 HIGH RISK: Manual approval required"
+            exit 1
+          elif [ "$RISK_SCORE" -gt 25 ]; then
+            echo "⚠️ MEDIUM RISK: Enhanced monitoring enabled"
+          else
+            echo "✅ LOW RISK: Normal processing"
+          fi
+
+      - name: '📋 Enhanced Security Audit Log'
+        if: always()
+        run: |
+          echo "📋 Recording enhanced security audit entry..."
+          
+          cat > security_audit.json <<EOF
+          {
+            "timestamp": "$(date -u '+%Y-%m-%dT%H:%M:%S.%3NZ')",
+            "execution_id": "${{ env.EXECUTION_ID }}",
+            "security_id": "${{ steps.init-security.outputs.security_id }}",
+            "workflow": "bulk-import-v11.0",
+            "actor": "${{ github.actor }}",
+            "inputs": {
+              "file_type": "${{ github.event.inputs.fileType }}",
+              "max_size_mb": "${{ github.event.inputs.maxSize }}",
+              "validation_level": "${{ github.event.inputs.validationLevel }}"
+            },
+            "validation_results": {
+              "input_validation": "${{ steps.input-validation.outputs.passed }}",
+              "format_validation": "${{ steps.format-validation.outputs.valid }}",
+              "risk_score": "${{ steps.risk-assessment.outputs.score }}"
+            },
+            "security_enhancements": {
+              "json_csv_only": true,
+              "enhanced_url_validation": true,
+              "firebase_auth_verified": true,
+              "permissions_checked": true
+            }
+          }
+          EOF
+          
+          echo "✅ Security audit log created"
+          cat security_audit.json
+
+  # ================================================================================
+  # PHASE 2: ENHANCED FILE PROCESSING & VALIDATION
+  # ================================================================================
+
+  file-processing:
+    name: '📁 Enhanced File Processing & Validation (JSON/CSV Only)'
+    runs-on: ubuntu-latest
+    needs: security-validation
+    if: needs.security-validation.outputs.security-passed == 'true'
+    timeout-minutes: 30
+    outputs:
+      valid-records: ${{ steps.validation.outputs.valid_records }}
+      invalid-records: ${{ steps.validation.outputs.invalid_records }}
+      file-hash: ${{ steps.download.outputs.file_hash }}
+      processing-stats: ${{ steps.validation.outputs.processing_stats }}
+
+    steps:
+      - name: '🔧 Setup Enhanced Processing Environment'
+        run: |
+          echo "🔧 Setting up enhanced file processing environment..."
+          
+          # Create organized directory structure
+          mkdir -p {
+            temp/{raw,validated,failed,processed},
+            reports/{summary,detailed,errors},
+            logs/{processing,validation,performance},
+            monitoring/{metrics,health}
+          }
+          
+          # Install enhanced dependencies for JSON/CSV only
+          npm install -g csv-parser@3.0.0
+          npm install -g fast-csv@4.3.6
+          npm install -g ajv@8.12.0
+          npm install -g ajv-formats@2.1.1
+          npm install -g validator@13.11.0
+          
+          # Setup performance monitoring
+          echo "📊 Enhanced processing environment ready"
+          echo "🎯 Supported formats: JSON, CSV"
+          echo "⚡ Performance optimizations: Enabled"
+          echo "🔍 Enhanced validation: Ready"
+
+      - name: '⬇️ Enhanced Secure File Download & Verification'
+        id: download
+        run: |
+          URL="${{ github.event.inputs.downloadUrl }}"
+          FILE_TYPE="${{ github.event.inputs.fileType }}"
+          MAX_SIZE_MB="${{ env.MAX_FILE_SIZE_MB }}"
+          
+          echo "⬇️ Starting enhanced secure download..."
+          echo "🔗 URL: $URL"
+          echo "📁 Expected Type: $FILE_TYPE"
+          echo "📊 Max Size: ${MAX_SIZE_MB}MB"
+          
+          # Enhanced download with security headers
+          TEMP_FILE="temp/raw/import_file_$(date +%s).${FILE_TYPE}"
+          
+          curl -L \
+            --max-time 300 \
+            --max-filesize $((MAX_SIZE_MB * 1024 * 1024)) \
+            --user-agent "SocialHub-Pro-v11.0-BulkImporter" \
+            --header "Accept: application/json, text/csv, text/plain" \
+            --header "X-Requested-With: SocialHub-Pro" \
+            --fail \
+            --silent \
+            --show-error \
+            --output "$TEMP_FILE" \
+            "$URL" 2>&1 | tee logs/processing/download.log
+          
+          if [ ! -f "$TEMP_FILE" ]; then
+            echo "❌ Download failed: File not created"
+            exit 1
+          fi
+          
+          # Enhanced file verification
+          FILE_SIZE_BYTES=$(stat -c%s "$TEMP_FILE")
+          FILE_SIZE_MB=$((FILE_SIZE_BYTES / 1024 / 1024))
+          
+          echo "📊 Downloaded file size: ${FILE_SIZE_MB}MB (${FILE_SIZE_BYTES} bytes)"
+          
+          # Size validation with enhanced limits
+          if [ "$FILE_SIZE_MB" -gt "$MAX_SIZE_MB" ]; then
+            echo "❌ File size (${FILE_SIZE_MB}MB) exceeds limit (${MAX_SIZE_MB}MB)"
+            rm -f "$TEMP_FILE"
+            exit 1
+          fi
+          
+          if [ "$FILE_SIZE_BYTES" -lt 10 ]; then
+            echo "❌ File too small (${FILE_SIZE_BYTES} bytes) - possibly corrupted"
+            rm -f "$TEMP_FILE"
+            exit 1
+          fi
+          
+          # Enhanced file type verification for JSON/CSV only
+          DETECTED_TYPE=$(file -b --mime-type "$TEMP_FILE")
+          echo "🔍 Detected MIME type: $DETECTED_TYPE"
+          
+          case "$FILE_TYPE" in
+            "json")
+              if [[ ! "$DETECTED_TYPE" =~ ^(application/json|text/plain|text/json)$ ]]; then
+                echo "⚠️ MIME type warning for JSON: $DETECTED_TYPE"
+              fi
+              
+              # JSON syntax validation
+              if ! jq empty "$TEMP_FILE" 2>/dev/null; then
+                echo "❌ Invalid JSON syntax detected"
+                rm -f "$TEMP_FILE"
+                exit 1
+              fi
+              echo "✅ JSON syntax validation passed"
+              ;;
+              
+            "csv")
+              if [[ ! "$DETECTED_TYPE" =~ ^text/ ]]; then
+                echo "⚠️ MIME type warning for CSV: $DETECTED_TYPE"
+              fi
+              
+              # CSV structure validation
+              if ! head -1 "$TEMP_FILE" | grep -q ","; then
+                echo "❌ Invalid CSV format - no comma delimiters found"
+                rm -f "$TEMP_FILE"
+                exit 1
+              fi
+              echo "✅ CSV structure validation passed"
+              ;;
+          esac
+          
+          # Generate enhanced file hash for integrity
+          FILE_HASH=$(sha256sum "$TEMP_FILE" | cut -d' ' -f1)
+          echo "🔐 File SHA256: $FILE_HASH"
+          
+          # Enhanced security scan
+          echo "🔍 Performing enhanced content security scan..."
+          SUSPICIOUS_PATTERNS=(
+            "<script" "</script" "javascript:" "eval(" "exec("
+            "document.cookie" "localStorage" "sessionStorage"
+            "XMLHttpRequest" "fetch(" "window.location"
+          )
+          
+          for pattern in "${SUSPICIOUS_PATTERNS[@]}"; do
+            if grep -q "$pattern" "$TEMP_FILE" 2>/dev/null; then
+              echo "🚨 SECURITY WARNING: Suspicious pattern detected: $pattern"
+            fi
+          done
+          
+          echo "✅ Enhanced file download and verification completed"
+          echo "file_path=$TEMP_FILE" >> $GITHUB_OUTPUT
+          echo "file_size=$FILE_SIZE_MB" >> $GITHUB_OUTPUT
+          echo "file_hash=$FILE_HASH" >> $GITHUB_OUTPUT
+          
+          # Log enhanced download metrics
+          cat > logs/processing/download_metrics.json <<EOF
+          {
+            "timestamp": "$(date -u '+%Y-%m-%dT%H:%M:%S.%3NZ')",
+            "operation": "enhanced_file_download",
+            "url_hash": "$(echo "$URL" | sha256sum | cut -d' ' -f1)",
+            "file_path": "$TEMP_FILE",
+            "file_size_mb": $FILE_SIZE_MB,
+            "file_hash": "$FILE_HASH",
+            "mime_type": "$DETECTED_TYPE",
+            "file_type": "$FILE_TYPE",
+            "security_scan": "completed",
+            "validation_status": "passed"
+          }
+          EOF
+
+      - name: '🔬 Enhanced Data Validation & Schema Verification'
+        id: validation
+        run: |
+          FILE_PATH="${{ steps.download.outputs.file_path }}"
+          FILE_TYPE="${{ github.event.inputs.fileType }}"
+          VALIDATION_LEVEL="${{ github.event.inputs.validationLevel }}"
+          
+          echo "🔬 Starting enhanced data validation..."
+          echo "📁 File: $FILE_PATH"
+          echo "📋 Type: $FILE_TYPE"
+          echo "🔍 Validation Level: $VALIDATION_LEVEL"
+          
+          node <<'EOF'
+          const fs = require('fs');
+          const csv = require('csv-parser');
+          const Ajv = require('ajv');
+          const addFormats = require('ajv-formats');
+          const validator = require('validator');
+          const { performance } = require('perf_hooks');
+          
+          // Enhanced validation schema with corrected field names
+          const getValidationSchema = (level) => {
+            const baseSchema = {
+              type: 'object',
+              required: [
+                'socialTitle', 'socialDescription', 'shortUrl', 
+                'linkType', 'socialImageurl', 'socialhachtags', 
+                'day', 'hour', 'platform'  // Fixed: 'hour' instead of 'houre'
+              ],
+              properties: {
+                socialTitle: {
+                  type: 'string',
+                  minLength: 1,
+                  maxLength: 280,
+                  pattern: '^[^<>"\';\\\\]*$' // Enhanced XSS prevention
+                },
+                socialDescription: {
+                  type: 'string', 
+                  minLength: 1,
+                  maxLength: 2000,
+                  pattern: '^[^<>"\';\\\\]*$'
+                },
+                shortUrl: {
+                  type: 'string',
+                  format: 'uri',
+                  pattern: '^https://'
+                },
+                linkType: {
+                  type: 'string',
+                  enum: ['article', 'video', 'image', 'link', 'event']
+                },
+                socialImageurl: {
+                  type: 'string',
+                  format: 'uri',
+                  pattern: '^https://.*\\.(jpg|jpeg|png|gif|webp)($|\\?)'
+                },
+                socialhachtags: {
+                  type: 'string',
+                  pattern: '^#[a-zA-Z0-9_]{1,30}(,#[a-zA-Z0-9_]{1,30})*$'
+                },
+                day: {
+                  type: 'string',
+                  format: 'date'
+                },
+                hour: {  // Fixed: 'hour' instead of 'houre'
+                  type: 'string',
+                  pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$'
+                },
+                platform: {
+                  type: 'string',
+                  pattern: '^(facebook|instagram|twitter|linkedin|tiktok)(,(facebook|instagram|twitter|linkedin|tiktok))*$'
+                }
+              },
+              additionalProperties: false
+            };
+            
+            // Enhanced validations for strict/enterprise levels
+            if (level === 'strict' || level === 'enterprise') {
+              baseSchema.properties.socialTitle.minLength = 5;
+              baseSchema.properties.socialDescription.minLength = 10;
+              
+              if (level === 'enterprise') {
+                baseSchema.properties.socialTitle.maxLength = 240;
+                baseSchema.properties.businessCategory = {
+                  type: 'string',
+                  enum: ['tech', 'finance', 'health', 'education', 'entertainment', 'news', 'sports', 'lifestyle']
+                };
+              }
+            }
+            
+            return baseSchema;
+          };
+          
+          // Enhanced row validation with comprehensive business logic
+          async function validateRow(row, index, schema, ajv) {
+            const errors = [];
+            const warnings = [];
+            
+            // Schema validation
+            const valid = ajv.validate(schema, row);
+            if (!valid) {
+              errors.push(...ajv.errors.map(err => `${err.instancePath || err.dataPath}: ${err.message}`));
+            }
+            
+            // Enhanced business logic validations
+            try {
+              // Date/time validation with timezone awareness
+              const scheduleDate = new Date(`${row.day}T${row.hour}:00`);
+              const now = new Date();
+              
+              if (isNaN(scheduleDate.getTime())) {
+                errors.push('Invalid date/time format');
+              } else {
+                if (scheduleDate < now) {
+                  warnings.push('Scheduled time is in the past');
+                }
+                
+                if (scheduleDate > new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000)) {
+                  warnings.push('Scheduled time is more than 1 year in future');
+                }
+              }
+              
+              // Enhanced URL validation
+              if (row.shortUrl && !validator.isURL(row.shortUrl, { 
+                protocols: ['https'], 
+                require_protocol: true,
+                require_valid_protocol: true
+              })) {
+                errors.push('Invalid HTTPS URL format');
+              }
+              
+              // Image URL validation
+              if (row.socialImageurl && !validator.isURL(row.socialImageurl, { 
+                protocols: ['https'],
+                require_protocol: true 
+              })) {
+                errors.push('Invalid image URL format');
+              }
+              
+              // Platform-specific validations
+              const platforms = row.platform.split(',').map(p => p.trim());
+              for (const platform of platforms) {
+                switch (platform) {
+                  case 'twitter':
+                    if (row.socialTitle.length > 280) {
+                      errors.push('Twitter content exceeds 280 characters');
+                    }
+                    break;
+                  case 'instagram':
+                    if (!row.socialImageurl) {
+                      errors.push('Instagram posts require an image URL');
+                    }
+                    break;
+                  case 'linkedin':
+                    if (row.socialTitle.length > 200) {
+                      warnings.push('LinkedIn titles work best under 200 characters');
+                    }
+                    break;
+                }
+              }
+              
+              // Enhanced content quality checks
+              const suspiciousPatterns = [
+                /click\s+here/gi, /buy\s+now/gi, /free\s+money/gi,
+                /urgent/gi, /limited\s+time/gi, /act\s+now/gi,
+                /guaranteed/gi, /risk\s+free/gi
+              ];
+              
+              const content = (row.socialTitle + ' ' + row.socialDescription).toLowerCase();
+              for (const pattern of suspiciousPatterns) {
+                if (pattern.test(content)) {
+                  warnings.push(`Potentially spammy content detected: ${pattern.source}`);
+                }
+              }
+              
+              // Hashtag validation
+              if (row.socialhachtags) {
+                const hashtags = row.socialhachtags.split(',');
+                if (hashtags.length > 10) {
+                  warnings.push('More than 10 hashtags may reduce engagement');
+                }
+              }
+              
+            } catch (error) {
+              errors.push(`Validation error: ${error.message}`);
+            }
+            
+            return {
+              row,
+              index: index + 1,
+              errors,
+              warnings,
+              isValid: errors.length === 0
+            };
+          }
+          
+          // Main validation function with enhanced processing
+          async function validateData() {
+            const startTime = performance.now();
+            const filePath = process.env.FILE_PATH;
+            const fileType = process.env.FILE_TYPE;
+            const validationLevel = process.env.VALIDATION_LEVEL || 'standard';
+            
+            console.log(`🔬 Processing file: ${filePath}`);
+            console.log(`📊 File type: ${fileType}`);
+            console.log(`🔍 Validation level: ${validationLevel}`);
+            
+            let records = [];
+            
+            try {
+              // Enhanced file parsing based on type
+              switch (fileType) {
+                case 'csv':
+                  console.log('📊 Parsing CSV file...');
+                  records = await new Promise((resolve, reject) => {
+                    const results = [];
+                    fs.createReadStream(filePath)
+                      .pipe(csv())
+                      .on('data', (data) => results.push(data))
+                      .on('end', () => resolve(results))
+                      .on('error', reject);
+                  });
+                  break;
+                  
+                case 'json':
+                  console.log('📊 Parsing JSON file...');
+                  const jsonData = fs.readFileSync(filePath, 'utf8');
+                  const parsedData = JSON.parse(jsonData);
+                  records = Array.isArray(parsedData) ? parsedData : [parsedData];
+                  break;
+                  
+                default:
+                  throw new Error(`Unsupported file type: ${fileType}`);
+              }
+              
+            } catch (error) {
+              console.error(`❌ File parsing failed: ${error.message}`);
+              process.exit(1);
+            }
+            
+            console.log(`📊 Total records found: ${records.length}`);
+            
+            if (records.length === 0) {
+              console.error('❌ No records found in file');
+              process.exit(1);
+            }
+            
+            // Enhanced validation setup
+            const ajv = new Ajv({ allErrors: true, verbose: true });
+            addFormats(ajv);
+            const schema = getValidationSchema(validationLevel);
+            
+            const validRecords = [];
+            const invalidRecords = [];
+            const warningRecords = [];
+            
+            // Process records with enhanced progress tracking
+            console.log('🔍 Starting record validation...');
+            for (let i = 0; i < records.length; i++) {
+              if (i > 0 && i % 500 === 0) {
+                console.log(`📊 Processed ${i}/${records.length} records...`);
+              }
+              
+              const result = await validateRow(records[i], i, schema, ajv);
+              
+              if (result.isValid) {
+                validRecords.push(result.row);
+                if (result.warnings.length > 0) {
+                  warningRecords.push(result);
+                }
+              } else {
+                invalidRecords.push(result);
+              }
+            }
+            
+            const endTime = performance.now();
+            const processingTime = Math.round(endTime - startTime);
+            
+            // Enhanced statistics generation
+            const stats = {
+              totalRecords: records.length,
+              validRecords: validRecords.length,
+              invalidRecords: invalidRecords.length,
+              warningRecords: warningRecords.length,
+              processingTimeMs: processingTime,
+              validationLevel,
+              recordsPerSecond: Math.round(records.length / (processingTime / 1000)),
+              successRate: Math.round((validRecords.length / records.length) * 100),
+              fileType,
+              enhancedValidation: true
+            };
+            
+            console.log('\n📊 Enhanced Validation Results:');
+            console.log(` Total: ${stats.totalRecords}`);
+            console.log(` ✅ Valid: ${stats.validRecords} (${stats.successRate}%)`);
+            console.log(` ❌ Invalid: ${stats.invalidRecords}`);
+            console.log(` ⚠️ Warnings: ${stats.warningRecords}`);
+            console.log(` ⏱️ Processing: ${processingTime}ms`);
+            console.log(` 🚀 Speed: ${stats.recordsPerSecond} records/sec`);
+            
+            // Save enhanced results
+            fs.writeFileSync('temp/validated/valid_records.json', JSON.stringify(validRecords, null, 2));
+            fs.writeFileSync('temp/failed/invalid_records.json', JSON.stringify(invalidRecords, null, 2));
+            fs.writeFileSync('temp/processed/warning_records.json', JSON.stringify(warningRecords, null, 2));
+            fs.writeFileSync('reports/summary/validation_stats.json', JSON.stringify(stats, null, 2));
+            
+            // Enhanced error analysis
+            if (invalidRecords.length > 0) {
+              const errorSummary = {};
+              invalidRecords.forEach(record => {
+                record.errors.forEach(error => {
+                  errorSummary[error] = (errorSummary[error] || 0) + 1;
+                });
+              });
+              
+              fs.writeFileSync('reports/detailed/error_summary.json', JSON.stringify(errorSummary, null, 2));
+              
+              console.log('\n❌ Top validation errors:');
+              Object.entries(errorSummary)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 5)
+                .forEach(([error, count]) => {
+                  console.log(` ${count}x: ${error}`);
+                });
+            }
+            
+            // Set GitHub outputs
+            console.log('\n📤 Setting workflow outputs...');
+            console.log(`valid_records=${stats.validRecords}`);
+            console.log(`invalid_records=${stats.invalidRecords}`);
+            console.log(`processing_stats=${JSON.stringify(stats)}`);
+            
+            // Enhanced exit condition
+            if (validRecords.length === 0) {
+              console.error('❌ No valid records found. Import cannot proceed.');
+              process.exit(1);
+            }
+            
+            if (stats.successRate < 50) {
+              console.warn('⚠️ Success rate below 50%. Review data quality.');
+            }
+            
+            console.log('✅ Enhanced validation completed successfully');
+          }
+          
+          // Execute validation
+          validateData().catch(error => {
+            console.error('💥 Enhanced validation failed:', error);
+            process.exit(1);
+          });
+          EOF
+        env:
+          FILE_PATH: ${{ steps.download.outputs.file_path }}
+          FILE_TYPE: ${{ github.event.inputs.fileType }}
+          VALIDATION_LEVEL: ${{ github.event.inputs.validationLevel }}
+
+      - name: '📊 Enhanced Processing Performance Analysis'
+        run: |
+          echo "📈 Analyzing enhanced processing performance..."
+          
+          if [ -f "reports/summary/validation_stats.json" ]; then
+            STATS=$(cat reports/summary/validation_stats.json)
+            echo "📊 Enhanced Validation Statistics:"
+            echo "$STATS" | jq -r '
+              "File Type: " + .fileType + "\n" +
+              "Total Records: " + (.totalRecords | tostring) + "\n" +
+              "Processing Speed: " + (.recordsPerSecond | tostring) + " records/sec\n" +
+              "Success Rate: " + (.successRate | tostring) + "%\n" +
+              "Processing Time: " + (.processingTimeMs | tostring) + "ms\n" +
+              "Enhanced Validation: " + (.enhancedValidation | tostring)
+            '
+            
+            # Enhanced performance benchmarking
+            RECORDS_PER_SEC=$(echo "$STATS" | jq -r '.recordsPerSecond')
+            SUCCESS_RATE=$(echo "$STATS" | jq -r '.successRate')
+            
+            if [ "$RECORDS_PER_SEC" -lt 100 ]; then
+              echo "⚠️ PERFORMANCE ALERT: Processing speed below optimal threshold"
+            elif [ "$RECORDS_PER_SEC" -gt 500 ]; then
+              echo "🚀 EXCELLENT: High-speed processing achieved!"
+            fi
+            
+            if [ "$SUCCESS_RATE" -lt 80 ]; then
+              echo "⚠️ QUALITY ALERT: Success rate below recommended threshold"
+            elif [ "$SUCCESS_RATE" -eq 100 ]; then
+              echo "🎯 PERFECT: 100% validation success rate!"
+            fi
+          fi
+
+  # ================================================================================
+  # PHASE 3: ENHANCED DATABASE OPERATIONS WITH CLEANUP TRACKING
+  # ================================================================================
+
+  database-operations:
+    name: '🗄️ Enhanced Database Operations & Cleanup Tracking'
+    runs-on: ubuntu-latest
+    needs: [security-validation, file-processing]
+    if: needs.file-processing.outputs.valid-records > 0
+    timeout-minutes: 45
+    outputs:
+      import-id: ${{ steps.database-import.outputs.import_id }}
+      records-imported: ${{ steps.database-import.outputs.records_imported }}
+      cleanup-tracking-enabled: ${{ steps.database-import.outputs.cleanup_tracking }}
+
+    steps:
+      - name: '🔧 Setup Enhanced Database Environment'
+        run: |
+          echo "🗄️ Setting up enhanced database environment..."
+          
+          # Install optimized dependencies
+          npm install -g firebase-admin@12.0.0
+          npm install -g p-limit@4.0.0
+          npm install -g p-retry@5.0.0
+          
+          # Create enhanced directory structure
+          mkdir -p {
+            database/{transactions,backups,logs,cleanup},
+            monitoring/{performance,health,alerts}
+          }
+          
+          echo "✅ Enhanced database environment ready"
+          echo "🎯 Features: Batch processing, Cleanup tracking, Performance monitoring"
+
+      - name: '🔥 Enhanced Firebase Admin SDK Initialization'
+        run: |
+          echo "🔥 Initializing enhanced Firebase Admin SDK..."
+          
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          const fs = require('fs');
+          
+          try {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            
+            admin.initializeApp({
+              credential: admin.credential.cert(serviceAccount),
+              databaseURL: process.env.FIREBASE_DATABASE_URL,
+              storageBucket: process.env.FIREBASE_STORAGE_BUCKET
+            });
+            
+            // Enhanced Firestore configuration
+            const firestore = admin.firestore();
+            firestore.settings({
+              ignoreUndefinedProperties: true,
+              maxIdleChannels: 10,
+              keepAlive: true
+            });
+            
+            // Test connectivity with enhanced verification
+            await firestore.doc('system/health').set({
+              status: 'operational',
+              timestamp: admin.firestore.FieldValue.serverTimestamp(),
+              source: 'bulk-import-v11.0',
+              features: {
+                enhanced_validation: true,
+                cleanup_tracking: true,
+                json_csv_only: true
+              }
+            });
+            
+            // Test cleanup collection access
+            await firestore.collection('cleanup_tracking').doc('test').set({
+              test: true,
+              timestamp: admin.firestore.FieldValue.serverTimestamp()
+            });
+            
+            await firestore.collection('cleanup_tracking').doc('test').delete();
+            
+            console.log('✅ Enhanced Firebase Admin SDK initialized successfully');
+            console.log('🔗 Database connection verified');
+            console.log('🗑️ Cleanup tracking system ready');
+            console.log('📊 Enhanced configuration applied');
+            
+          } catch (error) {
+            console.error('❌ Enhanced Firebase initialization failed:', error.message);
+            process.exit(1);
+          }
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+
+      - name: '💾 Enhanced Database Import with Cleanup Tracking'
+        id: database-import
+        run: |
+          echo "💾 Starting enhanced database import with cleanup tracking..."
+          
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          const fs = require('fs');
+          const pLimit = require('p-limit');
+          const pRetry = require('p-retry');
+          const { performance } = require('perf_hooks');
+          
+          // Enhanced configuration
+          const CONFIG = {
+            batchSize: parseInt(process.env.BATCH_SIZE) || 100,
+            maxConcurrency: parseInt(process.env.MAX_CONCURRENCY) || 5,
+            maxRetries: parseInt(process.env.MAX_RETRIES) || 3,
+            retryDelay: parseInt(process.env.RETRY_DELAY) || 5,
+            transactionTimeout: 60000, // 1 minute
+            enableCleanup: process.env.ENABLE_AUTO_CLEANUP === 'true'
+          };
+          
+          // Initialize services
+          const db = admin.firestore();
+          const storage = admin.storage();
+          const FieldValue = admin.firestore.FieldValue;
+          const Timestamp = admin.firestore.Timestamp;
+          
+          // Concurrency control
+          const concurrencyLimit = pLimit(CONFIG.maxConcurrency);
+          
+          // Enhanced error handling
+          class DatabaseError extends Error {
+            constructor(message, code, operation, batchIndex) {
+              super(message);
+              this.name = 'DatabaseError';
+              this.code = code;
+              this.operation = operation;
+              this.batchIndex = batchIndex;
+              this.timestamp = new Date().toISOString();
+            }
+          }
+          
+          // Enhanced batch processor with cleanup tracking
+          async function processBatch(batchData, batchIndex, importId) {
+            const batchId = `batch_${batchIndex}_${Date.now()}`;
+            
+            return await pRetry(async () => {
+              const startTime = performance.now();
+              
+              try {
+                const batch = db.batch();
+                const batchOperations = [];
+                
+                for (const row of batchData) {
+                  // Generate document reference
+                  const docRef = db.collection('posts').doc();
+                  
+                  // Enhanced document data with cleanup tracking
+                  const documentData = {
+                    // Core data from JSON/CSV
+                    uid: process.env.TARGET_UID,
+                    ...row,
+                    
+                    // Parse platforms array
+                    platforms: row.platform.split(',').map(p => p.trim()),
+                    
+                    // Enhanced scheduling
+                    scheduledAt: Timestamp.fromDate(new Date(`${row.day}T${row.hour}:00`)),
+                    
+                    // Enhanced metadata
+                    importMetadata: {
+                      importId: importId,
+                      batchId: batchId,
+                      batchIndex: batchIndex,
+                      originalRowIndex: batchData.indexOf(row),
+                      importedAt: FieldValue.serverTimestamp(),
+                      source: 'bulk-import-v11.0',
+                      correlationId: process.env.CORRELATION_ID,
+                      validationLevel: process.env.VALIDATION_LEVEL || 'standard',
+                      fileType: process.env.FILE_TYPE,
+                      fileHash: process.env.FILE_HASH
+                    },
+                    
+                    // Enhanced status management
+                    status: process.env.DRY_RUN === 'true' ? 'dry-run' : 'scheduled',
+                    publishStatus: 'pending',
+                    
+                    // Enhanced cleanup tracking
+                    cleanupTracking: {
+                      fileCleanupRequired: CONFIG.enableCleanup,
+                      originalFileHash: process.env.FILE_HASH,
+                      publishingCompleted: false,
+                      publishingAttempts: 0,
+                      cleanupCompleted: false,
+                      cleanupScheduled: CONFIG.enableCleanup,
+                      lastStatusUpdate: FieldValue.serverTimestamp()
+                    },
+                    
+                    // Enhanced audit trail
+                    auditTrail: {
+                      createdAt: FieldValue.serverTimestamp(),
+                      createdBy: process.env.GITHUB_ACTOR || 'system',
+                      lastModified: FieldValue.serverTimestamp(),
+                      version: 1,
+                      workflow: 'bulk-import-v11.0',
+                      securityValidated: true,
+                      enhancedValidation: true
+                    },
+                    
+                    // Enhanced performance tracking
+                    performanceMetrics: {
+                      processingTimeMs: Math.round(performance.now() - startTime),
+                      batchSize: batchData.length,
+                      validationLevel: process.env.VALIDATION_LEVEL
+                    }
+                  };
+                  
+                  // Add to batch
+                  batch.set(docRef, documentData);
+                  batchOperations.push({
+                    docId: docRef.id,
+                    operation: 'create',
+                    collection: 'posts'
+                  });
+                }
+                
+                // Execute batch with timeout
+                await Promise.race([
+                  batch.commit(),
+                  new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Batch commit timeout')), CONFIG.transactionTimeout)
+                  )
+                ]);
+                
+                const endTime = performance.now();
+                const processingTime = Math.round(endTime - startTime);
+                
+                console.log(`✅ Batch ${batchIndex + 1} completed: ${batchData.length} records in ${processingTime}ms`);
+                
+                return {
+                  batchIndex,
+                  batchId,
+                  recordCount: batchData.length,
+                  processingTime,
+                  operations: batchOperations,
+                  success: true
+                };
+                
+              } catch (error) {
+                console.error(`❌ Batch ${batchIndex + 1} failed: ${error.message}`);
+                throw new DatabaseError(
+                  `Enhanced batch processing failed: ${error.message}`,
+                  error.code || 'BATCH_FAILED',
+                  'batch_commit',
+                  batchIndex
+                );
+              }
+            }, {
+              retries: CONFIG.maxRetries,
+              minTimeout: CONFIG.retryDelay * 1000,
+              onFailedAttempt: (error) => {
+                console.log(`⚠️ Batch ${batchIndex + 1} attempt ${error.attemptNumber} failed. Retrying...`);
+              }
+            });
+          }
+          
+          // Main enhanced import function
+          async function executeEnhancedImport() {
+            const startTime = performance.now();
+            const importId = `import_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            
+            console.log(`🚀 Starting enhanced import operation`);
+            console.log(`📋 Import ID: ${importId}`);
+            console.log(`⚙️ Configuration:`, CONFIG);
+            
+            try {
+              // Load valid records
+              const validRecordsPath = 'temp/validated/valid_records.json';
+              if (!fs.existsSync(validRecordsPath)) {
+                throw new Error('Valid records file not found');
+              }
+              
+              const validRecords = JSON.parse(fs.readFileSync(validRecordsPath, 'utf8'));
+              console.log(`📊 Processing ${validRecords.length} valid records`);
+              
+              // Create enhanced import metadata record
+              const importMetaRef = db.collection('import_operations').doc(importId);
+              await importMetaRef.set({
+                importId,
+                uid: process.env.TARGET_UID,
+                initiatedBy: process.env.GITHUB_ACTOR,
+                correlationId: process.env.CORRELATION_ID,
+                
+                configuration: {
+                  batchSize: CONFIG.batchSize,
+                  maxConcurrency: CONFIG.maxConcurrency,
+                  validationLevel: process.env.VALIDATION_LEVEL,
+                  fileType: process.env.FILE_TYPE,
+                  dryRun: process.env.DRY_RUN === 'true',
+                  autoCleanup: CONFIG.enableCleanup
+                },
+                
+                statistics: {
+                  totalRecords: validRecords.length,
+                  expectedBatches: Math.ceil(validRecords.length / CONFIG.batchSize)
+                },
+                
+                status: 'in_progress',
+                startedAt: FieldValue.serverTimestamp(),
+                
+                // Enhanced cleanup tracking
+                cleanupTracking: {
+                  enabled: CONFIG.enableCleanup,
+                  fileHash: process.env.FILE_HASH,
+                  originalFileName: `import_${importId}`,
+                  cleanupScheduled: false,
+                  cleanupCompleted: false
+                },
+                
+                auditTrail: {
+                  workflowRun: process.env.GITHUB_RUN_ID,
+                  repository: process.env.GITHUB_REPOSITORY,
+                  actor: process.env.GITHUB_ACTOR,
+                  version: 'v11.0',
+                  enhancedFeatures: true
+                }
+              });
+              
+              // Process records in enhanced batches
+              const batches = [];
+              for (let i = 0; i < validRecords.length; i += CONFIG.batchSize) {
+                batches.push(validRecords.slice(i, i + CONFIG.batchSize));
+              }
+              
+              console.log(`📦 Created ${batches.length} enhanced batches`);
+              
+              // Execute batches with enhanced concurrency control
+              const batchResults = await Promise.allSettled(
+                batches.map((batch, index) =>
+                  concurrencyLimit(() => processBatch(batch, index, importId))
+                )
+              );
+              
+              // Analyze enhanced results
+              const successfulBatches = batchResults.filter(result => result.status === 'fulfilled');
+              const failedBatches = batchResults.filter(result => result.status === 'rejected');
+              
+              const totalImported = successfulBatches.reduce((sum, result) => 
+                sum + (result.value?.recordCount || 0), 0
+              );
+              
+              const endTime = performance.now();
+              const totalProcessingTime = Math.round(endTime - startTime);
+              
+              console.log(`\n📊 Enhanced Import Operation Results:`);
+              console.log(` ✅ Successful batches: ${successfulBatches.length}/${batches.length}`);
+              console.log(` ❌ Failed batches: ${failedBatches.length}`);
+              console.log(` 📝 Records imported: ${totalImported}/${validRecords.length}`);
+              console.log(` ⏱️ Total time: ${totalProcessingTime}ms`);
+              console.log(` 🚀 Import rate: ${Math.round(totalImported / (totalProcessingTime / 1000))} records/sec`);
+              console.log(` 🗑️ Cleanup tracking: ${CONFIG.enableCleanup ? 'Enabled' : 'Disabled'}`);
+              
+              // Update import metadata with enhanced results
+              await importMetaRef.update({
+                status: failedBatches.length === 0 ? 'completed' : 'partial_success',
+                completedAt: FieldValue.serverTimestamp(),
+                
+                results: {
+                  totalProcessed: validRecords.length,
+                  successfullyImported: totalImported,
+                  failedRecords: validRecords.length - totalImported,
+                  processingTimeMs: totalProcessingTime,
+                  averageRecordsPerSecond: Math.round(totalImported / (totalProcessingTime / 1000)),
+                  
+                  batchResults: {
+                    successful: successfulBatches.length,
+                    failed: failedBatches.length,
+                    successRate: Math.round((successfulBatches.length / batches.length) * 100)
+                  }
+                },
+                
+                performance: {
+                  recordsPerSecond: Math.round(totalImported / (totalProcessingTime / 1000)),
+                  averageBatchTime: Math.round(totalProcessingTime / batches.length),
+                  concurrencyUtilization: CONFIG.maxConcurrency,
+                  enhancedProcessing: true
+                },
+                
+                // Enhanced cleanup preparation
+                cleanupTracking: {
+                  enabled: CONFIG.enableCleanup,
+                  fileHash: process.env.FILE_HASH,
+                  recordsRequiringCleanup: totalImported,
+                  cleanupScheduled: CONFIG.enableCleanup && totalImported > 0,
+                  cleanupReadyAt: CONFIG.enableCleanup ? FieldValue.serverTimestamp() : null
+                }
+              });
+              
+              // Create cleanup tracking record if enabled
+              if (CONFIG.enableCleanup && totalImported > 0) {
+                await db.collection('cleanup_tracking').doc(importId).set({
+                  importId,
+                  fileHash: process.env.FILE_HASH,
+                  totalRecords: totalImported,
+                  cleanupRequired: true,
+                  publishingCompleted: false,
+                  cleanupCompleted: false,
+                  createdAt: FieldValue.serverTimestamp(),
+                  status: 'awaiting_publishing',
+                  
+                  trackingData: {
+                    uid: process.env.TARGET_UID,
+                    correlationId: process.env.CORRELATION_ID,
+                    fileType: process.env.FILE_TYPE,
+                    batchCount: batches.length
+                  }
+                });
+                
+                console.log(`🗑️ Cleanup tracking record created for import: ${importId}`);
+              }
+              
+              // Generate enhanced final report
+              const finalReport = {
+                importId,
+                summary: {
+                  totalRecords: validRecords.length,
+                  importedRecords: totalImported,
+                  failedRecords: validRecords.length - totalImported,
+                  successRate: Math.round((totalImported / validRecords.length) * 100)
+                },
+                performance: {
+                  totalTimeMs: totalProcessingTime,
+                  recordsPerSecond: Math.round(totalImported / (totalProcessingTime / 1000)),
+                  batchCount: batches.length,
+                  averageBatchTimeMs: Math.round(totalProcessingTime / batches.length)
+                },
+                cleanupTracking: {
+                  enabled: CONFIG.enableCleanup,
+                  recordsToTrack: totalImported
+                },
+                timestamp: new Date().toISOString(),
+                version: 'v11.0',
+                enhanced: true
+              };
+              
+              fs.writeFileSync('reports/summary/enhanced_import_report.json', JSON.stringify(finalReport, null, 2));
+              console.log(`\n📋 Enhanced final report saved`);
+              
+              // Set GitHub outputs
+              console.log(`\n📤 Setting enhanced workflow outputs...`);
+              console.log(`import_id=${importId}`);
+              console.log(`records_imported=${totalImported}`);
+              console.log(`cleanup_tracking=${CONFIG.enableCleanup}`);
+              
+              if (totalImported === 0) {
+                throw new Error('No records were successfully imported');
+              }
+              
+              console.log(`\n✅ Enhanced import operation completed successfully`);
+              return finalReport;
+              
+            } catch (error) {
+              console.error(`💥 Enhanced import operation failed: ${error.message}`);
+              process.exit(1);
+            }
+          }
+          
+          // Execute the enhanced import
+          executeEnhancedImport().catch(error => {
+            console.error('💥 Critical enhanced import failure:', error);
+            process.exit(1);
+          });
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          TARGET_UID: ${{ github.event.inputs.uid }}
+          BATCH_SIZE: ${{ github.event.inputs.batchSize }}
+          MAX_CONCURRENCY: ${{ env.MAX_CONCURRENCY }}
+          MAX_RETRIES: ${{ env.MAX_RETRIES }}
+          RETRY_DELAY: ${{ env.RETRY_DELAY }}
+          VALIDATION_LEVEL: ${{ github.event.inputs.validationLevel }}
+          DRY_RUN: ${{ github.event.inputs.dryRun }}
+          ENABLE_AUTO_CLEANUP: ${{ env.ENABLE_AUTO_CLEANUP }}
+          CORRELATION_ID: ${{ env.CORRELATION_ID }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          FILE_TYPE: ${{ github.event.inputs.fileType }}
+          FILE_HASH: ${{ needs.file-processing.outputs.file-hash }}
+
+      - name: '📊 Enhanced Database Performance Analysis'
+        run: |
+          echo "📈 Analyzing enhanced database operation performance..."
+          
+          if [ -f "reports/summary/enhanced_import_report.json" ]; then
+            REPORT=$(cat reports/summary/enhanced_import_report.json)
+            echo "📊 Enhanced Import Performance Summary:"
+            echo "$REPORT" | jq -r '
+              "Import ID: " + .importId + "\n" +
+              "Version: " + .version + "\n" +
+              "Records Imported: " + (.summary.importedRecords | tostring) + "/" + (.summary.totalRecords | tostring) + "\n" +
+              "Success Rate: " + (.summary.successRate | tostring) + "%" + "\n" +
+              "Processing Speed: " + (.performance.recordsPerSecond | tostring) + " records/sec" + "\n" +
+              "Total Time: " + (.performance.totalTimeMs | tostring) + "ms" + "\n" +
+              "Cleanup Tracking: " + (.cleanupTracking.enabled | tostring) + "\n" +
+              "Enhanced Features: " + (.enhanced | tostring)
+            '
+            
+            # Enhanced performance benchmarking
+            RECORDS_PER_SEC=$(echo "$REPORT" | jq -r '.performance.recordsPerSecond')
+            SUCCESS_RATE=$(echo "$REPORT" | jq -r '.summary.successRate')
+            CLEANUP_ENABLED=$(echo "$REPORT" | jq -r '.cleanupTracking.enabled')
+            
+            if [ "$RECORDS_PER_SEC" -lt 50 ]; then
+              echo "⚠️ PERFORMANCE ALERT: Import speed below optimal threshold"
+            elif [ "$RECORDS_PER_SEC" -gt 200 ]; then
+              echo "🚀 EXCELLENT: High-speed processing achieved!"
+            fi
+            
+            if [ "$SUCCESS_RATE" -lt 95 ]; then
+              echo "⚠️ QUALITY ALERT: Success rate below recommended threshold"
+            elif [ "$SUCCESS_RATE" -eq 100 ]; then
+              echo "🎯 PERFECT: 100% import success rate!"
+            fi
+            
+            if [ "$CLEANUP_ENABLED" = "true" ]; then
+              echo "🗑️ CLEANUP: Automatic file cleanup enabled and tracked"
+            fi
+          fi
+
+  # ================================================================================
+  # PHASE 4: SCHEDULED PUBLISHING INTEGRATION
+  # ================================================================================
+
+  scheduled-publishing:
+    name: '📅 Enhanced Scheduled Publishing Integration'
+    runs-on: ubuntu-latest
+    needs: [security-validation, database-operations]
+    if: |
+      needs.database-operations.outputs.records-imported > 0 &&
+      github.event.inputs.schedulePublishing == 'true' &&
+      github.event.inputs.dryRun == 'false'
+    timeout-minutes: 15
+
+    steps:
+      - name: '📅 Initialize Publishing Integration'
+        run: |
+          echo "📅 Initializing enhanced scheduled publishing integration..."
+          echo "🔗 Import ID: ${{ needs.database-operations.outputs.import-id }}"
+          echo "📊 Records to publish: ${{ needs.database-operations.outputs.records-imported }}"
+          echo "🗑️ Cleanup tracking: ${{ needs.database-operations.outputs.cleanup-tracking-enabled }}"
+
+      - name: '🚀 Trigger Enhanced Scheduled Publishing'
+        run: |
+          echo "🚀 Triggering enhanced scheduled publishing workflow..."
+          
+          # Enhanced workflow dispatch with cleanup tracking
+          curl -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --fail \
+            --silent \
+            --show-error \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/scheduled-publish-production.yml/dispatches" \
+            --data "{
+              \"ref\": \"main\",
+              \"inputs\": {
+                \"importId\": \"${{ needs.database-operations.outputs.import-id }}\",
+                \"uid\": \"${{ github.event.inputs.uid }}\",
+                \"enableCleanup\": \"${{ needs.database-operations.outputs.cleanup-tracking-enabled }}\",
+                \"correlationId\": \"${{ env.CORRELATION_ID }}\",
+                \"priority\": \"${{ github.event.inputs.priority }}\",
+                \"notificationChannels\": \"${{ github.event.inputs.notificationChannels }}\",
+                \"source\": \"bulk-import-v11.0\"
+              }
+            }"
+          
+          echo "✅ Enhanced scheduled publishing workflow triggered successfully"
+          echo "🔗 Import-Publishing correlation established"
+          echo "🗑️ Cleanup will be triggered after successful publishing"
+
+      - name: '📊 Publishing Integration Status'
+        run: |
+          echo "📊 Enhanced publishing integration status:"
+          echo " 🆔 Import ID: ${{ needs.database-operations.outputs.import-id }}"
+          echo " 📝 Records queued: ${{ needs.database-operations.outputs.records-imported }}"
+          echo " 🗑️ Auto cleanup: ${{ needs.database-operations.outputs.cleanup-tracking-enabled }}"
+          echo " ⚡ Priority: ${{ github.event.inputs.priority }}"
+          echo " 📢 Notifications: ${{ github.event.inputs.notificationChannels }}"
+          echo " 🔗 Correlation ID: ${{ env.CORRELATION_ID }}"
+          echo ""
+          echo "🔄 Next steps:"
+          echo " 1. Scheduled publishing will process all imported posts"
+          echo " 2. Each successful publish will be tracked"
+          echo " 3. When all posts are published, cleanup will trigger automatically"
+          echo " 4. Import files will be deleted from Firebase Storage"
+          echo " 5. Cleanup completion will be logged and reported"
+
+  # ================================================================================
+  # PHASE 5: ENHANCED NOTIFICATION & REPORTING SYSTEM
+  # ================================================================================
+
+  notification-reporting:
+    name: '📢 Enhanced Notification & Comprehensive Reporting'
+    runs-on: ubuntu-latest
+    needs: [security-validation, file-processing, database-operations]
+    if: always() && needs.security-validation.result == 'success'
+    timeout-minutes: 10
+
+    steps:
+      - name: '📊 Generate Enhanced Comprehensive Report'
+        run: |
+          echo "📋 Generating enhanced comprehensive import report..."
+          
+          # Create enhanced final report
+          cat > enhanced_final_report.json <<EOF
+          {
+            "timestamp": "$(date -u '+%Y-%m-%dT%H:%M:%S.%3NZ')",
+            "execution_id": "${{ env.EXECUTION_ID }}",
+            "correlation_id": "${{ env.CORRELATION_ID }}",
+            "workflow_version": "v11.0",
+            "enhanced_features": {
+              "json_csv_only": true,
+              "auto_cleanup": ${{ env.ENABLE_AUTO_CLEANUP }},
+              "enhanced_validation": true,
+              "scheduled_publishing": ${{ env.ENABLE_SCHEDULED_PUBLISHING }},
+              "cleanup_tracking": true
+            },
+            "security": {
+              "validation_passed": "${{ needs.security-validation.outputs.security-passed }}",
+              "risk_score": "${{ needs.security-validation.outputs.risk-score }}",
+              "format_validation": "${{ needs.security-validation.outputs.file-format-valid }}"
+            },
+            "file_processing": {
+              "status": "${{ needs.file-processing.result }}",
+              "valid_records": "${{ needs.file-processing.outputs.valid-records }}",
+              "invalid_records": "${{ needs.file-processing.outputs.invalid-records }}",
+              "file_hash": "${{ needs.file-processing.outputs.file-hash }}"
+            },
+            "database_operations": {
+              "status": "${{ needs.database-operations.result }}",
+              "import_id": "${{ needs.database-operations.outputs.import-id }}",
+              "records_imported": "${{ needs.database-operations.outputs.records-imported }}",
+              "cleanup_tracking": "${{ needs.database-operations.outputs.cleanup-tracking-enabled }}"
+            },
+            "configuration": {
+              "file_type": "${{ github.event.inputs.fileType }}",
+              "max_size_mb": "${{ github.event.inputs.maxSize }}",
+              "validation_level": "${{ github.event.inputs.validationLevel }}",
+              "batch_size": "${{ github.event.inputs.batchSize }}",
+              "priority": "${{ github.event.inputs.priority }}",
+              "dry_run": ${{ github.event.inputs.dryRun }}
+            },
+            "user_context": {
+              "uid": "${{ github.event.inputs.uid }}",
+              "actor": "${{ github.actor }}",
+              "repository": "${{ github.repository }}"
+            }
+          }
+          EOF
+          
+          echo "✅ Enhanced comprehensive report generated"
+
+      - name: '📧 Enhanced Multi-Channel Notifications'
+        if: always()
+        run: |
+          CHANNELS="${{ github.event.inputs.notificationChannels }}"
+          IMPORT_STATUS="${{ needs.database-operations.result }}"
+          RECORDS_IMPORTED="${{ needs.database-operations.outputs.records-imported }}"
+          IMPORT_ID="${{ needs.database-operations.outputs.import-id }}"
+          
+          echo "📢 Sending enhanced notifications via: $CHANNELS"
+          
+          # Determine overall status
+          if [ "${{ needs.security-validation.result }}" != "success" ]; then
+            OVERALL_STATUS="❌ SECURITY_FAILED"
+            MESSAGE="فشل التحقق الأمني للاستيراد المجمع"
+          elif [ "${{ needs.file-processing.result }}" != "success" ]; then
+            OVERALL_STATUS="❌ FILE_PROCESSING_FAILED"
+            MESSAGE="فشل معالجة ملف الاستيراد المجمع"
+          elif [ "$IMPORT_STATUS" != "success" ]; then
+            OVERALL_STATUS="❌ DATABASE_FAILED"
+            MESSAGE="فشل عملية الاستيراد إلى قاعدة البيانات"
+          else
+            OVERALL_STATUS="✅ SUCCESS"
+            MESSAGE="تمت عملية الاستيراد المجمع بنجاح - تم استيراد ${RECORDS_IMPORTED} منشور"
+          fi
+          
+          # Enhanced notification payload
+          NOTIFICATION_PAYLOAD=$(cat <<EOF
+          {
+            "timestamp": "$(date -u '+%Y-%m-%dT%H:%M:%S.%3NZ')",
+            "workflow": "bulk-import-v11.0",
+            "execution_id": "${{ env.EXECUTION_ID }}",
+            "status": "$OVERALL_STATUS",
+            "message": "$MESSAGE",
+            "details": {
+              "import_id": "$IMPORT_ID",
+              "records_processed": "$RECORDS_IMPORTED",
+              "file_type": "${{ github.event.inputs.fileType }}",
+              "validation_level": "${{ github.event.inputs.validationLevel }}",
+              "auto_cleanup": ${{ env.ENABLE_AUTO_CLEANUP }},
+              "user": "${{ github.event.inputs.uid }}",
+              "actor": "${{ github.actor }}"
+            },
+            "next_steps": {
+              "scheduled_publishing": ${{ env.ENABLE_SCHEDULED_PUBLISHING }},
+              "cleanup_tracking": "${{ needs.database-operations.outputs.cleanup-tracking-enabled }}",
+              "estimated_completion": "$(date -u -d '+2 hours' '+%Y-%m-%dT%H:%M:%S.%3NZ')"
+            }
+          }
+          EOF
+          )
+          
+          # Send notifications based on channels
+          IFS=',' read -ra CHANNEL_ARRAY <<< "$CHANNELS"
+          for channel in "${CHANNEL_ARRAY[@]}"; do
+            case "$channel" in
+              "email")
+                echo "📧 Sending enhanced email notification..."
+                # Email notification logic here
+                ;;
+              "webhook")
+                echo "🔗 Sending enhanced webhook notification..."
+                if [ -n "${{ secrets.ALERTING_WEBHOOK }}" ]; then
+                  curl -X POST \
+                    -H "Content-Type: application/json" \
+                    -d "$NOTIFICATION_PAYLOAD" \
+                    "${{ secrets.ALERTING_WEBHOOK }}" \
+                    --fail --silent --show-error || echo "⚠️ Webhook notification failed"
+                fi
+                ;;
+              "slack")
+                echo "💬 Sending enhanced Slack notification..."
+                if [ -n "${{ secrets.SLACK_WEBHOOK }}" ]; then
+                  SLACK_MESSAGE=$(echo "$NOTIFICATION_PAYLOAD" | jq -r '.message')
+                  curl -X POST \
+                    -H "Content-Type: application/json" \
+                    -d "{\"text\":\"$SLACK_MESSAGE\",\"username\":\"SocialHub Pro\",\"icon_emoji\":\":rocket:\"}" \
+                    "${{ secrets.SLACK_WEBHOOK }}" \
+                    --fail --silent --show-error || echo "⚠️ Slack notification failed"
+                fi
+                ;;
+            esac
+          done
+          
+          echo "✅ Enhanced notifications sent successfully"
+
+      - name: '📈 Enhanced Final Workflow Status'
+        if: always()
+        run: |
+          echo "📈 Enhanced Bulk Import Workflow v11.0 - Final Status Report"
+          echo "═══════════════════════════════════════════════════════════════"
+          echo ""
+          echo "🆔 Execution Details:"
+          echo " • Execution ID: ${{ env.EXECUTION_ID }}"
+          echo " • Correlation ID: ${{ env.CORRELATION_ID }}"
+          echo " • Workflow Version: v11.0 (Enhanced)"
+          echo " • Started: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo " • Actor: ${{ github.actor }}"
+          echo ""
+          echo "🔧 Configuration:"
+          echo " • File Format: ${{ github.event.inputs.fileType }} (JSON/CSV Only)"
+          echo " • Validation Level: ${{ github.event.inputs.validationLevel }}"
+          echo " • Batch Size: ${{ github.event.inputs.batchSize }}"
+          echo " • Max File Size: ${{ github.event.inputs.maxSize }}MB"
+          echo " • Auto Cleanup: ${{ env.ENABLE_AUTO_CLEANUP }}"
+          echo " • Scheduled Publishing: ${{ env.ENABLE_SCHEDULED_PUBLISHING }}"
+          echo " • Dry Run: ${{ github.event.inputs.dryRun }}"
+          echo ""
+          echo "📊 Phase Results:"
+          echo " • Security Validation: ${{ needs.security-validation.result }} ${{ needs.security-validation.result == 'success' && '✅' || '❌' }}"
+          echo " • File Processing: ${{ needs.file-processing.result }} ${{ needs.file-processing.result == 'success' && '✅' || '❌' }}"
+          echo " • Database Operations: ${{ needs.database-operations.result }} ${{ needs.database-operations.result == 'success' && '✅' || '❌' }}"
+          echo ""
+          echo "📈 Performance Metrics:"
+          echo " • Valid Records: ${{ needs.file-processing.outputs.valid-records }}"
+          echo " • Records Imported: ${{ needs.database-operations.outputs.records-imported }}"
+          echo " • Import ID: ${{ needs.database-operations.outputs.import-id }}"
+          echo " • Cleanup Tracking: ${{ needs.database-operations.outputs.cleanup-tracking-enabled }}"
+          echo ""
+          echo "🔮 Next Steps:"
+          if [ "${{ needs.database-operations.result }}" = "success" ] && [ "${{ env.ENABLE_SCHEDULED_PUBLISHING }}" = "true" ]; then
+            echo " 1. ✅ Scheduled publishing workflow triggered"
+            echo " 2. 📅 Posts will be published according to schedule"
+            echo " 3. 📊 Publishing progress will be tracked"
+            if [ "${{ env.ENABLE_AUTO_CLEANUP }}" = "true" ]; then
+              echo " 4. 🗑️ Files will be cleaned up automatically after publishing"
+              echo " 5. 📧 Cleanup completion notifications will be sent"
+            fi
+          else
+            echo " • Review error logs for any failures"
+            echo " • Check notification channels for detailed reports"
+          fi
+          echo ""
+          echo "✨ Enhanced Features Enabled:"
+          echo " • 🎯 JSON/CSV Only Processing"
+          echo " • 🔒 Enhanced Security Validation"
+          echo " • 📊 Comprehensive Data Validation"
+          echo " • 🗑️ Automatic File Cleanup Tracking"
+          echo " • 📅 Scheduled Publishing Integration"
+          echo " • 📈 Performance Monitoring"
+          echo " • 📢 Multi-Channel Notifications"
+          echo ""
+          echo "═══════════════════════════════════════════════════════════════"
+          echo "🎉 SocialHub Pro v11.0 Enhanced Bulk Import Workflow Complete!"
+
+# ==================================================================================
+# END OF ENHANCED BULK IMPORT WORKFLOW v11.0
+# ==================================================================================

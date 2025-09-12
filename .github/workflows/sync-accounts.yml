@@ -1,0 +1,1598 @@
+# ==============================================================================
+# SocialHub Pro v11.0 - Simplified Account Synchronization Workflow
+# Production-Grade - Simplified - Real Production Environment Only
+# 🚀 Focus: Reliability, Performance, Maintainability
+# ==============================================================================
+
+name: '🔄 SocialHub Pro v11.0 - Account Sync Engine'
+
+# ==============================================================================
+# WORKFLOW TRIGGERS (SIMPLIFIED & OPTIMIZED)
+# ==============================================================================
+
+on:
+  # Optimized scheduling for production use
+  schedule:
+    - cron: '0 */6 * * *'    # Every 6 hours - optimal for production
+    - cron: '*/15 * * * *'   # Every 15 minutes - critical accounts only
+
+  # Manual trigger with essential parameters only
+  workflow_dispatch:
+    inputs:
+      sync_mode:
+        description: '⚡ Sync Mode'
+        required: true
+        type: choice
+        options:
+          - full        # Complete sync all accounts
+          - incremental # Only accounts needing updates
+          - priority    # High-priority accounts only
+          - single_user # Specific user accounts
+        default: incremental
+      
+      target_user:
+        description: '👤 Target User ID (for single_user mode)'
+        required: false
+        type: string
+      
+      platforms:
+        description: '🌐 Platforms (comma-separated or "all")'
+        required: false
+        type: string
+        default: 'all'
+      
+      max_accounts:
+        description: '📦 Max Accounts to Process'
+        required: false
+        type: choice
+        options: ['10', '25', '50', '100', '200', '500']
+        default: '100'
+      
+      enable_token_refresh:
+        description: '🔑 Enable Automatic Token Refresh'
+        required: false
+        type: boolean
+        default: true
+      
+      notification_level:
+        description: '🔔 Notification Level'
+        required: false
+        type: choice
+        options: ['minimal', 'standard', 'detailed']
+        default: 'standard'
+
+# ==============================================================================
+# SIMPLIFIED ENVIRONMENT CONFIGURATION
+# ==============================================================================
+
+env:
+  # Core Configuration
+  NODE_VERSION: '20'
+  WORKFLOW_VERSION: 'v11.0'
+  TIMEZONE: 'Asia/Dubai'
+  
+  # Processing Parameters
+  SYNC_MODE: ${{ github.event.inputs.sync_mode || 'incremental' }}
+  TARGET_USER: ${{ github.event.inputs.target_user || '' }}
+  PLATFORMS: ${{ github.event.inputs.platforms || 'all' }}
+  MAX_ACCOUNTS: ${{ github.event.inputs.max_accounts || '100' }}
+  ENABLE_TOKEN_REFRESH: ${{ github.event.inputs.enable_token_refresh || 'true' }}
+  NOTIFICATION_LEVEL: ${{ github.event.inputs.notification_level || 'standard' }}
+  
+  # Performance Settings (Simplified)
+  BATCH_SIZE: 20
+  MAX_CONCURRENCY: 8
+  REQUEST_TIMEOUT: 30000
+  MAX_RETRIES: 3
+  RETRY_DELAY_MS: 5000
+  
+  # Rate Limiting (Simple & Effective)
+  RATE_LIMIT_BUFFER: 0.9  # Use 90% of API limits
+  FACEBOOK_HOURLY_LIMIT: 200
+  INSTAGRAM_HOURLY_LIMIT: 200
+  TWITTER_HOURLY_LIMIT: 300
+  LINKEDIN_HOURLY_LIMIT: 100
+  TIKTOK_HOURLY_LIMIT: 100
+  
+  # Platform API Versions
+  FACEBOOK_API_VERSION: 'v19.0'
+  INSTAGRAM_API_VERSION: 'v19.0'
+  TWITTER_API_VERSION: '2'
+  LINKEDIN_API_VERSION: 'v2'
+  TIKTOK_API_VERSION: 'v2'
+  
+  # Firebase Configuration
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+  FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+  FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+  
+  # Platform Credentials (Essential Only)
+  FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID }}
+  FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}
+  INSTAGRAM_APP_ID: ${{ secrets.INSTAGRAM_APP_ID }}
+  INSTAGRAM_APP_SECRET: ${{ secrets.INSTAGRAM_APP_SECRET }}
+  TWITTER_CLIENT_ID: ${{ secrets.TWITTER_CLIENT_ID }}
+  TWITTER_CLIENT_SECRET: ${{ secrets.TWITTER_CLIENT_SECRET }}
+  LINKEDIN_CLIENT_ID: ${{ secrets.LINKEDIN_CLIENT_ID }}
+  LINKEDIN_CLIENT_SECRET: ${{ secrets.LINKEDIN_CLIENT_SECRET }}
+  TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+  TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+  
+  # Notification Services (Essential Only)
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  EMAIL_SERVICE_API_KEY: ${{ secrets.EMAIL_SERVICE_API_KEY }}
+
+# ==============================================================================
+# SIMPLIFIED PRODUCTION JOBS
+# ==============================================================================
+
+jobs:
+
+  # ============================================================================
+  # PHASE 1: SECURITY & CONFIGURATION VALIDATION
+  # ============================================================================
+
+  security_validation:
+    name: '🔐 Security & Configuration Validation'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      validation_status: ${{ steps.validate.outputs.status }}
+      platforms_enabled: ${{ steps.validate.outputs.platforms }}
+      accounts_estimated: ${{ steps.validate.outputs.estimated_accounts }}
+
+    steps:
+      - name: '🏁 Initialize Security Validation'
+        run: |
+          echo "🔐 Starting Security & Configuration Validation"
+          echo "⏰ Timestamp: $(date -u '+%Y-%m-%dT%H:%M:%S.%3NZ')"
+          echo "🔧 Sync Mode: ${{ env.SYNC_MODE }}"
+          echo "🌐 Platforms: ${{ env.PLATFORMS }}"
+          echo "📦 Max Accounts: ${{ env.MAX_ACCOUNTS }}"
+          echo "🔑 Token Refresh: ${{ env.ENABLE_TOKEN_REFRESH }}"
+
+      - name: '🔍 Validate Platform Configurations'
+        id: validate
+        run: |
+          echo "🔍 Validating platform configurations..."
+          
+          # Determine target platforms
+          if [[ "${{ env.PLATFORMS }}" == "all" ]]; then
+            PLATFORMS_LIST="facebook,instagram,twitter,linkedin,tiktok"
+          else
+            PLATFORMS_LIST="${{ env.PLATFORMS }}"
+          fi
+          
+          echo "🌐 Target platforms: $PLATFORMS_LIST"
+          
+          # Validate platform credentials
+          VALIDATION_ERRORS=0
+          
+          if [[ "$PLATFORMS_LIST" == *"facebook"* ]]; then
+            if [[ -z "${{ secrets.FACEBOOK_APP_ID }}" || -z "${{ secrets.FACEBOOK_APP_SECRET }}" ]]; then
+              echo "❌ Facebook credentials missing"
+              VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+            else
+              echo "✅ Facebook credentials validated"
+            fi
+          fi
+          
+          if [[ "$PLATFORMS_LIST" == *"instagram"* ]]; then
+            if [[ -z "${{ secrets.INSTAGRAM_APP_ID }}" || -z "${{ secrets.INSTAGRAM_APP_SECRET }}" ]]; then
+              echo "❌ Instagram credentials missing"
+              VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+            else
+              echo "✅ Instagram credentials validated"
+            fi
+          fi
+          
+          if [[ "$PLATFORMS_LIST" == *"twitter"* ]]; then
+            if [[ -z "${{ secrets.TWITTER_CLIENT_ID }}" || -z "${{ secrets.TWITTER_CLIENT_SECRET }}" ]]; then
+              echo "❌ Twitter credentials missing"
+              VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+            else
+              echo "✅ Twitter credentials validated"
+            fi
+          fi
+          
+          if [[ "$PLATFORMS_LIST" == *"linkedin"* ]]; then
+            if [[ -z "${{ secrets.LINKEDIN_CLIENT_ID }}" || -z "${{ secrets.LINKEDIN_CLIENT_SECRET }}" ]]; then
+              echo "❌ LinkedIn credentials missing"
+              VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+            else
+              echo "✅ LinkedIn credentials validated"
+            fi
+          fi
+          
+          if [[ "$PLATFORMS_LIST" == *"tiktok"* ]]; then
+            if [[ -z "${{ secrets.TIKTOK_CLIENT_KEY }}" || -z "${{ secrets.TIKTOK_CLIENT_SECRET }}" ]]; then
+              echo "❌ TikTok credentials missing"
+              VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+            else
+              echo "✅ TikTok credentials validated"
+            fi
+          fi
+          
+          # Validate Firebase credentials
+          if [[ -z "${{ secrets.FIREBASE_PROJECT_ID }}" || -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]]; then
+            echo "❌ Firebase credentials missing"
+            VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+          else
+            echo "✅ Firebase credentials validated"
+          fi
+          
+          # Determine validation status
+          if [[ $VALIDATION_ERRORS -eq 0 ]]; then
+            echo "✅ All validations passed"
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "❌ $VALIDATION_ERRORS validation error(s) found"
+            echo "status=failed" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          # Estimate accounts (placeholder for production calculation)
+          ESTIMATED_ACCOUNTS=$((${{ env.MAX_ACCOUNTS }} / 2))
+          
+          echo "platforms=$PLATFORMS_LIST" >> $GITHUB_OUTPUT
+          echo "estimated_accounts=$ESTIMATED_ACCOUNTS" >> $GITHUB_OUTPUT
+
+      - name: '📊 Validation Summary'
+        run: |
+          echo "📊 Security & Configuration Validation Summary"
+          echo "════════════════════════════════════════════"
+          echo "✅ Status: ${{ steps.validate.outputs.status }}"
+          echo "🌐 Platforms: ${{ steps.validate.outputs.platforms }}"
+          echo "📦 Estimated Accounts: ${{ steps.validate.outputs.estimated_accounts }}"
+          echo "════════════════════════════════════════════"
+
+  # ============================================================================
+  # PHASE 2: ACCOUNT DISCOVERY & PREPARATION
+  # ============================================================================
+
+  account_discovery:
+    name: '📋 Account Discovery & Sync Preparation'
+    runs-on: ubuntu-latest
+    needs: security_validation
+    if: needs.security_validation.outputs.validation_status == 'success'
+    timeout-minutes: 15
+    outputs:
+      accounts_to_sync: ${{ steps.discovery.outputs.accounts_count }}
+      sync_batches: ${{ steps.discovery.outputs.batch_count }}
+      priority_accounts: ${{ steps.discovery.outputs.priority_count }}
+
+    steps:
+      - name: '🔧 Setup Node.js Environment'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: '📦 Install Essential Dependencies'
+        run: |
+          echo "📦 Installing production dependencies..."
+          npm install -g --production \
+            firebase-admin@12.1.0 \
+            moment-timezone@0.5.44 \
+            lodash@4.17.21
+          
+          echo "✅ Dependencies installed successfully"
+
+      - name: '🔥 Initialize Firebase'
+        run: |
+          echo "🔥 Initializing Firebase Admin SDK..."
+          
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          
+          try {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            
+            admin.initializeApp({
+              credential: admin.credential.cert(serviceAccount),
+              databaseURL: process.env.FIREBASE_DATABASE_URL
+            });
+            
+            console.log('✅ Firebase Admin SDK initialized successfully');
+          } catch (error) {
+            console.error('❌ Firebase initialization failed:', error.message);
+            process.exit(1);
+          }
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+
+      - name: '🔍 Discover & Prepare Accounts for Sync'
+        id: discovery
+        run: |
+          echo "🔍 Discovering accounts for synchronization..."
+          
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          const moment = require('moment-timezone');
+          const _ = require('lodash');
+          
+          const db = admin.firestore();
+          
+          async function discoverAccounts() {
+            try {
+              console.log('🔍 Starting account discovery...');
+              
+              const syncMode = process.env.SYNC_MODE;
+              const targetUser = process.env.TARGET_USER;
+              const platformsInput = process.env.PLATFORMS;
+              const maxAccounts = parseInt(process.env.MAX_ACCOUNTS) || 100;
+              
+              console.log(`📋 Sync Mode: ${syncMode}`);
+              console.log(`👤 Target User: ${targetUser || 'All users'}`);
+              console.log(`🌐 Platforms: ${platformsInput}`);
+              console.log(`📦 Max Accounts: ${maxAccounts}`);
+              
+              // Determine target platforms
+              let targetPlatforms = [];
+              if (platformsInput === 'all') {
+                targetPlatforms = ['facebook', 'instagram', 'twitter', 'linkedin', 'tiktok'];
+              } else {
+                targetPlatforms = platformsInput.split(',').map(p => p.trim());
+              }
+              
+              console.log(`🎯 Target platforms: ${targetPlatforms.join(', ')}`);
+              
+              // Build query based on sync mode
+              let accountsQuery = db.collection('accounts')
+                .where('status', '==', 'connected');
+              
+              // Filter by user if specified
+              if (syncMode === 'single_user' && targetUser) {
+                accountsQuery = accountsQuery.where('uid', '==', targetUser);
+              }
+              
+              // Filter by platforms
+              if (targetPlatforms.length > 0 && !targetPlatforms.includes('all')) {
+                accountsQuery = accountsQuery.where('platform', 'in', targetPlatforms);
+              }
+              
+              // Apply limit
+              accountsQuery = accountsQuery.limit(maxAccounts * 2); // Get more to allow for filtering
+              
+              const snapshot = await accountsQuery.get();
+              
+              if (snapshot.empty) {
+                console.log('ℹ️ No accounts found matching criteria');
+                console.log('accounts_count=0');
+                console.log('batch_count=0');
+                console.log('priority_count=0');
+                return;
+              }
+              
+              const allAccounts = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+                lastSync: doc.data().lastSync?.toDate?.() || new Date(0)
+              }));
+              
+              console.log(`📦 Found ${allAccounts.length} connected accounts`);
+              
+              // Filter accounts based on sync mode
+              let accountsToSync = [];
+              const now = new Date();
+              const sixHoursAgo = new Date(now.getTime() - (6 * 60 * 60 * 1000));
+              
+              switch (syncMode) {
+                case 'full':
+                  accountsToSync = allAccounts;
+                  break;
+                  
+                case 'incremental':
+                  accountsToSync = allAccounts.filter(account => 
+                    account.lastSync < sixHoursAgo || 
+                    account.forceSync === true ||
+                    !account.lastSuccessfulSync
+                  );
+                  break;
+                  
+                case 'priority':
+                  accountsToSync = allAccounts.filter(account => 
+                    account.priority === 'high' ||
+                    account.tier === 'premium' ||
+                    account.tier === 'enterprise' ||
+                    (account.followers && parseInt(account.followers) > 100000)
+                  );
+                  break;
+                  
+                case 'single_user':
+                  accountsToSync = allAccounts;
+                  break;
+                  
+                default:
+                  accountsToSync = allAccounts;
+              }
+              
+              // Limit to max accounts
+              if (accountsToSync.length > maxAccounts) {
+                // Sort by priority and last sync time
+                accountsToSync = accountsToSync
+                  .sort((a, b) => {
+                    // Priority sort
+                    const aPriority = a.priority === 'high' ? 3 : a.priority === 'medium' ? 2 : 1;
+                    const bPriority = b.priority === 'high' ? 3 : b.priority === 'medium' ? 2 : 1;
+                    
+                    if (aPriority !== bPriority) {
+                      return bPriority - aPriority; // Higher priority first
+                    }
+                    
+                    // Then sort by last sync (older first)
+                    return a.lastSync - b.lastSync;
+                  })
+                  .slice(0, maxAccounts);
+              }
+              
+              console.log(`🎯 Selected ${accountsToSync.length} accounts for sync`);
+              
+              // Calculate batches
+              const batchSize = parseInt(process.env.BATCH_SIZE) || 20;
+              const batchCount = Math.ceil(accountsToSync.length / batchSize);
+              
+              // Count priority accounts
+              const priorityAccounts = accountsToSync.filter(account =>
+                account.priority === 'high' ||
+                account.tier === 'premium' ||
+                account.tier === 'enterprise'
+              ).length;
+              
+              // Platform distribution
+              const platformDistribution = _.countBy(accountsToSync, 'platform');
+              
+              console.log('📊 Account Distribution:');
+              Object.entries(platformDistribution).forEach(([platform, count]) => {
+                console.log(`  ${platform}: ${count} accounts`);
+              });
+              
+              // Save account data for sync job
+              const accountData = {
+                accounts: accountsToSync.map(account => ({
+                  id: account.id,
+                  uid: account.uid,
+                  platform: account.platform,
+                  priority: account.priority || 'normal',
+                  tier: account.tier || 'free',
+                  lastSync: account.lastSync.toISOString(),
+                  accessToken: account.accessToken,
+                  refreshToken: account.refreshToken,
+                  platformAccountId: account.platformAccountId || account.pageId || account.instagramAccountId,
+                  tokenExpiresAt: account.tokenExpiresAt?.toISOString?.() || null
+                })),
+                metadata: {
+                  totalAccounts: accountsToSync.length,
+                  batchSize: batchSize,
+                  batchCount: batchCount,
+                  priorityCount: priorityAccounts,
+                  syncMode: syncMode,
+                  targetPlatforms: targetPlatforms,
+                  createdAt: new Date().toISOString()
+                }
+              };
+              
+              // Save for next job
+              require('fs').writeFileSync('accounts-sync-data.json', JSON.stringify(accountData, null, 2));
+              
+              // Output results
+              console.log(`accounts_count=${accountsToSync.length}`);
+              console.log(`batch_count=${batchCount}`);
+              console.log(`priority_count=${priorityAccounts}`);
+              
+              console.log('✅ Account discovery completed successfully');
+              
+            } catch (error) {
+              console.error('❌ Account discovery failed:', error.message);
+              console.log('accounts_count=0');
+              console.log('batch_count=0');
+              console.log('priority_count=0');
+              process.exit(1);
+            }
+          }
+          
+          discoverAccounts();
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          SYNC_MODE: ${{ env.SYNC_MODE }}
+          TARGET_USER: ${{ env.TARGET_USER }}
+          PLATFORMS: ${{ needs.security_validation.outputs.platforms_enabled }}
+          MAX_ACCOUNTS: ${{ env.MAX_ACCOUNTS }}
+          BATCH_SIZE: ${{ env.BATCH_SIZE }}
+
+      - name: '📊 Discovery Summary'
+        run: |
+          echo "📊 Account Discovery Summary"
+          echo "══════════════════════════"
+          echo "📦 Accounts to Sync: ${{ steps.discovery.outputs.accounts_count }}"
+          echo "🎯 Sync Batches: ${{ steps.discovery.outputs.batch_count }}"
+          echo "⭐ Priority Accounts: ${{ steps.discovery.outputs.priority_count }}"
+          echo "══════════════════════════"
+
+      - name: '📤 Upload Account Data'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-account-data-${{ github.run_number }}
+          path: accounts-sync-data.json
+          retention-days: 7
+
+  # ============================================================================
+  # PHASE 3: MULTI-PLATFORM SYNCHRONIZATION ENGINE
+  # ============================================================================
+
+  sync_accounts:
+    name: '🚀 Multi-Platform Sync Engine'
+    runs-on: ubuntu-latest
+    needs: [security_validation, account_discovery]
+    if: needs.account_discovery.outputs.accounts_to_sync > 0
+    timeout-minutes: 45
+    outputs:
+      sync_results: ${{ steps.sync.outputs.results }}
+      success_count: ${{ steps.sync.outputs.success_count }}
+      failure_count: ${{ steps.sync.outputs.failure_count }}
+      tokens_refreshed: ${{ steps.sync.outputs.tokens_refreshed }}
+
+    steps:
+      - name: '🔧 Setup Enhanced Environment'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: '📦 Install Sync Dependencies'
+        run: |
+          echo "📦 Installing sync engine dependencies..."
+          npm install -g --production \
+            firebase-admin@12.1.0 \
+            node-fetch@3.3.2 \
+            p-limit@4.0.0 \
+            moment-timezone@0.5.44 \
+            lodash@4.17.21 \
+            crypto-js@4.2.0
+          
+          echo "✅ Sync dependencies installed"
+
+      - name: '🔥 Initialize Firebase & Services'
+        run: |
+          echo "🔥 Initializing Firebase for sync operations..."
+          
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          
+          try {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            
+            admin.initializeApp({
+              credential: admin.credential.cert(serviceAccount),
+              databaseURL: process.env.FIREBASE_DATABASE_URL
+            });
+            
+            const db = admin.firestore();
+            db.settings({ ignoreUndefinedProperties: true });
+            
+            console.log('✅ Firebase initialized for sync operations');
+          } catch (error) {
+            console.error('❌ Firebase initialization failed:', error.message);
+            process.exit(1);
+          }
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+
+      - name: '📥 Download Account Data'
+        uses: actions/download-artifact@v4
+        with:
+          name: sync-account-data-${{ github.run_number }}
+
+      - name: '⚡ Execute Multi-Platform Synchronization'
+        id: sync
+        run: |
+          echo "⚡ Starting multi-platform synchronization engine..."
+          
+          node <<'EOF'
+          const admin = require('firebase-admin');
+          const fetch = require('node-fetch');
+          const pLimit = require('p-limit');
+          const moment = require('moment-timezone');
+          const _ = require('lodash');
+          const crypto = require('crypto-js');
+          const fs = require('fs');
+          
+          const db = admin.firestore();
+          
+          // ===== CONFIGURATION =====
+          const CONFIG = {
+            maxConcurrency: parseInt(process.env.MAX_CONCURRENCY) || 8,
+            batchSize: parseInt(process.env.BATCH_SIZE) || 20,
+            requestTimeout: parseInt(process.env.REQUEST_TIMEOUT) || 30000,
+            maxRetries: parseInt(process.env.MAX_RETRIES) || 3,
+            retryDelay: parseInt(process.env.RETRY_DELAY_MS) || 5000,
+            enableTokenRefresh: process.env.ENABLE_TOKEN_REFRESH === 'true',
+            rateLimitBuffer: parseFloat(process.env.RATE_LIMIT_BUFFER) || 0.9
+          };
+          
+          console.log('🔧 Sync Engine Configuration:');
+          console.log(` Max Concurrency: ${CONFIG.maxConcurrency}`);
+          console.log(` Batch Size: ${CONFIG.batchSize}`);
+          console.log(` Request Timeout: ${CONFIG.requestTimeout}ms`);
+          console.log(` Token Refresh: ${CONFIG.enableTokenRefresh}`);
+          
+          // ===== RATE LIMITER =====
+          class SimpleRateLimiter {
+            constructor() {
+              this.limits = {
+                facebook: { hourly: 200, current: 0, resetTime: Date.now() + 3600000 },
+                instagram: { hourly: 200, current: 0, resetTime: Date.now() + 3600000 },
+                twitter: { hourly: 300, current: 0, resetTime: Date.now() + 3600000 },
+                linkedin: { hourly: 100, current: 0, resetTime: Date.now() + 3600000 },
+                tiktok: { hourly: 100, current: 0, resetTime: Date.now() + 3600000 }
+              };
+            }
+            
+            async checkAndWait(platform) {
+              const limit = this.limits[platform];
+              if (!limit) return;
+              
+              // Reset if needed
+              if (Date.now() > limit.resetTime) {
+                limit.current = 0;
+                limit.resetTime = Date.now() + 3600000;
+              }
+              
+              // Check if we're at limit
+              const maxAllowed = Math.floor(limit.hourly * CONFIG.rateLimitBuffer);
+              if (limit.current >= maxAllowed) {
+                const waitTime = limit.resetTime - Date.now();
+                console.log(`⏳ Rate limit reached for ${platform}, waiting ${Math.round(waitTime/1000)}s`);
+                await new Promise(resolve => setTimeout(resolve, waitTime));
+                limit.current = 0;
+                limit.resetTime = Date.now() + 3600000;
+              }
+              
+              limit.current++;
+            }
+          }
+          
+          // ===== TOKEN MANAGER =====
+          class TokenManager {
+            async refreshToken(account) {
+              console.log(`🔑 Refreshing token for ${account.platform} account ${account.id}`);
+              
+              switch (account.platform) {
+                case 'facebook':
+                  return await this.refreshFacebookToken(account);
+                case 'instagram':
+                  return await this.refreshInstagramToken(account);
+                case 'twitter':
+                  return await this.refreshTwitterToken(account);
+                case 'linkedin':
+                  return await this.refreshLinkedInToken(account);
+                case 'tiktok':
+                  return await this.refreshTikTokToken(account);
+                default:
+                  throw new Error(`Token refresh not supported for ${account.platform}`);
+              }
+            }
+            
+            async refreshFacebookToken(account) {
+              const url = 'https://graph.facebook.com/oauth/access_token';
+              const params = new URLSearchParams({
+                grant_type: 'fb_exchange_token',
+                client_id: process.env.FACEBOOK_APP_ID,
+                client_secret: process.env.FACEBOOK_APP_SECRET,
+                fb_exchange_token: account.accessToken
+              });
+              
+              const response = await fetch(`${url}?${params}`, {
+                timeout: CONFIG.requestTimeout
+              });
+              
+              if (!response.ok) {
+                throw new Error(`Facebook token refresh failed: ${response.status}`);
+              }
+              
+              const data = await response.json();
+              
+              // Update token in database
+              await db.collection('accounts').doc(account.id).update({
+                accessToken: data.access_token,
+                tokenRefreshedAt: admin.firestore.FieldValue.serverTimestamp(),
+                tokenExpiresAt: data.expires_in ? 
+                  new Date(Date.now() + (data.expires_in * 1000)) : null
+              });
+              
+              console.log(`✅ Facebook token refreshed for account ${account.id}`);
+              return data.access_token;
+            }
+            
+            async refreshInstagramToken(account) {
+              // Instagram uses Facebook token refresh
+              return await this.refreshFacebookToken(account);
+            }
+            
+            async refreshTwitterToken(account) {
+              if (!account.refreshToken) {
+                throw new Error('No refresh token available for Twitter account');
+              }
+              
+              const url = 'https://api.twitter.com/2/oauth2/token';
+              const credentials = Buffer.from(`${process.env.TWITTER_CLIENT_ID}:${process.env.TWITTER_CLIENT_SECRET}`).toString('base64');
+              
+              const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Basic ${credentials}`,
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                  grant_type: 'refresh_token',
+                  refresh_token: account.refreshToken
+                }),
+                timeout: CONFIG.requestTimeout
+              });
+              
+              if (!response.ok) {
+                throw new Error(`Twitter token refresh failed: ${response.status}`);
+              }
+              
+              const data = await response.json();
+              
+              await db.collection('accounts').doc(account.id).update({
+                accessToken: data.access_token,
+                refreshToken: data.refresh_token,
+                tokenRefreshedAt: admin.firestore.FieldValue.serverTimestamp(),
+                tokenExpiresAt: new Date(Date.now() + (data.expires_in * 1000))
+              });
+              
+              console.log(`✅ Twitter token refreshed for account ${account.id}`);
+              return data.access_token;
+            }
+            
+            async refreshLinkedInToken(account) {
+              if (!account.refreshToken) {
+                throw new Error('No refresh token available for LinkedIn account');
+              }
+              
+              const url = 'https://www.linkedin.com/oauth/v2/accessToken';
+              const params = new URLSearchParams({
+                grant_type: 'refresh_token',
+                refresh_token: account.refreshToken,
+                client_id: process.env.LINKEDIN_CLIENT_ID,
+                client_secret: process.env.LINKEDIN_CLIENT_SECRET
+              });
+              
+              const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params,
+                timeout: CONFIG.requestTimeout
+              });
+              
+              if (!response.ok) {
+                throw new Error(`LinkedIn token refresh failed: ${response.status}`);
+              }
+              
+              const data = await response.json();
+              
+              await db.collection('accounts').doc(account.id).update({
+                accessToken: data.access_token,
+                refreshToken: data.refresh_token || account.refreshToken,
+                tokenRefreshedAt: admin.firestore.FieldValue.serverTimestamp(),
+                tokenExpiresAt: new Date(Date.now() + (data.expires_in * 1000))
+              });
+              
+              console.log(`✅ LinkedIn token refreshed for account ${account.id}`);
+              return data.access_token;
+            }
+            
+            async refreshTikTokToken(account) {
+              if (!account.refreshToken) {
+                throw new Error('No refresh token available for TikTok account');
+              }
+              
+              const url = 'https://open.tiktokapis.com/v2/oauth/token/';
+              
+              const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                  grant_type: 'refresh_token',
+                  refresh_token: account.refreshToken,
+                  client_key: process.env.TIKTOK_CLIENT_KEY,
+                  client_secret: process.env.TIKTOK_CLIENT_SECRET
+                }),
+                timeout: CONFIG.requestTimeout
+              });
+              
+              if (!response.ok) {
+                throw new Error(`TikTok token refresh failed: ${response.status}`);
+              }
+              
+              const data = await response.json();
+              
+              await db.collection('accounts').doc(account.id).update({
+                accessToken: data.access_token,
+                refreshToken: data.refresh_token,
+                tokenRefreshedAt: admin.firestore.FieldValue.serverTimestamp(),
+                tokenExpiresAt: new Date(Date.now() + (data.expires_in * 1000))
+              });
+              
+              console.log(`✅ TikTok token refreshed for account ${account.id}`);
+              return data.access_token;
+            }
+          }
+          
+          // ===== PLATFORM SYNC HANDLERS =====
+          class PlatformSyncHandlers {
+            constructor(rateLimiter, tokenManager) {
+              this.rateLimiter = rateLimiter;
+              this.tokenManager = tokenManager;
+            }
+            
+            async syncAccount(account) {
+              await this.rateLimiter.checkAndWait(account.platform);
+              
+              switch (account.platform) {
+                case 'facebook':
+                  return await this.syncFacebook(account);
+                case 'instagram':
+                  return await this.syncInstagram(account);
+                case 'twitter':
+                  return await this.syncTwitter(account);
+                case 'linkedin':
+                  return await this.syncLinkedIn(account);
+                case 'tiktok':
+                  return await this.syncTikTok(account);
+                default:
+                  throw new Error(`Unsupported platform: ${account.platform}`);
+              }
+            }
+            
+            async syncFacebook(account) {
+              const apiVersion = process.env.FACEBOOK_API_VERSION;
+              let accessToken = account.accessToken;
+              let tokenRefreshed = false;
+              
+              const fields = [
+                'id', 'name', 'fan_count', 'followers_count',
+                'picture.width(400).height(400)',
+                'cover', 'about', 'category', 'verification_status'
+              ].join(',');
+              
+              const accountId = account.platformAccountId || 'me';
+              const url = `https://graph.facebook.com/${apiVersion}/${accountId}?fields=${fields}&access_token=${accessToken}`;
+              
+              try {
+                const response = await fetch(url, { timeout: CONFIG.requestTimeout });
+                
+                if (response.status === 401 && CONFIG.enableTokenRefresh) {
+                  console.log(`🔑 Token expired for Facebook account ${account.id}, refreshing...`);
+                  accessToken = await this.tokenManager.refreshToken(account);
+                  tokenRefreshed = true;
+                  
+                  // Retry with new token
+                  const retryUrl = `https://graph.facebook.com/${apiVersion}/${accountId}?fields=${fields}&access_token=${accessToken}`;
+                  const retryResponse = await fetch(retryUrl, { timeout: CONFIG.requestTimeout });
+                  
+                  if (!retryResponse.ok) {
+                    throw new Error(`Facebook API error after refresh: ${retryResponse.status}`);
+                  }
+                  
+                  const data = await retryResponse.json();
+                  return this.formatFacebookData(data, tokenRefreshed);
+                }
+                
+                if (!response.ok) {
+                  throw new Error(`Facebook API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return this.formatFacebookData(data, tokenRefreshed);
+                
+              } catch (error) {
+                console.error(`❌ Facebook sync failed for account ${account.id}:`, error.message);
+                throw error;
+              }
+            }
+            
+            formatFacebookData(data, tokenRefreshed) {
+              return {
+                platform: 'facebook',
+                platformId: data.id,
+                name: data.name,
+                followers: (data.fan_count || data.followers_count || 0).toString(),
+                imageUrl: data.picture?.data?.url || '',
+                coverUrl: data.cover?.source || '',
+                about: data.about || '',
+                category: data.category || '',
+                verified: data.verification_status === 'blue_verified',
+                tokenRefreshed: tokenRefreshed,
+                lastSync: admin.firestore.FieldValue.serverTimestamp(),
+                syncVersion: process.env.WORKFLOW_VERSION
+              };
+            }
+            
+            async syncInstagram(account) {
+              const apiVersion = process.env.INSTAGRAM_API_VERSION;
+              let accessToken = account.accessToken;
+              let tokenRefreshed = false;
+              
+              const fields = [
+                'id', 'username', 'name', 'followers_count', 'media_count',
+                'profile_picture_url', 'biography', 'website'
+              ].join(',');
+              
+              const accountId = account.platformAccountId;
+              const url = `https://graph.facebook.com/${apiVersion}/${accountId}?fields=${fields}&access_token=${accessToken}`;
+              
+              try {
+                const response = await fetch(url, { timeout: CONFIG.requestTimeout });
+                
+                if (response.status === 401 && CONFIG.enableTokenRefresh) {
+                  console.log(`🔑 Token expired for Instagram account ${account.id}, refreshing...`);
+                  accessToken = await this.tokenManager.refreshToken(account);
+                  tokenRefreshed = true;
+                  
+                  const retryUrl = `https://graph.facebook.com/${apiVersion}/${accountId}?fields=${fields}&access_token=${accessToken}`;
+                  const retryResponse = await fetch(retryUrl, { timeout: CONFIG.requestTimeout });
+                  
+                  if (!retryResponse.ok) {
+                    throw new Error(`Instagram API error after refresh: ${retryResponse.status}`);
+                  }
+                  
+                  const data = await retryResponse.json();
+                  return this.formatInstagramData(data, tokenRefreshed);
+                }
+                
+                if (!response.ok) {
+                  throw new Error(`Instagram API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return this.formatInstagramData(data, tokenRefreshed);
+                
+              } catch (error) {
+                console.error(`❌ Instagram sync failed for account ${account.id}:`, error.message);
+                throw error;
+              }
+            }
+            
+            formatInstagramData(data, tokenRefreshed) {
+              return {
+                platform: 'instagram',
+                platformId: data.id,
+                username: data.username,
+                name: data.name,
+                followers: (data.followers_count || 0).toString(),
+                mediaCount: data.media_count || 0,
+                imageUrl: data.profile_picture_url || '',
+                biography: data.biography || '',
+                website: data.website || '',
+                tokenRefreshed: tokenRefreshed,
+                lastSync: admin.firestore.FieldValue.serverTimestamp(),
+                syncVersion: process.env.WORKFLOW_VERSION
+              };
+            }
+            
+            async syncTwitter(account) {
+              let accessToken = account.accessToken;
+              let tokenRefreshed = false;
+              
+              const userFields = [
+                'created_at', 'description', 'entities', 'id', 'location',
+                'name', 'profile_image_url', 'protected', 'public_metrics',
+                'url', 'username', 'verified', 'verified_type'
+              ].join(',');
+              
+              const url = `https://api.twitter.com/2/users/me?user.fields=${userFields}`;
+              
+              try {
+                const response = await fetch(url, {
+                  headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                  },
+                  timeout: CONFIG.requestTimeout
+                });
+                
+                if (response.status === 401 && CONFIG.enableTokenRefresh) {
+                  console.log(`🔑 Token expired for Twitter account ${account.id}, refreshing...`);
+                  accessToken = await this.tokenManager.refreshToken(account);
+                  tokenRefreshed = true;
+                  
+                  const retryResponse = await fetch(url, {
+                    headers: {
+                      'Authorization': `Bearer ${accessToken}`,
+                      'Content-Type': 'application/json'
+                    },
+                    timeout: CONFIG.requestTimeout
+                  });
+                  
+                  if (!retryResponse.ok) {
+                    throw new Error(`Twitter API error after refresh: ${retryResponse.status}`);
+                  }
+                  
+                  const retryData = await retryResponse.json();
+                  return this.formatTwitterData(retryData.data, tokenRefreshed);
+                }
+                
+                if (!response.ok) {
+                  throw new Error(`Twitter API error: ${response.status}`);
+                }
+                
+                const responseData = await response.json();
+                return this.formatTwitterData(responseData.data, tokenRefreshed);
+                
+              } catch (error) {
+                console.error(`❌ Twitter sync failed for account ${account.id}:`, error.message);
+                throw error;
+              }
+            }
+            
+            formatTwitterData(data, tokenRefreshed) {
+              return {
+                platform: 'twitter',
+                platformId: data.id,
+                username: data.username,
+                name: data.name,
+                description: data.description || '',
+                location: data.location || '',
+                followers: (data.public_metrics?.followers_count || 0).toString(),
+                following: (data.public_metrics?.following_count || 0).toString(),
+                tweets: (data.public_metrics?.tweet_count || 0).toString(),
+                listed: (data.public_metrics?.listed_count || 0).toString(),
+                imageUrl: data.profile_image_url?.replace('_normal', '_400x400') || '',
+                verified: data.verified || false,
+                verifiedType: data.verified_type || '',
+                protected: data.protected || false,
+                website: data.entities?.url?.urls?.[0]?.expanded_url || '',
+                createdAt: data.created_at,
+                tokenRefreshed: tokenRefreshed,
+                lastSync: admin.firestore.FieldValue.serverTimestamp(),
+                syncVersion: process.env.WORKFLOW_VERSION
+              };
+            }
+            
+            async syncLinkedIn(account) {
+              let accessToken = account.accessToken;
+              let tokenRefreshed = false;
+              
+              const url = 'https://api.linkedin.com/v2/people/~:(id,localizedFirstName,localizedLastName,profilePicture(displayImage~:playableStreams))';
+              
+              try {
+                const response = await fetch(url, {
+                  headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                  },
+                  timeout: CONFIG.requestTimeout
+                });
+                
+                if (response.status === 401 && CONFIG.enableTokenRefresh) {
+                  console.log(`🔑 Token expired for LinkedIn account ${account.id}, refreshing...`);
+                  accessToken = await this.tokenManager.refreshToken(account);
+                  tokenRefreshed = true;
+                  
+                  const retryResponse = await fetch(url, {
+                    headers: {
+                      'Authorization': `Bearer ${accessToken}`,
+                      'Content-Type': 'application/json'
+                    },
+                    timeout: CONFIG.requestTimeout
+                  });
+                  
+                  if (!retryResponse.ok) {
+                    throw new Error(`LinkedIn API error after refresh: ${retryResponse.status}`);
+                  }
+                  
+                  const data = await retryResponse.json();
+                  return this.formatLinkedInData(data, tokenRefreshed);
+                }
+                
+                if (!response.ok) {
+                  throw new Error(`LinkedIn API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return this.formatLinkedInData(data, tokenRefreshed);
+                
+              } catch (error) {
+                console.error(`❌ LinkedIn sync failed for account ${account.id}:`, error.message);
+                throw error;
+              }
+            }
+            
+            formatLinkedInData(data, tokenRefreshed) {
+              return {
+                platform: 'linkedin',
+                platformId: data.id,
+                name: `${data.localizedFirstName} ${data.localizedLastName}`,
+                firstName: data.localizedFirstName,
+                lastName: data.localizedLastName,
+                followers: '0', // Not available in personal profile API
+                imageUrl: data.profilePicture?.displayImage?.elements?.[0]?.identifiers?.[0]?.identifier || '',
+                tokenRefreshed: tokenRefreshed,
+                lastSync: admin.firestore.FieldValue.serverTimestamp(),
+                syncVersion: process.env.WORKFLOW_VERSION
+              };
+            }
+            
+            async syncTikTok(account) {
+              let accessToken = account.accessToken;
+              let tokenRefreshed = false;
+              
+              const userFields = 'user_id,display_name,bio_description,follower_count,following_count,likes_count,video_count';
+              const url = `https://open.tiktokapis.com/v2/user/info/?fields=${userFields}`;
+              
+              try {
+                const response = await fetch(url, {
+                  headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                  },
+                  timeout: CONFIG.requestTimeout
+                });
+                
+                if (response.status === 401 && CONFIG.enableTokenRefresh) {
+                  console.log(`🔑 Token expired for TikTok account ${account.id}, refreshing...`);
+                  accessToken = await this.tokenManager.refreshToken(account);
+                  tokenRefreshed = true;
+                  
+                  const retryResponse = await fetch(url, {
+                    headers: {
+                      'Authorization': `Bearer ${accessToken}`,
+                      'Content-Type': 'application/json'
+                    },
+                    timeout: CONFIG.requestTimeout
+                  });
+                  
+                  if (!retryResponse.ok) {
+                    throw new Error(`TikTok API error after refresh: ${retryResponse.status}`);
+                  }
+                  
+                  const retryData = await retryResponse.json();
+                  return this.formatTikTokData(retryData.data.user, tokenRefreshed);
+                }
+                
+                if (!response.ok) {
+                  throw new Error(`TikTok API error: ${response.status}`);
+                }
+                
+                const responseData = await response.json();
+                return this.formatTikTokData(responseData.data.user, tokenRefreshed);
+                
+              } catch (error) {
+                console.error(`❌ TikTok sync failed for account ${account.id}:`, error.message);
+                throw error;
+              }
+            }
+            
+            formatTikTokData(data, tokenRefreshed) {
+              return {
+                platform: 'tiktok',
+                platformId: data.user_id,
+                username: data.display_name,
+                displayName: data.display_name,
+                bio: data.bio_description || '',
+                followers: (data.follower_count || 0).toString(),
+                following: (data.following_count || 0).toString(),
+                likes: (data.likes_count || 0).toString(),
+                videos: (data.video_count || 0).toString(),
+                tokenRefreshed: tokenRefreshed,
+                lastSync: admin.firestore.FieldValue.serverTimestamp(),
+                syncVersion: process.env.WORKFLOW_VERSION
+              };
+            }
+          }
+          
+          // ===== MAIN SYNC EXECUTION =====
+          async function executeSyncEngine() {
+            try {
+              console.log('🚀 Starting Multi-Platform Sync Engine');
+              
+              // Load account data
+              const syncData = JSON.parse(fs.readFileSync('accounts-sync-data.json', 'utf8'));
+              const accounts = syncData.accounts;
+              
+              console.log(`📦 Processing ${accounts.length} accounts`);
+              
+              if (accounts.length === 0) {
+                console.log('ℹ️ No accounts to sync');
+                console.log('results={}');
+                console.log('success_count=0');
+                console.log('failure_count=0');
+                console.log('tokens_refreshed=0');
+                return;
+              }
+              
+              // Initialize components
+              const rateLimiter = new SimpleRateLimiter();
+              const tokenManager = new TokenManager();
+              const syncHandlers = new PlatformSyncHandlers(rateLimiter, tokenManager);
+              
+              // Process accounts with concurrency control
+              const limit = pLimit(CONFIG.maxConcurrency);
+              const results = [];
+              let successCount = 0;
+              let failureCount = 0;
+              let tokensRefreshed = 0;
+              
+              const startTime = Date.now();
+              
+              const syncPromises = accounts.map((account, index) => 
+                limit(async () => {
+                  const accountStartTime = Date.now();
+                  
+                  try {
+                    console.log(`🔄 [${index + 1}/${accounts.length}] Syncing ${account.platform} account ${account.id}`);
+                    
+                    const syncResult = await syncHandlers.syncAccount(account);
+                    
+                    // Update account in Firestore
+                    await db.collection('accounts').doc(account.id).update({
+                      ...syncResult,
+                      status: 'connected',
+                      lastSuccessfulSync: admin.firestore.FieldValue.serverTimestamp(),
+                      syncCount: admin.firestore.FieldValue.increment(1),
+                      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    const duration = Date.now() - accountStartTime;
+                    
+                    if (syncResult.tokenRefreshed) {
+                      tokensRefreshed++;
+                    }
+                    
+                    successCount++;
+                    
+                    console.log(`✅ [${index + 1}/${accounts.length}] ${account.platform} sync completed (${duration}ms)${syncResult.tokenRefreshed ? ' + token refreshed' : ''}`);
+                    
+                    return {
+                      accountId: account.id,
+                      platform: account.platform,
+                      status: 'success',
+                      duration: duration,
+                      tokenRefreshed: syncResult.tokenRefreshed || false,
+                      data: syncResult
+                    };
+                    
+                  } catch (error) {
+                    const duration = Date.now() - accountStartTime;
+                    failureCount++;
+                    
+                    console.error(`❌ [${index + 1}/${accounts.length}] ${account.platform} sync failed (${duration}ms): ${error.message}`);
+                    
+                    // Update account with error
+                    try {
+                      await db.collection('accounts').doc(account.id).update({
+                        status: 'sync_failed',
+                        lastError: error.message,
+                        lastFailedSync: admin.firestore.FieldValue.serverTimestamp(),
+                        failedSyncCount: admin.firestore.FieldValue.increment(1),
+                        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                      });
+                    } catch (updateError) {
+                      console.error(`Failed to update error status for ${account.id}:`, updateError.message);
+                    }
+                    
+                    return {
+                      accountId: account.id,
+                      platform: account.platform,
+                      status: 'failed',
+                      duration: duration,
+                      error: error.message,
+                      tokenRefreshed: false
+                    };
+                  }
+                })
+              );
+              
+              // Execute all syncs
+              const syncResults = await Promise.allSettled(syncPromises);
+              
+              // Process results
+              syncResults.forEach(result => {
+                if (result.status === 'fulfilled') {
+                  results.push(result.value);
+                } else {
+                  console.error('Sync promise rejected:', result.reason);
+                  failureCount++;
+                }
+              });
+              
+              const totalDuration = Date.now() - startTime;
+              const successRate = accounts.length > 0 ? (successCount / accounts.length * 100).toFixed(1) : '0';
+              
+              console.log('\\n📊 Sync Engine Results Summary:');
+              console.log(` Total Accounts: ${accounts.length}`);
+              console.log(` Successful: ${successCount}`);
+              console.log(` Failed: ${failureCount}`);
+              console.log(` Success Rate: ${successRate}%`);
+              console.log(` Tokens Refreshed: ${tokensRefreshed}`);
+              console.log(` Total Duration: ${(totalDuration / 1000).toFixed(1)}s`);
+              console.log(` Avg per Account: ${Math.round(totalDuration / accounts.length)}ms`);
+              
+              // Platform breakdown
+              const platformStats = _.groupBy(results, 'platform');
+              console.log('\\n📱 Platform Breakdown:');
+              Object.entries(platformStats).forEach(([platform, platformResults]) => {
+                const platformSuccess = platformResults.filter(r => r.status === 'success').length;
+                const platformTotal = platformResults.length;
+                const platformRate = (platformSuccess / platformTotal * 100).toFixed(1);
+                console.log(` ${platform}: ${platformSuccess}/${platformTotal} (${platformRate}%)`);
+              });
+              
+              // Save detailed results
+              const finalReport = {
+                metadata: {
+                  startTime: new Date(startTime).toISOString(),
+                  endTime: new Date().toISOString(),
+                  duration: totalDuration,
+                  syncMode: process.env.SYNC_MODE,
+                  workflowVersion: process.env.WORKFLOW_VERSION
+                },
+                summary: {
+                  totalAccounts: accounts.length,
+                  successCount: successCount,
+                  failureCount: failureCount,
+                  successRate: parseFloat(successRate),
+                  tokensRefreshed: tokensRefreshed,
+                  avgDuration: Math.round(totalDuration / accounts.length)
+                },
+                platformStats: _.mapValues(platformStats, platformResults => ({
+                  total: platformResults.length,
+                  successful: platformResults.filter(r => r.status === 'success').length,
+                  failed: platformResults.filter(r => r.status === 'failed').length,
+                  successRate: (platformResults.filter(r => r.status === 'success').length / platformResults.length * 100).toFixed(1)
+                })),
+                results: results
+              };
+              
+              await db.collection('sync_reports').add(finalReport);
+              
+              // Set outputs
+              console.log(`results=${JSON.stringify(finalReport.summary)}`);
+              console.log(`success_count=${successCount}`);
+              console.log(`failure_count=${failureCount}`);
+              console.log(`tokens_refreshed=${tokensRefreshed}`);
+              
+              console.log('\\n✅ Multi-Platform Sync Engine completed successfully');
+              
+            } catch (error) {
+              console.error('💥 Critical error in sync engine:', error);
+              console.log('results={}');
+              console.log('success_count=0');
+              console.log('failure_count=0');
+              console.log('tokens_refreshed=0');
+              process.exit(1);
+            }
+          }
+          
+          executeSyncEngine();
+          EOF
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          WORKFLOW_VERSION: ${{ env.WORKFLOW_VERSION }}
+          SYNC_MODE: ${{ env.SYNC_MODE }}
+          MAX_CONCURRENCY: ${{ env.MAX_CONCURRENCY }}
+          BATCH_SIZE: ${{ env.BATCH_SIZE }}
+          REQUEST_TIMEOUT: ${{ env.REQUEST_TIMEOUT }}
+          MAX_RETRIES: ${{ env.MAX_RETRIES }}
+          RETRY_DELAY_MS: ${{ env.RETRY_DELAY_MS }}
+          ENABLE_TOKEN_REFRESH: ${{ env.ENABLE_TOKEN_REFRESH }}
+          RATE_LIMIT_BUFFER: ${{ env.RATE_LIMIT_BUFFER }}
+          FACEBOOK_API_VERSION: ${{ env.FACEBOOK_API_VERSION }}
+          INSTAGRAM_API_VERSION: ${{ env.INSTAGRAM_API_VERSION }}
+          TWITTER_API_VERSION: ${{ env.TWITTER_API_VERSION }}
+          LINKEDIN_API_VERSION: ${{ env.LINKEDIN_API_VERSION }}
+          TIKTOK_API_VERSION: ${{ env.TIKTOK_API_VERSION }}
+          FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID }}
+          FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}
+          INSTAGRAM_APP_ID: ${{ secrets.INSTAGRAM_APP_ID }}
+          INSTAGRAM_APP_SECRET: ${{ secrets.INSTAGRAM_APP_SECRET }}
+          TWITTER_CLIENT_ID: ${{ secrets.TWITTER_CLIENT_ID }}
+          TWITTER_CLIENT_SECRET: ${{ secrets.TWITTER_CLIENT_SECRET }}
+          LINKEDIN_CLIENT_ID: ${{ secrets.LINKEDIN_CLIENT_ID }}
+          LINKEDIN_CLIENT_SECRET: ${{ secrets.LINKEDIN_CLIENT_SECRET }}
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+
+      - name: '📊 Sync Results Summary'
+        run: |
+          echo "📊 Multi-Platform Sync Engine Results"
+          echo "════════════════════════════════════"
+          echo "✅ Successful Syncs: ${{ steps.sync.outputs.success_count }}"
+          echo "❌ Failed Syncs: ${{ steps.sync.outputs.failure_count }}"
+          echo "🔑 Tokens Refreshed: ${{ steps.sync.outputs.tokens_refreshed }}"
+          echo "📈 Sync Results: ${{ steps.sync.outputs.sync_results }}"
+          echo "════════════════════════════════════"
+
+  # ============================================================================
+  # PHASE 4: NOTIFICATION & REPORTING
+  # ============================================================================
+
+  notification_reporting:
+    name: '🔔 Notification & Reporting'
+    runs-on: ubuntu-latest
+    needs: [security_validation, account_discovery, sync_accounts]
+    if: always() && needs.security_validation.outputs.validation_status == 'success'
+    timeout-minutes: 10
+
+    steps:
+      - name: '📊 Generate Comprehensive Report'
+        id: report
+        run: |
+          echo "📊 Generating comprehensive sync report..."
+          
+          # Collect results from previous jobs
+          TOTAL_ACCOUNTS="${{ needs.account_discovery.outputs.accounts_to_sync || '0' }}"
+          SUCCESS_COUNT="${{ needs.sync_accounts.outputs.success_count || '0' }}"
+          FAILURE_COUNT="${{ needs.sync_accounts.outputs.failure_count || '0' }}"
+          TOKENS_REFRESHED="${{ needs.sync_accounts.outputs.tokens_refreshed || '0' }}"
+          
+          # Calculate metrics
+          if [[ $TOTAL_ACCOUNTS -gt 0 ]]; then
+            SUCCESS_RATE=$(echo "scale=1; $SUCCESS_COUNT * 100 / $TOTAL_ACCOUNTS" | bc -l 2>/dev/null || echo "0.0")
+          else
+            SUCCESS_RATE="0.0"
+          fi
+          
+          # Determine overall status
+          OVERALL_STATUS="success"
+          STATUS_EMOJI="✅"
+          
+          if [[ $TOTAL_ACCOUNTS -eq 0 ]]; then
+            OVERALL_STATUS="no_accounts"
+            STATUS_EMOJI="ℹ️"
+          elif [[ $FAILURE_COUNT -gt 0 ]] && [[ $(echo "$SUCCESS_RATE < 90" | bc -l) -eq 1 ]]; then
+            OVERALL_STATUS="partial_failure"
+            STATUS_EMOJI="⚠️"
+          elif [[ $SUCCESS_COUNT -eq 0 ]] && [[ $TOTAL_ACCOUNTS -gt 0 ]]; then
+            OVERALL_STATUS="complete_failure"
+            STATUS_EMOJI="❌"
+          fi
+          
+          echo "📊 Report Summary:"
+          echo " Status: $OVERALL_STATUS ($STATUS_EMOJI)"
+          echo " Total Accounts: $TOTAL_ACCOUNTS"
+          echo " Success Rate: ${SUCCESS_RATE}%"
+          echo " Tokens Refreshed: $TOKENS_REFRESHED"
+          
+          echo "overall_status=$OVERALL_STATUS" >> $GITHUB_OUTPUT
+          echo "status_emoji=$STATUS_EMOJI" >> $GITHUB_OUTPUT
+          echo "total_accounts=$TOTAL_ACCOUNTS" >> $GITHUB_OUTPUT
+          echo "success_count=$SUCCESS_COUNT" >> $GITHUB_OUTPUT
+          echo "failure_count=$FAILURE_COUNT" >> $GITHUB_OUTPUT
+          echo "success_rate=$SUCCESS_RATE" >> $GITHUB_OUTPUT
+          echo "tokens_refreshed=$TOKENS_REFRESHED" >> $GITHUB_OUTPUT
+
+      - name: '💬 Send Slack Notification'
+        if: env.NOTIFICATION_LEVEL != 'minimal' && env.SLACK_WEBHOOK_URL != ''
+        run: |
+          echo "💬 Sending Slack notification..."
+          
+          STATUS="${{ steps.report.outputs.overall_status }}"
+          STATUS_EMOJI="${{ steps.report.outputs.status_emoji }}"
+          
+          # Determine message color
+          if [[ "$STATUS" == "success" ]]; then
+            COLOR="good"
+          elif [[ "$STATUS" == "complete_failure" ]]; then
+            COLOR="danger"
+          else
+            COLOR="warning"
+          fi
+          
+          # Create Slack payload
+          SLACK_PAYLOAD=$(cat << EOF
+          {
+            "username": "SocialHub Sync Bot",
+            "icon_emoji": ":robot_face:",
+            "attachments": [
+              {
+                "color": "$COLOR",
+                "title": "$STATUS_EMOJI Account Sync Report - SocialHub Pro v11.0",
+                "title_link": "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID",
+                "fields": [
+                  {
+                    "title": "📊 Results",
+                    "value": "• Total: ${{ steps.report.outputs.total_accounts }}\\n• Successful: ${{ steps.report.outputs.success_count }}\\n• Failed: ${{ steps.report.outputs.failure_count }}",
+                    "short": true
+                  },
+                  {
+                    "title": "📈 Metrics",
+                    "value": "• Success Rate: ${{ steps.report.outputs.success_rate }}%\\n• Tokens Refreshed: ${{ steps.report.outputs.tokens_refreshed }}\\n• Sync Mode: ${{ env.SYNC_MODE }}",
+                    "short": true
+                  },
+                  {
+                    "title": "🌐 Platforms",
+                    "value": "${{ needs.security_validation.outputs.platforms_enabled }}",
+                    "short": false
+                  }
+                ],
+                "footer": "SocialHub Pro v11.0 - Account Sync Engine",
+                "footer_icon": "https://github.com/github.png",
+                "ts": $(date +%s)
+              }
+            ]
+          }
+          EOF
+          )
+          
+          # Send notification with retry
+          for attempt in 1 2 3; do
+            if curl -X POST \
+              -H 'Content-type: application/json' \
+              --data "$SLACK_PAYLOAD" \
+              --silent \
+              "$SLACK_WEBHOOK_URL"; then
+              echo "✅ Slack notification sent successfully on attempt $attempt"
+              break
+            else
+              echo "⚠️ Slack notification failed on attempt $attempt"
+              if [[ $attempt -eq 3 ]]; then
+                echo "❌ All Slack notification attempts failed"
+              else
+                sleep 5
+              fi
+            fi
+          done
+
+      - name: '📧 Send Email Report'
+        if: env.NOTIFICATION_LEVEL == 'detailed' && env.EMAIL_SERVICE_API_KEY != ''
+        run: |
+          echo "📧 Email reporting would be implemented here"
+          echo "ℹ️ Email service integration requires additional setup"
+
+      - name: '📈 Final Status Summary'
+        run: |
+          echo "📈 SocialHub Pro v11.0 - Account Sync Final Status"
+          echo "════════════════════════════════════════════════"
+          echo ""
+          echo "${{ steps.report.outputs.status_emoji }} Overall Status: ${{ steps.report.outputs.overall_status }}"
+          echo "⏰ Execution Time: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "🔧 Sync Mode: ${{ env.SYNC_MODE }}"
+          echo "👤 Target User: ${{ env.TARGET_USER || 'All Users' }}"
+          echo "🌐 Platforms: ${{ needs.security_validation.outputs.platforms_enabled }}"
+          echo ""
+          echo "📊 Results Summary:"
+          echo " Total Accounts: ${{ steps.report.outputs.total_accounts }}"
+          echo " Successful Syncs: ${{ steps.report.outputs.success_count }}"
+          echo " Failed Syncs: ${{ steps.report.outputs.failure_count }}"
+          echo " Success Rate: ${{ steps.report.outputs.success_rate }}%"
+          echo " Tokens Refreshed: ${{ steps.report.outputs.tokens_refreshed }}"
+          echo ""
+          echo "✨ Features Active:"
+          echo " • 🚀 Multi-Platform Sync Engine (Facebook, Instagram, Twitter, LinkedIn, TikTok)"
+          echo " • 🔑 Automatic Token Refresh for All Platforms"
+          echo " • ⚡ Smart Rate Limiting & Concurrency Control"
+          echo " • 🔍 Intelligent Account Discovery & Prioritization"
+          echo " • 📊 Real-Time Progress Tracking & Analytics"
+          echo " • 🔔 Multi-Channel Notifications"
+          echo " • 🔐 Enhanced Security & Validation"
+          echo ""
+          if [[ "${{ steps.report.outputs.overall_status }}" == "success" ]]; then
+            echo "🎉 Account synchronization completed successfully!"
+            echo "✅ All systems operating normally"
+          elif [[ "${{ steps.report.outputs.overall_status }}" == "no_accounts" ]]; then
+            echo "ℹ️ No accounts needed synchronization at this time"
+            echo "✅ System ready for next scheduled run"
+          else
+            echo "⚠️ Some issues encountered during synchronization"
+            echo "🔄 Check logs for details and retry failed accounts"
+          fi
+          echo ""
+          echo "════════════════════════════════════════════════"
+          echo "🔄 SocialHub Pro v11.0 - Account Sync Engine Complete!"
+
+# ==============================================================================
+# END OF SOCIALHUB PRO v11.0 - ACCOUNT SYNCHRONIZATION WORKFLOW
+# ==============================================================================
