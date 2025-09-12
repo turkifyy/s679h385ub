@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <!-- =================================================================
+         SOCIALHUB PRO v11.0 - BULK IMPORT FOCUSED SYSTEM
+         Production-Grade HTML - Real Implementation Only
+         Focus: Bulk Import with JSON/CSV Support + Auto File Cleanup
+         ================================================================= -->
+    
+    <!-- Basic Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- SEO Meta Tags -->
+    <title>SocialHub Pro - نظام الاستيراد المجمع للمنصات الاجتماعية</title>
+    <meta name="description" content="نظام متطور لاستيراد ونشر المحتوى على منصات التواصل الاجتماعي بشكل مجمع. يدعم ملفات JSON و CSV مع جدولة تلقائية وإدارة ذكية للملفات.">
+    <meta name="keywords" content="استيراد مجمع, منصات اجتماعية, فيسبوك, إنستغرام, تويتر, لينكد إن, تيك توك, جدولة منشورات, إدارة محتوى, تسويق رقمي">
+    <meta name="author" content="SocialHub Pro Team">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Arabic">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="SocialHub Pro - نظام الاستيراد المجمع">
+    <meta property="og:description" content="أتمت عملية نشر المحتوى على جميع منصات التواصل الاجتماعي">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://socialhub-pro.com">
+    <meta property="og:image" content="https://socialhub-pro.com/assets/og-image.jpg">
+    <meta property="og:site_name" content="SocialHub Pro">
+    <meta property="og:locale" content="ar_AE">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SocialHub Pro - نظام الاستيراد المجمع">
+    <meta name="twitter:description" content="أتمت عملية نشر المحتوى على جميع منصات التواصل الاجتماعي">
+    <meta name="twitter:image" content="https://socialhub-pro.com/assets/twitter-image.jpg">
+    <meta name="twitter:creator" content="@SocialHubPro">
+    
+    <!-- Progressive Web App -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a365d">
+    <meta name="background-color" content="#ffffff">
+    <meta name="display" content="standalone">
+    <meta name="orientation" content="portrait">
+    
+    <!-- Apple Specific Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SocialHub Pro">
+    <link rel="apple-touch-icon" sizes="57x57" href="/icons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/icons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/icons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/icons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/icons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-icon-180x180.png">
+    
+    <!-- Microsoft Specific Meta Tags -->
+    <meta name="msapplication-TileColor" content="#1a365d">
+    <meta name="msapplication-TileImage" content="/icons/ms-icon-144x144.png">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/icons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/android-icon-192x192.png">
+    
+    <!-- Performance Hints -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="dns-prefetch" href="//www.googleapis.com">
+    <link rel="dns-prefetch" href="//firebaseapp.com">
+    <link rel="dns-prefetch" href="//firestore.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://socialhub-pro.firebaseapp.com">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self' https:;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googleapis.com https://apis.google.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data: https: blob:;
+        connect-src 'self' https://api.twitter.com https://graph.facebook.com https://api.linkedin.com https://business-api.tiktok.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com;
+        media-src 'self' https:;
+        object-src 'none';
+        base-uri 'self';
+        form-action 'self';
+        frame-ancestors 'none';
+        upgrade-insecure-requests;
+    ">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
+    
+    <!-- Fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800&display=swap">
+    </noscript>
+    
+    <!-- Stylesheets -->
+    <style>
+        /* Critical CSS - Above the Fold */
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2d3748;
+            --accent-color: #3182ce;
+            --success-color: #38a169;
+            --warning-color: #d69e2e;
+            --error-color: #e53e3e;
+            --info-color: #3182ce;
+            --background-color: #f7fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --border-color: #e2e8f0;
+            --border-hover: #cbd5e0;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --font-family: 'Noto Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            --font-size-4xl: 2.25rem;
+            --spacing-1: 0.25rem;
+            --spacing-2: 0.5rem;
+            --spacing-3: 0.75rem;
+            --spacing-4: 1rem;
+            --spacing-5: 1.25rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+            --spacing-10: 2.5rem;
+            --spacing-12: 3rem;
+            --spacing-16: 4rem;
+            --radius-sm: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            --transition-fast: 150ms ease;
+            --transition-normal: 200ms ease;
+            --transition-slow: 300ms ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            font-size: 16px;
+            line-height: 1.5;
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            direction: rtl;
+            text-align: right;
+            overflow-x: hidden;
+        }
+        
+        /* Loading Screen Styles */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity var(--transition-slow);
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loading-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: var(--spacing-6);
+            animation: pulse 2s infinite;
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .loading-progress {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        
+        .loading-progress-bar {
+            height: 100%;
+            background: white;
+            border-radius: var(--radius-sm);
+            animation: loading 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        
+        @keyframes loading {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        
+        /* Authentication Screen Styles */
+        .auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--background-color);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+        }
+        
+        .auth-screen.active {
+            display: flex;
+        }
+        
+        .auth-container {
+            background: var(--surface-color);
+            padding: var(--spacing-12);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .auth-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--spacing-6);
+        }
+        
+        .auth-title {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-2);
+        }
+        
+        .auth-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-8);
+        }
+        
+        .auth-button {
+            width: 100%;
+            padding: var(--spacing-4);
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            margin-bottom: var(--spacing-3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-3);
+        }
+        
+        .auth-button:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .auth-button.google {
+            background: #4285f4;
+            color: white;
+        }
+        
+        .auth-button.facebook {
+            background: #1877f2;
+            color: white;
+        }
+        
+        .auth-button.twitter {
+            background: #1da1f2;
+            color: white;
+        }
+        
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Skip to content link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            z-index: 10000;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+    </style>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "SocialHub Pro",
+        "description": "نظام متطور لاستيراد ونشر المحتوى على منصات التواصل الاجتماعي",
+        "url": "https://socialhub-pro.com",
+        "author": {
+            "@type": "Organization",
+            "name": "SocialHub Pro Team"
+        },
+        "operatingSystem": "Web",
+        "applicationCategory": "BusinessApplication",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+</head>
+
+<body>
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-link">الانتقال إلى المحتوى الرئيسي</a>
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen" role="status" aria-label="جاري تحميل التطبيق">
+        <svg class="loading-logo" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="60" cy="60" r="50" stroke="white" stroke-width="2" fill="none" opacity="0.3"/>
+            <path d="M60 10 C88.7 10 110 31.3 110 60" stroke="white" stroke-width="4" fill="none" stroke-linecap="round">
+                <animateTransform attributeName="transform" type="rotate" values="0 60 60;360 60 60" dur="1s" repeatCount="indefinite"/>
+            </path>
+        </svg>
+        <h1 class="loading-text">SocialHub Pro</h1>
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+        <p class="sr-only">جاري تحميل نظام الاستيراد المجمع...</p>
+    </div>
+
+    <!-- Authentication Screen -->
+    <div id="authScreen" class="auth-screen" role="dialog" aria-labelledby="auth-title" aria-describedby="auth-subtitle">
+        <div class="auth-container">
+            <svg class="auth-logo" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect width="80" height="80" rx="16" fill="var(--primary-color)"/>
+                <path d="M25 35h30v10H25V35z" fill="white"/>
+                <path d="M25 50h20v10H25V50z" fill="white"/>
+                <path d="M50 50h5v10h-5V50z" fill="white"/>
+            </svg>
+            
+            <h2 id="auth-title" class="auth-title">أهلاً بك في SocialHub Pro</h2>
+            <p id="auth-subtitle" class="auth-subtitle">قم بتسجيل الدخول للوصول إلى نظام الاستيراد المجمع</p>
+            
+            <button id="signInGoogle" class="auth-button google" aria-describedby="google-desc">
+                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                الدخول باستخدام Google
+            </button>
+            <div id="google-desc" class="sr-only">تسجيل الدخول باستخدام حساب Google الخاص بك</div>
+            
+            <button id="signInFacebook" class="auth-button facebook" aria-describedby="facebook-desc">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                الدخول باستخدام Facebook
+            </button>
+            <div id="facebook-desc" class="sr-only">تسجيل الدخول باستخدام حساب Facebook الخاص بك</div>
+            
+            <button id="signInTwitter" class="auth-button twitter" aria-describedby="twitter-desc">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                </svg>
+                الدخول باستخدام Twitter
+            </button>
+            <div id="twitter-desc" class="sr-only">تسجيل الدخول باستخدام حساب Twitter الخاص بك</div>
+            
+            <div id="authError" class="auth-error" style="display: none;" role="alert" aria-live="polite"></div>
+            <div class="auth-footer">
+                <p><small>بالمتابعة، أنت توافق على <a href="/terms">الشروط والأحكام</a> و <a href="/privacy">سياسة الخصوصية</a></small></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-label="الإشعارات"></div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="main-app hidden">
+        <!-- Sidebar Overlay for Mobile -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+        
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar" class="sidebar" role="navigation" aria-label="التنقل الرئيسي">
+            <div class="sidebar-header">
+                <button id="sidebarToggle" class="sidebar-toggle" aria-label="إغلاق القائمة الجانبية" aria-expanded="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                
+                <div class="sidebar-brand">
+                    <svg class="brand-logo" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <rect width="32" height="32" rx="8" fill="var(--primary-color)"/>
+                        <rect x="6" y="10" width="20" height="3" fill="white"/>
+                        <rect x="6" y="15" width="14" height="3" fill="white"/>
+                        <rect x="22" y="15" width="4" height="3" fill="white"/>
+                        <rect x="6" y="20" width="10" height="3" fill="white"/>
+                    </svg>
+                    <span class="brand-text">SocialHub Pro</span>
+                </div>
+            </div>
+            
+            <!-- User Profile Section -->
+            <div class="sidebar-user">
+                <img id="userAvatar" class="user-avatar" src="" alt="صورة المستخدم" loading="lazy">
+                <div class="user-info">
+                    <div id="userName" class="user-name">المستخدم</div>
+                    <div id="userEmail" class="user-email">user@example.com</div>
+                </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="sidebar-stats">
+                <div class="stat-item">
+                    <span class="stat-label">عمليات الاستيراد</span>
+                    <span id="sidebarImports" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">مجدولة اليوم</span>
+                    <span id="sidebarScheduled" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">حسابات متصلة</span>
+                    <span id="sidebarAccounts" class="stat-value">0</span>
+                </div>
+            </div>
+            
+            <!-- Navigation Menu -->
+            <ul class="sidebar-nav" role="list">
+                <li class="nav-item">
+                    <button id="navDashboard" class="nav-link active" aria-current="page" data-page="dashboard">
+                        <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span class="nav-text">لوحة التحكم</span>
+                    </button>
+                </li>
+                
+                <li class="nav-item">
+                    <button id="navBulkImport" class="nav-link" data-page="bulk-import">
+                        <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14,2 14,8 20,8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10,9 9,9 8,9"></polyline>
+                        </svg>
+                        <span class="nav-text">الاستيراد المجمع</span>
+                        <span class="nav-badge">جديد</span>
+                    </button>
+                </li>
+                
+                <li class="nav-item">
+                    <button id="navAnalytics" class="nav-link" data-page="analytics">
+                        <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
+                        </svg>
+                        <span class="nav-text">التحليلات</span>
+                    </button>
+                </li>
+                
+                <li class="nav-item">
+                    <button id="navAccounts" class="nav-link" data-page="accounts">
+                        <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <line x1="20" y1="8" x2="20" y2="14"></line>
+                            <line x1="23" y1="11" x2="17" y2="11"></line>
+                        </svg>
+                        <span class="nav-text">إدارة الحسابات</span>
+                    </button>
+                </li>
+                
+                <li class="nav-item">
+                    <button id="navSettings" class="nav-link" data-page="settings">
+                        <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1m10-7a4 4 0 0 1 0 8 4 4 0 0 1 0-8zM1 12a4 4 0 0 1 8 0 4 4 0 0 1-8 0zm18 0a4 4 0 0 1-8 0 4 4 0 0 1 8 0z"></path>
+                        </svg>
+                        <span class="nav-text">الإعدادات</span>
+                    </button>
+                </li>
+            </ul>
+            
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="sidebar-actions">
+                    <button id="themeToggle" class="sidebar-action" aria-label="تغيير المظهر" title="تغيير المظهر">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                    
+                    <button id="helpCenter" class="sidebar-action" aria-label="مركز المساعدة" title="مركز المساعدة">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                    </button>
+                    
+                    <button id="signOut" class="sidebar-action" aria-label="تسجيل الخروج" title="تسجيل الخروج">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16,17 21,12 16,7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="sidebar-storage">
+                    <div class="storage-info">
+                        <span class="storage-label">المساحة المستخدمة</span>
+                        <span id="storageUsage" class="storage-value">0 MB</span>
+                    </div>
+                    <div class="storage-bar">
+                        <div id="storageBar" class="storage-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Main Content Area -->
+        <main id="main-content" class="main-content" role="main">
+            <!-- Mobile Header -->
+            <header class="mobile-header">
+                <button id="mobileSidebarToggle" class="mobile-menu-toggle" aria-label="فتح القائمة" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                
+                <div class="mobile-title">
+                    <h1 id="mobilePageTitle">لوحة التحكم</h1>
+                </div>
+                
+                <div class="mobile-actions">
+                    <button id="mobileNotifications" class="mobile-action" aria-label="الإشعارات" title="الإشعارات">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span id="notificationBadge" class="notification-badge hidden">0</span>
+                    </button>
+                </div>
+            </header>
+                                <!-- Page Content Container -->
+            <div class="page-container">
+                <!-- Dashboard Page -->
+                <section id="page-dashboard" class="page-content active" role="tabpanel" aria-labelledby="navDashboard">
+                    <div class="page-header">
+                        <div class="page-title-section">
+                            <h1 class="page-title">لوحة التحكم</h1>
+                            <p class="page-subtitle">نظرة شاملة على أداء نظام الاستيراد المجمع</p>
+                        </div>
+                        
+                        <div class="page-actions">
+                            <button id="refreshDashboard" class="btn btn-secondary" aria-label="تحديث البيانات">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <polyline points="23,4 23,10 17,10"></polyline>
+                                    <polyline points="1,20 1,14 7,14"></polyline>
+                                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                                </svg>
+                                تحديث
+                            </button>
+                            
+                            <button id="bulkImportQuick" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14,2 14,8 20,8"></polyline>
+                                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                                </svg>
+                                استيراد جديد
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Statistics Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card primary">
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h3 class="stat-title">إجمالي عمليات الاستيراد</h3>
+                                    <div id="totalImports" class="stat-number">0</div>
+                                </div>
+                                <div class="stat-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14,2 14,8 20,8"></polyline>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="stat-footer">
+                                <span class="stat-change positive" id="importsChange">+0%</span>
+                                <span class="stat-period">مقارنة بالشهر الماضي</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card success">
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h3 class="stat-title">المنشورات المجدولة</h3>
+                                    <div id="scheduledPosts" class="stat-number">0</div>
+                                </div>
+                                <div class="stat-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12,6 12,12 16,14"></polyline>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="stat-footer">
+                                <span class="stat-change" id="scheduledChange">0</span>
+                                <span class="stat-period">في آخر 24 ساعة</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card warning">
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h3 class="stat-title">معدل النجاح</h3>
+                                    <div id="successRate" class="stat-number">0%</div>
+                                </div>
+                                <div class="stat-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="stat-footer">
+                                <span class="stat-change" id="successChange">0%</span>
+                                <span class="stat-period">معدل النشر الناجح</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card info">
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h3 class="stat-title">المساحة المستخدمة</h3>
+                                    <div id="storageUsed" class="stat-number">0 MB</div>
+                                </div>
+                                <div class="stat-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="stat-footer">
+                                <span class="stat-change" id="storageChange">0</span>
+                                <span class="stat-period">ملفات نشطة</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity Section -->
+                    <div class="dashboard-section">
+                        <div class="section-header">
+                            <h2 class="section-title">النشاط الأخير</h2>
+                            <div class="section-actions">
+                                <button id="viewAllImports" class="btn btn-text">عرض الكل</button>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-container">
+                            <div id="recentImports" class="activity-list" role="list">
+                                <!-- Will be populated dynamically -->
+                                <div class="loading-state">
+                                    <div class="loading-spinner" aria-hidden="true"></div>
+                                    <p>جاري تحميل النشاط الأخير...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Upcoming Posts Section -->
+                    <div class="dashboard-section">
+                        <div class="section-header">
+                            <h2 class="section-title">المنشورات القادمة (24 ساعة)</h2>
+                            <div class="section-actions">
+                                <button id="viewScheduled" class="btn btn-text">عرض الجدولة</button>
+                            </div>
+                        </div>
+                        
+                        <div class="upcoming-container">
+                            <div id="upcomingPosts" class="upcoming-list" role="list">
+                                <!-- Will be populated dynamically -->
+                                <div class="loading-state">
+                                    <div class="loading-spinner" aria-hidden="true"></div>
+                                    <p>جاري تحميل المنشورات القادمة...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Platform Performance Section -->
+                    <div class="dashboard-section">
+                        <div class="section-header">
+                            <h2 class="section-title">أداء المنصات</h2>
+                        </div>
+                        
+                        <div class="platforms-grid">
+                            <div class="platform-card facebook">
+                                <div class="platform-header">
+                                    <div class="platform-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="platform-info">
+                                        <h3 class="platform-name">Facebook</h3>
+                                        <span id="facebookStatus" class="platform-status online">متصل</span>
+                                    </div>
+                                </div>
+                                <div class="platform-stats">
+                                    <div class="platform-stat">
+                                        <span class="stat-label">نُشر اليوم</span>
+                                        <span id="facebookToday" class="stat-value">0</span>
+                                    </div>
+                                    <div class="platform-stat">
+                                        <span class="stat-label">معدل النجاح</span>
+                                        <span id="facebookSuccess" class="stat-value">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="platform-card instagram">
+                                <div class="platform-header">
+                                    <div class="platform-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                                        </svg>
+                                    </div>
+                                    <div class="platform-info">
+                                        <h3 class="platform-name">Instagram</h3>
+                                        <span id="instagramStatus" class="platform-status online">متصل</span>
+                                    </div>
+                                </div>
+                                <div class="platform-stats">
+                                    <div class="platform-stat">
+                                        <span class="stat-label">نُشر اليوم</span>
+                                        <span id="instagramToday" class="stat-value">0</span>
+                                    </div>
+                                    <div class="platform-stat">
+                                        <span class="stat-label">معدل النجاح</span>
+                                        <span id="instagramSuccess" class="stat-value">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="platform-card twitter">
+                                <div class="platform-header">
+                                    <div class="platform-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="platform-info">
+                                        <h3 class="platform-name">Twitter</h3>
+                                        <span id="twitterStatus" class="platform-status online">متصل</span>
+                                    </div>
+                                </div>
+                                <div class="platform-stats">
+                                    <div class="platform-stat">
+                                        <span class="stat-label">نُشر اليوم</span>
+                                        <span id="twitterToday" class="stat-value">0</span>
+                                    </div>
+                                    <div class="platform-stat">
+                                        <span class="stat-label">معدل النجاح</span>
+                                        <span id="twitterSuccess" class="stat-value">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="platform-card linkedin">
+                                <div class="platform-header">
+                                    <div class="platform-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="platform-info">
+                                        <h3 class="platform-name">LinkedIn</h3>
+                                        <span id="linkedinStatus" class="platform-status online">متصل</span>
+                                    </div>
+                                </div>
+                                <div class="platform-stats">
+                                    <div class="platform-stat">
+                                        <span class="stat-label">نُشر اليوم</span>
+                                        <span id="linkedinToday" class="stat-value">0</span>
+                                    </div>
+                                    <div class="platform-stat">
+                                        <span class="stat-label">معدل النجاح</span>
+                                        <span id="linkedinSuccess" class="stat-value">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="platform-card tiktok">
+                                <div class="platform-header">
+                                    <div class="platform-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                            <path d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="platform-info">
+                                        <h3 class="platform-name">TikTok</h3>
+                                        <span id="tiktokStatus" class="platform-status online">متصل</span>
+                                    </div>
+                                </div>
+                                <div class="platform-stats">
+                                    <div class="platform-stat">
+                                        <span class="stat-label">نُشر اليوم</span>
+                                        <span id="tiktokToday" class="stat-value">0</span>
+                                    </div>
+                                    <div class="platform-stat">
+                                        <span class="stat-label">معدل النجاح</span>
+                                        <span id="tiktokSuccess" class="stat-value">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Bulk Import Page -->
+                <section id="page-bulk-import" class="page-content" role="tabpanel" aria-labelledby="navBulkImport">
+                    <div class="page-header">
+                        <div class="page-title-section">
+                            <h1 class="page-title">الاستيراد المجمع</h1>
+                            <p class="page-subtitle">استيراد ونشر المحتوى على جميع المنصات الاجتماعية</p>
+                        </div>
+                        
+                        <div class="page-actions">
+                            <button id="viewImportGuide" class="btn btn-text" aria-describedby="guide-tooltip">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                                دليل الاستخدام
+                            </button>
+                            <div id="guide-tooltip" class="sr-only">فتح دليل شامل لكيفية استخدام نظام الاستيراد المجمع</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="import-stats-bar">
+                        <div class="import-stat">
+                            <span class="import-stat-label">آخر استيراد</span>
+                            <span id="lastImportTime" class="import-stat-value">--</span>
+                        </div>
+                        <div class="import-stat">
+                            <span class="import-stat-label">معدل النجاح</span>
+                            <span id="importSuccessRate" class="import-stat-value">--</span>
+                        </div>
+                        <div class="import-stat">
+                            <span class="import-stat-label">إجمالي الملفات</span>
+                            <span id="totalFiles" class="import-stat-value">0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- File Upload Section -->
+                    <div class="upload-section">
+                        <div class="section-header">
+                            <h2 class="section-title">رفع ملف الاستيراد</h2>
+                        </div>
+                        
+                        <div class="upload-container">
+                            <div id="fileDropZone" class="file-drop-zone" 
+                                 role="button" 
+                                 tabindex="0"
+                                 aria-label="منطقة رفع الملفات - اسحب وأفلت الملف هنا أو انقر لاختيار ملف"
+                                 aria-describedby="upload-instructions">
+                                
+                                <div class="drop-zone-content">
+                                    <div class="upload-icon">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14,2 14,8 20,8"></polyline>
+                                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                                        </svg>
+                                    </div>
+                                    
+                                    <h3 class="upload-title">اسحب وأفلت ملف CSV أو JSON</h3>
+                                    <p class="upload-subtitle">أو انقر لاختيار ملف من جهازك</p>
+                                    
+                                    <button id="fileSelectBtn" class="btn btn-primary" type="button">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="7,10 12,15 17,10"></polyline>
+                                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                                        </svg>
+                                        اختيار ملف
+                                    </button>
+                                    
+                                    <input type="file" 
+                                           id="bulkImportFile" 
+                                           accept=".csv,.json,text/csv,application/json" 
+                                           style="display: none;"
+                                           aria-describedby="file-requirements">
+                                </div>
+                                
+                                <div id="upload-instructions" class="upload-instructions">
+                                    <p><strong>الصيغ المدعومة:</strong> CSV, JSON</p>
+                                    <p><strong>الحد الأقصى للحجم:</strong> 50 ميجابايت</p>
+                                    <p><strong>التشفير:</strong> UTF-8</p>
+                                </div>
+                            </div>
+                            
+                            <!-- File Info Display -->
+                            <div id="fileInfo" class="file-info" style="display: none;" role="status" aria-live="polite">
+                                <!-- Will be populated dynamically -->
+                            </div>
+                            
+                            <!-- Upload Actions -->
+                            <div id="uploadActions" class="upload-actions" style="display: none;">
+                                <button id="uploadBulkFile" class="btn btn-primary" disabled>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17,8 12,3 7,8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    رفع وبدء المعالجة
+                                </button>
+                                
+                                <button id="clearFile" class="btn btn-secondary">إزالة الملف</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- File Requirements -->
+                    <div class="requirements-section">
+                        <div class="section-header">
+                            <h2 class="section-title">متطلبات الملف والأعمدة</h2>
+                            <button id="toggleRequirements" class="btn btn-text" aria-expanded="true" aria-controls="requirements-content">
+                                إخفاء التفاصيل
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div id="requirements-content" class="requirements-content">
+                            <div class="requirements-grid">
+                                <div class="requirement-item">
+                                    <h3 class="requirement-title">socialTitle</h3>
+                                    <p class="requirement-desc">عنوان المنشور (1-280 حرف)</p>
+                                    <code class="requirement-example">"عرض خاص لفترة محدودة!"</code>
+                                </div>
+                                
+                                <div class="requirement-item">
+                                    <h3 class="requirement-title">socialDescription</h3>
+                                    <p class="requirement-desc">وصف المنشور (1-2000 حرف)</p>
+                                    <code class="requirement-example">"اكتشف منتجاتنا الجديدة..."</code>
+                                </div>
+                                
+                                <div class="requirement-item">
+                                    <h3 class="requirement-title">shortUrl</h3>
+                                    <p class="requirement-desc">رابط صحيح يبدأ بـ https://</p>
+                                    <code class="requirement-example">"https://example.com/offer"</code>
+                                </div>
+                                
+                                <div class="requirement-item">
+                                    <h3 class="requirement-title">linkType</h3>
+                                    <p class="requirement-desc">نوع الرابط</p>
+                                    <code class="requirement-example">article, video, image, link, event</code>
+                                </div>
+                                
+                                <div class="requirement-item">
+                                    <h3 class="requirement-title">socialImageurl</h3>
+                                    <p class="requirement-desc">رابط الصورة المرفقة</p>
+                                    <code class="requirement-example">"https://example.com/image.jpg"</code>
+                                </div>
+                                
+                                <div class="requirement-item">
+                                    <h3 class="requirement-title">socialhachtags</h3>
+                                    <p class="requirement-desc">الهاشتاجات مفصولة بفواصل</p>
+                                    <code class="requirement-example">"#عرض,#خصم,#تسوق"</code>
+                                </div>
+                                
+                                <div class="requirement-item">
+                                    <h3 class="requirement-title">day</h3>
+                                    <p class="requirement-desc">تاريخ النشر (YYYY-MM-DD)</p>
+                                    <code class="requirement-example">"2024-12-25"</code>
+                                </div>
+                                
+                                <div class="requirement-item">
+                                    <h3 class="requirement-title">hour</h3>
+                                    <p class="requirement-desc">وقت النشر (HH:MM)</p>
+                                    <code class="requirement-example">"14:30"</code>
+                                </div>
+                                
+                                <div class="requirement-item">
+                                    <h3 class="requirement-title">platform</h3>
+                                    <p class="requirement-desc">المنصات مفصولة بفواصل</p>
+                                    <code class="requirement-example">"facebook,instagram,twitter"</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Templates Section -->
+                    <div class="templates-section">
+                        <div class="section-header">
+                            <h2 class="section-title">نماذج الملفات</h2>
+                            <p class="section-subtitle">حمّل نموذج جاهز لتبدأ بسرعة</p>
+                        </div>
+                        
+                        <div class="templates-grid">
+                            <div class="template-card">
+                                <div class="template-icon csv">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14,2 14,8 20,8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    </svg>
+                                </div>
+                                <div class="template-info">
+                                    <h3 class="template-title">نموذج CSV</h3>
+                                    <p class="template-desc">ملف CSV مع جميع الأعمدة المطلوبة وبيانات نموذجية</p>
+                                </div>
+                                <button id="downloadCsvTemplate" class="btn btn-outline">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7,10 12,15 17,10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    تحميل CSV
+                                </button>
+                            </div>
+                            
+                            <div class="template-card">
+                                <div class="template-icon json">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14,2 14,8 20,8"></polyline>
+                                        <path d="M10 12h4v4h-4z"></path>
+                                    </svg>
+                                </div>
+                                <div class="template-info">
+                                    <h3 class="template-title">نموذج JSON</h3>
+                                    <p class="template-desc">ملف JSON منسق مع هيكل البيانات الصحيح</p>
+                                </div>
+                                <button id="downloadJsonTemplate" class="btn btn-outline">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7,10 12,15 17,10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    تحميل JSON
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Import Progress Section -->
+                    <div id="importProgressContainer" class="progress-section" style="display: none;" role="region" aria-labelledby="progress-title">
+                        <div class="section-header">
+                            <h2 id="progress-title" class="section-title">جاري المعالجة</h2>
+                            <div class="section-actions">
+                                <button id="cancelImport" class="btn btn-danger-outline">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    إلغاء
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <!-- Progress Bar -->
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                    <div id="importProgressBar" class="progress-fill"></div>
+                                </div>
+                                <div class="progress-info">
+                                    <span id="importProgressText" class="progress-text">جاري التحضير...</span>
+                                    <span id="importProgressPercent" class="progress-percent">0%</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Progress Steps -->
+                            <div class="progress-steps">
+                                <div class="progress-step active" id="step-upload">
+                                    <div class="step-indicator">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17,8 12,3 7,8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                    </div>
+                                    <span class="step-label">رفع الملف</span>
+                                </div>
+                                
+                                <div class="progress-step" id="step-parse">
+                                    <div class="step-indicator">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14,2 14,8 20,8"></polyline>
+                                        </svg>
+                                    </div>
+                                    <span class="step-label">تحليل البيانات</span>
+                                </div>
+                                
+                                <div class="progress-step" id="step-validate">
+                                    <div class="step-indicator">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <polyline points="20,6 9,17 4,12"></polyline>
+                                        </svg>
+                                    </div>
+                                    <span class="step-label">التحقق من الصحة</span>
+                                </div>
+                                
+                                <div class="progress-step" id="step-schedule">
+                                    <div class="step-indicator">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12,6 12,12 16,14"></polyline>
+                                        </svg>
+                                    </div>
+                                    <span class="step-label">الجدولة</span>
+                                </div>
+                                
+                                <div class="progress-step" id="step-complete">
+                                    <div class="step-indicator">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                            <polyline points="22,4 12,14.01 9,11.01"></polyline>
+                                        </svg>
+                                    </div>
+                                    <span class="step-label">اكتمل</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Current Status -->
+                            <div class="progress-status">
+                                <div id="importStatus" class="status-indicator processing">
+                                    جاري المعالجة...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Import Results Section -->
+                    <div id="importResults" class="results-section" style="display: none;" role="region" aria-labelledby="results-title">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                    
+                    <!-- Import History Section -->
+                    <div class="history-section">
+                        <div class="section-header">
+                            <h2 class="section-title">تاريخ الاستيراد</h2>
+                            <div class="section-actions">
+                                <button id="refreshHistory" class="btn btn-text">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <polyline points="23,4 23,10 17,10"></polyline>
+                                        <polyline points="1,20 1,14 7,14"></polyline>
+                                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                                    </svg>
+                                    تحديث
+                                </button>
+                                
+                                <button id="clearHistory" class="btn btn-text text-danger">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <polyline points="3,6 5,6 21,6"></polyline>
+                                        <path d="M19,6v14a2,2 0,0,1-2,2H7a2,2 0,0,1-2-2V6m3,0V4a2,2 0,0,1,2-2h4a2,2 0,0,1,2,2v2"></path>
+                                    </svg>
+                                    مسح التاريخ
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="history-container">
+                            <div id="importHistory" class="history-list" role="list">
+                                <!-- Will be populated dynamically -->
+                                <div class="loading-state">
+                                    <div class="loading-spinner" aria-hidden="true"></div>
+                                    <p>جاري تحميل تاريخ الاستيراد...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                    
+                    <!-- Dashboard content will be populated by JavaScript -->
+                    <div class="dashboard-content">
+                        <div class="loading-state">
+                            <div class="loading-spinner"></div>
+                            <p>جاري تحميل بيانات لوحة التحكم...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Bulk Import Page -->
+                <section id="page-bulk-import" class="page-content" role="tabpanel" aria-labelledby="navBulkImport">
+                    <div class="page-header">
+                        <div class="page-title-section">
+                            <h1 class="page-title">الاستيراد المجمع</h1>
+                            <p class="page-subtitle">استيراد ونشر المحتوى على جميع المنصات الاجتماعية</p>
+                        </div>
+                    </div>
+
+                    <!-- File Upload Zone -->
+                    <div class="upload-section">
+                        <div id="fileDropZone" class="file-drop-zone" role="button" tabindex="0">
+                            <div class="drop-zone-content">
+                                <div class="upload-icon">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14,2 14,8 20,8"></polyline>
+                                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                                    </svg>
+                                </div>
+                                
+                                <h3 class="upload-title">اسحب وأفلت ملف CSV أو JSON</h3>
+                                <p class="upload-subtitle">أو انقر لاختيار ملف من جهازك</p>
+                                
+                                <button id="fileSelectBtn" class="btn btn-primary" type="button">اختيار ملف</button>
+                                
+                                <input type="file" 
+                                       id="bulkImportFile" 
+                                       accept=".csv,.json,text/csv,application/json" 
+                                       style="display: none;">
+                            </div>
+                        </div>
+                        
+                        <!-- File Info Display -->
+                        <div id="fileInfo" class="file-info" style="display: none;"></div>
+                        
+                        <!-- Upload Actions -->
+                        <div id="uploadActions" class="upload-actions" style="display: none;">
+                            <button id="uploadBulkFile" class="btn btn-primary" disabled>رفع وبدء المعالجة</button>
+                            <button id="clearFile" class="btn btn-secondary">إزالة الملف</button>
+                        </div>
+                    </div>
+
+                    <!-- Template Downloads -->
+                    <div class="templates-section">
+                        <h2 class="section-title">نماذج الملفات</h2>
+                        <div class="templates-grid">
+                            <button id="downloadCsvTemplate" class="template-btn">تحميل نموذج CSV</button>
+                            <button id="downloadJsonTemplate" class="template-btn">تحميل نموذج JSON</button>
+                        </div>
+                    </div>
+
+                    <!-- Import Progress -->
+                    <div id="importProgressContainer" class="progress-section" style="display: none;">
+                        <h2 class="section-title">جاري المعالجة</h2>
+                        <div class="progress-bar">
+                            <div id="importProgressBar" class="progress-fill"></div>
+                        </div>
+                        <div class="progress-info">
+                            <span id="importProgressText">جاري الرفع...</span>
+                            <span id="importProgressPercent">0%</span>
+                        </div>
+                        <button id="cancelImport" class="btn btn-danger">إلغاء</button>
+                    </div>
+
+                    <!-- Import Results -->
+                    <div id="importResults" class="results-section" style="display: none;">
+                        <!-- Results will be populated dynamically -->
+                    </div>
+
+                    <!-- Import History -->
+                    <div class="history-section">
+                        <h2 class="section-title">تاريخ الاستيراد</h2>
+                        <div id="importHistory" class="history-content">
+                            <div class="loading-state">
+                                <div class="loading-spinner"></div>
+                                <p>جاري تحميل تاريخ الاستيراد...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                               <!-- Analytics Page -->
+                <section id="page-analytics" class="page-content" role="tabpanel" aria-labelledby="navAnalytics">
+                    <div class="page-header">
+                        <div class="page-title-section">
+                            <h1 class="page-title">التحليلات</h1>
+                            <p class="page-subtitle">تحليل شامل لأداء النشر والاستيراد</p>
+                        </div>
+                        
+                        <div class="page-actions">
+                            <select id="analyticsTimeframe" class="form-select" aria-label="اختيار فترة التحليل">
+                                <option value="7">آخر 7 أيام</option>
+                                <option value="30" selected>آخر 30 يوم</option>
+                                <option value="90">آخر 3 أشهر</option>
+                                <option value="365">آخر سنة</option>
+                            </select>
+                            
+                            <button id="exportAnalytics" class="btn btn-outline">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-15"></path>
+                                    <polyline points="7,10 12,15 17,10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                تصدير التقرير
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Analytics Content -->
+                    <div class="analytics-container">
+                        <div class="loading-state">
+                            <div class="loading-spinner" aria-hidden="true"></div>
+                            <p>جاري تحميل بيانات التحليل...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Accounts Page -->
+                <section id="page-accounts" class="page-content" role="tabpanel" aria-labelledby="navAccounts">
+                    <div class="page-header">
+                        <div class="page-title-section">
+                            <h1 class="page-title">إدارة الحسابات</h1>
+                            <p class="page-subtitle">ربط وإدارة حساباتك على المنصات الاجتماعية</p>
+                        </div>
+                        
+                        <div class="page-actions">
+                            <button id="addNewAccount" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                ربط حساب جديد
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Accounts Content -->
+                    <div class="accounts-container">
+                        <div class="loading-state">
+                            <div class="loading-spinner" aria-hidden="true"></div>
+                            <p>جاري تحميل الحسابات المربوطة...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Page -->
+                <section id="page-settings" class="page-content" role="tabpanel" aria-labelledby="navSettings">
+                    <div class="page-header">
+                        <div class="page-title-section">
+                            <h1 class="page-title">الإعدادات</h1>
+                            <p class="page-subtitle">إعدادات النظام والتخصيص</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Settings Content -->
+                    <div class="settings-container">
+                        <div class="loading-state">
+                            <div class="loading-spinner" aria-hidden="true"></div>
+                            <p>جاري تحميل الإعدادات...</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div id="offlineIndicator" class="offline-indicator" style="display: none;" role="status" aria-live="polite">
+        <div class="offline-content">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+                <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+                <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+                <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+                <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+                <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                <line x1="12" y1="20" x2="12.01" y2="20"></line>
+            </svg>
+            <span>لا يوجد اتصال بالإنترنت</span>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal" role="dialog" aria-labelledby="help-modal-title" aria-describedby="help-modal-content" aria-hidden="true">
+        <div class="modal-overlay" role="presentation"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="help-modal-title" class="modal-title">مركز المساعدة</h2>
+                <button id="closeHelpModal" class="modal-close" aria-label="إغلاق مركز المساعدة">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="help-modal-content" class="modal-content">
+                <div class="help-content">
+                    <!-- Help content will be loaded dynamically -->
+                    <div class="loading-state">
+                        <div class="loading-spinner" aria-hidden="true"></div>
+                        <p>جاري تحميل المساعدة...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal" role="dialog" aria-labelledby="confirm-modal-title" aria-describedby="confirm-modal-content" aria-hidden="true">
+        <div class="modal-overlay" role="presentation"></div>
+        <div class="modal-container small">
+            <div class="modal-header">
+                <h2 id="confirm-modal-title" class="modal-title">تأكيد العملية</h2>
+            </div>
+            
+            <div id="confirm-modal-content" class="modal-content">
+                <p id="confirmMessage">هل أنت متأكد من هذا الإجراء؟</p>
+            </div>
+            
+            <div class="modal-footer">
+                <button id="confirmCancel" class="btn btn-secondary">إلغاء</button>
+                <button id="confirmAction" class="btn btn-danger">تأكيد</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen reader announcements -->
+    <div id="sr-announcements" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Critical Scripts -->
+    <script>
+        // Prevent FOUC (Flash of Unstyled Content)
+        document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+        
+        // Critical error handling
+        window.addEventListener('error', function(e) {
+            console.error('Critical Error:', e.error);
+            if (typeof window.SocialHubPro !== 'undefined' && window.SocialHubPro.ErrorHandler) {
+                window.SocialHubPro.ErrorHandler.handle(e.error);
+            }
+        });
+        
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled Promise Rejection:', e.reason);
+            if (typeof window.SocialHubPro !== 'undefined' && window.SocialHubPro.ErrorHandler) {
+                window.SocialHubPro.ErrorHandler.handle(e.reason);
+            }
+        });
+        
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            if (typeof PerformanceObserver !== 'undefined') {
+                try {
+                    const observer = new PerformanceObserver((list) => {
+                        for (const entry of list.getEntries()) {
+                            if (entry.name === 'first-contentful-paint') {
+                                console.log('FCP:', entry.startTime);
+                            }
+                            if (entry.name === 'largest-contentful-paint') {
+                                console.log('LCP:', entry.startTime);
+                            }
+                        }
+                    });
+                    observer.observe({entryTypes: ['paint', 'largest-contentful-paint']});
+                } catch (e) {
+                    console.warn('Performance Observer not supported');
+                }
+            }
+        });
+    </script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics-compat.js"></script>
+
+    <!-- Main Application Script -->
+    <script src="app.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        // Register Service Worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', function() {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', function() {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Show update available notification
+                                    if (typeof window.SocialHubPro !== 'undefined' && typeof showToast === 'function') {
+                                        showToast('تحديث جديد متوفر. يرجى إعادة تحميل الصفحة.', 'info', 10000);
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+    </script>
+
+    <!-- Analytics -->
+    <script>
+        // Google Analytics 4
+        window.gtag = window.gtag || function() {
+            (window.gtag.q = window.gtag.q || []).push(arguments);
+        };
+        window.gtag('js', new Date());
+        
+        // Only load analytics in production
+        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-PELQCY8ME1';
+            document.head.appendChild(script);
+            
+            window.gtag('config', 'G-PELQCY8ME1', {
+                page_title: document.title,
+                page_location: window.location.href,
+                custom_map: {
+                    'custom_parameter_1': 'bulk_import_usage',
+                    'custom_parameter_2': 'platform_connections'
+                }
+            });
+        }
+    </script>
+
+    <!-- Accessibility Enhancements -->
+    <script>
+        // Skip link functionality
+        const skipLink = document.querySelector('.skip-link');
+        if (skipLink) {
+            skipLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.focus();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        }
+        
+        // Keyboard navigation for custom elements
+        document.addEventListener('keydown', function(e) {
+            // Close modals with Escape key
+            if (e.key === 'Escape') {
+                const activeModal = document.querySelector('.modal[aria-hidden="false"]');
+                if (activeModal) {
+                    const closeBtn = activeModal.querySelector('.modal-close');
+                    if (closeBtn) {
+                        closeBtn.click();
+                    }
+                }
+            }
+            
+            // Navigate with arrow keys in lists
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                const focusedElement = document.activeElement;
+                const listItems = Array.from(document.querySelectorAll('.nav-link, .history-item, .activity-item'));
+                const currentIndex = listItems.indexOf(focusedElement);
+                
+                if (currentIndex !== -1) {
+                    e.preventDefault();
+                    const nextIndex = e.key === 'ArrowDown' 
+                        ? Math.min(currentIndex + 1, listItems.length - 1)
+                        : Math.max(currentIndex - 1, 0);
+                    
+                    listItems[nextIndex].focus();
+                }
+            }
+        });
+        
+        // Announce page changes to screen readers
+        function announcePageChange(pageName) {
+            const announcer = document.getElementById('sr-announcements');
+            if (announcer) {
+                announcer.textContent = `تم الانتقال إلى صفحة ${pageName}`;
+            }
+        }
+        
+        // High contrast mode detection
+        function detectHighContrast() {
+            const mediaQuery = window.matchMedia('(prefers-contrast: high)');
+            if (mediaQuery.matches) {
+                document.body.classList.add('high-contrast');
+            }
+            
+            mediaQuery.addEventListener('change', function(e) {
+                if (e.matches) {
+                    document.body.classList.add('high-contrast');
+                } else {
+                    document.body.classList.remove('high-contrast');
+                }
+            });
+        }
+        
+        // Reduced motion detection
+        function detectReducedMotion() {
+            const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+            if (mediaQuery.matches) {
+                document.body.classList.add('reduced-motion');
+            }
+            
+            mediaQuery.addEventListener('change', function(e) {
+                if (e.matches) {
+                    document.body.classList.add('reduced-motion');
+                } else {
+                    document.body.classList.remove('reduced-motion');
+                }
+            });
+        }
+        
+        // Initialize accessibility features
+        document.addEventListener('DOMContentLoaded', function() {
+            detectHighContrast();
+            detectReducedMotion();
+        });
+    </script>
+
+    <!-- PWA Install Prompt -->
+    <script>
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', function(e) {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            
+            // Show install button or banner
+            const installBanner = document.getElementById('installBanner');
+            if (installBanner) {
+                installBanner.style.display = 'block';
+            }
+        });
+        
+        function installPWA() {
+            if (deferredPrompt) {
+                // Show the prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then(function(choiceResult) {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the A2HS prompt');
+                        if (typeof window.gtag === 'function') {
+                            window.gtag('event', 'pwa_install', {
+                                event_category: 'engagement'
+                            });
+                        }
+                    } else {
+                        console.log('User dismissed the A2HS prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+        
+        // Track PWA usage
+        window.addEventListener('appinstalled', function(evt) {
+            console.log('PWA installed successfully');
+            if (typeof window.gtag === 'function') {
+                window.gtag('event', 'pwa_installed', {
+                    event_category: 'engagement'
+                });
+            }
+        });
+    </script>
+
+    <!-- Theme Management -->
+    <script>
+        // Theme management
+        const themeManager = {
+            init: function() {
+                const savedTheme = localStorage.getItem('theme');
+                const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                const theme = savedTheme || systemTheme;
+                
+                this.setTheme(theme);
+                this.setupThemeToggle();
+                this.watchSystemTheme();
+            },
+            
+            setTheme: function(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                
+                const themeIcon = document.querySelector('#themeToggle svg');
+                if (themeIcon) {
+                    if (theme === 'dark') {
+                        themeIcon.innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>';
+                    } else {
+                        themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+                    }
+                }
+            },
+            
+            toggleTheme: function() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                this.setTheme(newTheme);
+                
+                // Announce theme change
+                const announcer = document.getElementById('sr-announcements');
+                if (announcer) {
+                    announcer.textContent = `تم تغيير المظهر إلى ${newTheme === 'dark' ? 'الداكن' : 'الفاتح'}`;
+                }
+            },
+            
+            setupThemeToggle: function() {
+                const themeToggle = document.getElementById('themeToggle');
+                if (themeToggle) {
+                    themeToggle.addEventListener('click', () => this.toggleTheme());
+                }
+            },
+            
+            watchSystemTheme: function() {
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                mediaQuery.addEventListener('change', (e) => {
+                    if (!localStorage.getItem('theme')) {
+                        this.setTheme(e.matches ? 'dark' : 'light');
+                    }
+                });
+            }
+        };
+        
+        // Initialize theme when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => themeManager.init());
+        } else {
+            themeManager.init();
+        }
+    </script>
+
+    <!-- Final initialization -->
+    <script>
+        // Final checks and initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if all critical resources are loaded
+            const criticalResources = ['firebase', 'SocialHubPro'];
+            let allLoaded = true;
+            
+            for (const resource of criticalResources) {
+                if (typeof window[resource] === 'undefined') {
+                    console.error(`Critical resource not loaded: ${resource}`);
+                    allLoaded = false;
+                }
+            }
+            
+            if (!allLoaded) {
+                // Show error message
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.innerHTML = `
+                        <div style="text-align: center; color: white;">
+                            <h2>خطأ في التحميل</h2>
+                            <p>فشل في تحميل بعض الموارد المهمة</p>
+                            <button onclick="location.reload()" style="background: white; color: #1a365d; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 20px;">
+                                إعادة المحاولة
+                            </button>
+                        </div>
+                    `;
+                }
+                return;
+            }
+            
+            // All good, hide loading screen after a short delay
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.classList.add('hidden');
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                    }, 300);
+                }
+            }, 1000);
+        });
+        
+        // Global error recovery
+        window.addEventListener('online', function() {
+            console.log('Connection restored');
+            if (typeof window.SocialHubPro !== 'undefined' && window.SocialHubPro.NetworkHelper) {
+                window.SocialHubPro.NetworkHelper.notifyListeners(true);
+            }
+        });
+        
+        window.addEventListener('offline', function() {
+            console.log('Connection lost');
+            if (typeof window.SocialHubPro !== 'undefined' && window.SocialHubPro.NetworkHelper) {
+                window.SocialHubPro.NetworkHelper.notifyListeners(false);
+            }
+        });
+    </script>
+
+    <!-- Debug Mode (Development Only) -->
+    <script>
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.search.includes('debug=true')) {
+            // Enable debug mode
+            window.DEBUG_MODE = true;
+            console.log('🐛 Debug mode enabled');
+            
+            // Add debug panel
+            const debugPanel = document.createElement('div');
+            debugPanel.id = 'debugPanel';
+            debugPanel.innerHTML = `
+                <div style="position: fixed; bottom: 20px; left: 20px; background: #333; color: white; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px; z-index: 10000;">
+                    <div>Debug Mode Active</div>
+                    <div>Environment: ${window.location.hostname}</div>
+                    <div id="debugInfo">Loading...</div>
+                </div>
+            `;
+            document.body.appendChild(debugPanel);
+            
+            // Update debug info
+            setInterval(() => {
+                const debugInfo = document.getElementById('debugInfo');
+                if (debugInfo && typeof window.SocialHubPro !== 'undefined') {
+                    debugInfo.innerHTML = `
+                        <div>Auth: ${window.SocialHubPro.AuthService?.isAuthenticated() ? 'Yes' : 'No'}</div>
+                        <div>Firebase: ${typeof firebase !== 'undefined' ? 'Ready' : 'Loading'}</div>
+                    `;
+                }
+            }, 1000);
+        }
+    </script>           
+</body>
+</html>
