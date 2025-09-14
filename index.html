@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SocialHub Pro v11.0 - نظام إدارة المنصات الاجتماعية مع الاستيراد المجمع">
+    <meta name="keywords" content="social media, bulk import, scheduling, facebook, instagram, twitter, linkedin, tiktok">
+    <meta name="author" content="SocialHub Pro Team">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https:; font-src 'self' https://fonts.gstatic.com;">
+    
+    <title>SocialHub Pro v11.0 - نظام الاستيراد المجمع</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Progressive Web App -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#218A8D">
+    
+    <!-- Analytics (Placeholder) -->
+    <meta name="google-site-verification" content="your-verification-code">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <i class="fas fa-share-alt"></i>
+                <h2>SocialHub Pro</h2>
+            </div>
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+            <p class="loading-text">جاري تحميل النظام...</p>
+            <div class="loading-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="loading-progress-fill"></div>
+                </div>
+                <span class="progress-text" id="loading-progress-text">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Section -->
+    <div id="login-section" class="login-section" style="display: block;">
+        <div class="login-container">
+            <div class="login-left">
+                <div class="login-branding">
+                    <div class="brand-logo">
+                        <i class="fas fa-share-alt"></i>
+                        <h1>SocialHub Pro</h1>
+                        <span class="version">v11.0</span>
+                    </div>
+                    <p class="brand-tagline">نظام إدارة المنصات الاجتماعية مع الاستيراد المجمع</p>
+                    
+                    <div class="features-list">
+                        <div class="feature-item">
+                            <i class="fas fa-upload"></i>
+                            <span>استيراد مجمع للمنشورات (JSON/CSV)</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-clock"></i>
+                            <span>جدولة تلقائية للنشر</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-share-alt-square"></i>
+                            <span>دعم جميع المنصات الاجتماعية</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>تحليلات شاملة ولوحة تحكم</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>تنظيف تلقائي للملفات</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>أمان متقدم وحماية البيانات</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="login-right">
+                <div class="login-form-container">
+                    <div class="login-header">
+                        <h2>تسجيل الدخول</h2>
+                        <p>قم بتسجيل الدخول للوصول إلى نظام الاستيراد المجمع</p>
+                    </div>
+                    
+                    <form id="login-form" class="login-form">
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope"></i>
+                                البريد الإلكتروني
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="form-control" 
+                                placeholder="example@domain.com"
+                                required
+                                autocomplete="email"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock"></i>
+                                كلمة المرور
+                            </label>
+                            <div class="password-field">
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="password" 
+                                    class="form-control" 
+                                    placeholder="••••••••"
+                                    required
+                                    autocomplete="current-password"
+                                >
+                                <button type="button" class="password-toggle" id="password-toggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="remember-me" name="remember">
+                                <span class="checkbox-custom"></span>
+                                تذكرني
+                            </label>
+                            <a href="#" class="forgot-password" id="forgot-password-link">نسيت كلمة المرور؟</a>
+                        </div>
+                        
+                        <button type="submit" class="btn btn--primary btn--full login-button" id="login-button">
+                            <span class="button-text">تسجيل الدخول</span>
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                    </form>
+                    
+                    <div class="login-footer">
+                        <p>بالمتابعة، أنت توافق على <a href="#" class="legal-link">الشروط والأحكام</a> و <a href="#" class="legal-link">سياسة الخصوصية</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app-section" class="app-layout" style="display: none;">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <i class="fas fa-share-alt"></i>
+                    <span class="brand-text">SocialHub Pro</span>
+                    <span class="version-badge">v11.0</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active" data-target="dashboard-section">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span class="nav-text">لوحة التحكم</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-target="bulk-import-section">
+                            <i class="fas fa-upload"></i>
+                            <span class="nav-text">الاستيراد المجمع</span>
+                            <span class="nav-badge">جديد</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-target="posts-section">
+                            <i class="fas fa-file-alt"></i>
+                            <span class="nav-text">المنشورات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-target="analytics-section">
+                            <i class="fas fa-chart-bar"></i>
+                            <span class="nav-text">التحليلات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-target="accounts-section">
+                            <i class="fas fa-users"></i>
+                            <span class="nav-text">الحسابات المربوطة</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-target="settings-section">
+                            <i class="fas fa-cog"></i>
+                            <span class="nav-text">الإعدادات</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name" id="user-name">المستخدم</span>
+                        <span class="user-email" id="user-email">user@example.com</span>
+                    </div>
+                    <button class="user-menu-toggle">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+                
+                <button class="logout-button" id="logout-button">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>تسجيل الخروج</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item active" id="current-page">لوحة التحكم</span>
+                </div>
+            </div>
+            
+            <div class="header-center">
+                <div class="search-box">
+                    <input type="text" placeholder="البحث في المنشورات..." class="search-input" id="global-search">
+                    <button class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="header-actions">
+                    <button class="header-action" id="notifications-toggle" title="الإشعارات">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    
+                    <button class="header-action" id="theme-toggle" title="تغيير المظهر">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    
+                    <button class="header-action" id="help-toggle" title="المساعدة">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+                
+                <div class="connection-status" id="connection-status">
+                    <div class="status-indicator online" title="متصل">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="app-section active">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h1>لوحة التحكم</h1>
+                        <p>نظرة شاملة على أداء نظام الاستيراد المجمع</p>
+                    </div>
+                    <div class="section-actions">
+                        <select class="form-control" id="dashboard-time-range">
+                            <option value="24h">آخر 24 ساعة</option>
+                            <option value="7d" selected>آخر 7 أيام</option>
+                            <option value="30d">آخر 30 يوم</option>
+                            <option value="90d">آخر 90 يوم</option>
+                        </select>
+                        <button class="btn btn--secondary" id="dashboard-refresh">
+                            <i class="fas fa-sync-alt"></i>
+                            تحديث
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card" id="total-imports">
+                        <div class="stat-icon">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-title">إجمالي عمليات الاستيراد</h3>
+                            <div class="stat-value">0</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+12%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card" id="scheduled-posts">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-title">المنشورات المجدولة</h3>
+                            <div class="stat-value">0</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+8%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card" id="success-rate">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-title">معدل النجاح</h3>
+                            <div class="stat-value">0%</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+5%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card" id="storage-used">
+                        <div class="stat-icon">
+                            <i class="fas fa-hdd"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-title">المساحة المستخدمة</h3>
+                            <div class="stat-value">0 MB</div>
+                            <div class="stat-change neutral">
+                                <i class="fas fa-minus"></i>
+                                <span>0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Content -->
+                <div class="dashboard-grid">
+                    <!-- Recent Activity -->
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>النشاط الأخير</h3>
+                            <button class="btn btn--ghost btn--sm">
+                                <i class="fas fa-external-link-alt"></i>
+                                عرض الكل
+                            </button>
+                        </div>
+                        <div class="card__body">
+                            <div id="recent-activity-list" class="activity-list">
+                                <div class="activity-loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>جاري تحميل النشاط الأخير...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Upcoming Posts -->
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>المنشورات القادمة (24 ساعة)</h3>
+                            <button class="btn btn--ghost btn--sm">
+                                <i class="fas fa-calendar-alt"></i>
+                                التقويم
+                            </button>
+                        </div>
+                        <div class="card__body">
+                            <div id="upcoming-posts-list" class="upcoming-posts">
+                                <div class="posts-loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>جاري تحميل المنشورات القادمة...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Platform Performance -->
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>أداء المنصات</h3>
+                            <div class="card-actions">
+                                <button class="btn btn--ghost btn--sm">
+                                    <i class="fas fa-chart-pie"></i>
+                                    التفاصيل
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card__body">
+                            <div class="platform-performance">
+                                <div class="platform-item">
+                                    <div class="platform-info">
+                                        <i class="fab fa-facebook-f facebook-color"></i>
+                                        <span>Facebook</span>
+                                    </div>
+                                    <div class="platform-metrics">
+                                        <span class="metric-value">85%</span>
+                                        <div class="progress-bar small">
+                                            <div class="progress-fill" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="platform-item">
+                                    <div class="platform-info">
+                                        <i class="fab fa-instagram instagram-color"></i>
+                                        <span>Instagram</span>
+                                    </div>
+                                    <div class="platform-metrics">
+                                        <span class="metric-value">92%</span>
+                                        <div class="progress-bar small">
+                                            <div class="progress-fill" style="width: 92%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="platform-item">
+                                    <div class="platform-info">
+                                        <i class="fab fa-twitter twitter-color"></i>
+                                        <span>Twitter</span>
+                                    </div>
+                                    <div class="platform-metrics">
+                                        <span class="metric-value">78%</span>
+                                        <div class="progress-bar small">
+                                            <div class="progress-fill" style="width: 78%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="platform-item">
+                                    <div class="platform-info">
+                                        <i class="fab fa-linkedin-in linkedin-color"></i>
+                                        <span>LinkedIn</span>
+                                    </div>
+                                    <div class="platform-metrics">
+                                        <span class="metric-value">88%</span>
+                                        <div class="progress-bar small">
+                                            <div class="progress-fill" style="width: 88%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="platform-item">
+                                    <div class="platform-info">
+                                        <i class="fab fa-tiktok tiktok-color"></i>
+                                        <span>TikTok</span>
+                                    </div>
+                                    <div class="platform-metrics">
+                                        <span class="metric-value">73%</span>
+                                        <div class="progress-bar small">
+                                            <div class="progress-fill" style="width: 73%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bulk Import Section -->
+            <section id="bulk-import-section" class="app-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h1>الاستيراد المجمع</h1>
+                        <p>استيراد ونشر المحتوى على جميع المنصات الاجتماعية</p>
+                    </div>
+                    <div class="section-actions">
+                        <button class="btn btn--secondary" onclick="downloadCSVTemplate()">
+                            <i class="fas fa-download"></i>
+                            قالب CSV
+                        </button>
+                        <button class="btn btn--secondary" onclick="downloadJSONTemplate()">
+                            <i class="fas fa-download"></i>
+                            قالب JSON
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- File Upload Area -->
+                <div class="upload-section">
+                    <div class="upload-card">
+                        <div id="file-drop-zone" class="file-drop-zone">
+                            <div class="drop-zone-content">
+                                <div class="drop-zone-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <h3>اسحب وأفلت ملف البيانات هنا</h3>
+                                <p>أو انقر لاختيار ملف من جهازك</p>
+                                <div class="file-requirements">
+                                    <div class="requirement-item">
+                                        <strong>الصيغ المدعومة:</strong> CSV, JSON
+                                    </div>
+                                    <div class="requirement-item">
+                                        <strong>الحد الأقصى للحجم:</strong> 50 ميجابايت
+                                    </div>
+                                    <div class="requirement-item">
+                                        <strong>التشفير:</strong> UTF-8
+                                    </div>
+                                </div>
+                                <input type="file" id="csv-file-input" accept=".csv,.json" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Column Mapping Guide -->
+                <div class="mapping-guide">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>دليل أعمدة البيانات المطلوبة</h3>
+                            <button class="btn btn--ghost btn--sm" id="toggle-mapping-guide">
+                                <i class="fas fa-chevron-down"></i>
+                                إظهار/إخفاء
+                            </button>
+                        </div>
+                        <div class="card__body" id="mapping-guide-content">
+                            <div class="columns-grid">
+                                <div class="column-info">
+                                    <div class="column-header">
+                                        <i class="fas fa-heading"></i>
+                                        <strong>socialTitle</strong>
+                                    </div>
+                                    <p>عنوان المنشور (1-280 حرف)</p>
+                                    <code>"عرض خاص لفترة محدودة!"</code>
+                                </div>
+                                
+                                <div class="column-info">
+                                    <div class="column-header">
+                                        <i class="fas fa-align-left"></i>
+                                        <strong>socialDescription</strong>
+                                    </div>
+                                    <p>وصف المنشور (1-2000 حرف)</p>
+                                    <code>"اكتشف منتجاتنا الجديدة..."</code>
+                                </div>
+                                
+                                <div class="column-info">
+                                    <div class="column-header">
+                                        <i class="fas fa-link"></i>
+                                        <strong>shortUrl</strong>
+                                    </div>
+                                    <p>رابط صحيح يبدأ بـ https://</p>
+                                    <code>"https://example.com/offer"</code>
+                                </div>
+                                
+                                <div class="column-info">
+                                    <div class="column-header">
+                                        <i class="fas fa-tag"></i>
+                                        <strong>linkType</strong>
+                                    </div>
+                                    <p>نوع الرابط</p>
+                                    <code>"article, video, image, link, event"</code>
+                                </div>
+                                
+                                <div class="column-info">
+                                    <div class="column-header">
+                                        <i class="fas fa-image"></i>
+                                        <strong>socialImageurl</strong>
+                                    </div>
+                                    <p>رابط الصورة المرفقة</p>
+                                    <code>"https://example.com/image.jpg"</code>
+                                </div>
+                                
+                                <div class="column-info">
+                                    <div class="column-header">
+                                        <i class="fas fa-hashtag"></i>
+                                        <strong>socialhachtags</strong>
+                                    </div>
+                                    <p>الهاشتاجات مفصولة بفواصل</p>
+                                    <code>"#عرض,#خصم,#تسوق"</code>
+                                </div>
+                                
+                                <div class="column-info">
+                                    <div class="column-header">
+                                        <i class="fas fa-calendar"></i>
+                                        <strong>day</strong>
+                                    </div>
+                                    <p>تاريخ النشر (YYYY-MM-DD)</p>
+                                    <code>"2024-12-25"</code>
+                                </div>
+                                
+                                <div class="column-info">
+                                    <div class="column-header">
+                                        <i class="fas fa-clock"></i>
+                                        <strong>hour</strong>
+                                    </div>
+                                    <p>وقت النشر (HH:MM)</p>
+                                    <code>"14:30"</code>
+                                </div>
+                                
+                                <div class="column-info">
+                                    <div class="column-header">
+                                        <i class="fas fa-share-alt"></i>
+                                        <strong>platform</strong>
+                                    </div>
+                                    <p>المنصات مفصولة بفواصل</p>
+                                    <code>"facebook,instagram,twitter"</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Template Downloads -->
+                <div class="templates-section">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>قوالب جاهزة للاستخدام</h3>
+                            <p>حمّل نموذج جاهز لتبدأ بسرعة</p>
+                        </div>
+                        <div class="card__body">
+                            <div class="templates-grid">
+                                <div class="template-card">
+                                    <div class="template-icon">
+                                        <i class="fas fa-file-csv"></i>
+                                    </div>
+                                    <h4>قالب CSV</h4>
+                                    <p>ملف CSV مع جميع الأعمدة المطلوبة وبيانات نموذجية</p>
+                                    <button class="btn btn--primary btn--sm" onclick="downloadCSVTemplate()">
+                                        <i class="fas fa-download"></i>
+                                        تحميل CSV
+                                    </button>
+                                </div>
+                                
+                                <div class="template-card">
+                                    <div class="template-icon">
+                                        <i class="fas fa-file-code"></i>
+                                    </div>
+                                    <h4>قالب JSON</h4>
+                                    <p>ملف JSON منسق مع هيكل البيانات الصحيح</p>
+                                    <button class="btn btn--primary btn--sm" onclick="downloadJSONTemplate()">
+                                        <i class="fas fa-download"></i>
+                                        تحميل JSON
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Import History -->
+                <div class="import-history">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>تاريخ الاستيراد</h3>
+                            <div class="card-actions">
+                                <button class="btn btn--ghost btn--sm" id="refresh-history">
+                                    <i class="fas fa-sync-alt"></i>
+                                    تحديث
+                                </button>
+                                <button class="btn btn--ghost btn--sm" id="clear-history">
+                                    <i class="fas fa-trash"></i>
+                                    مسح التاريخ
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card__body">
+                            <div id="import-history-list" class="import-history-list">
+                                <div class="history-loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>جاري تحميل تاريخ الاستيراد...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Posts Section -->
+            <section id="posts-section" class="app-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h1>إدارة المنشورات</h1>
+                        <p>عرض وإدارة جميع المنشورات المجدولة والمنشورة</p>
+                    </div>
+                    <div class="section-actions">
+                        <div class="filter-group">
+                            <select class="form-control" id="posts-filter-status">
+                                <option value="all">جميع الحالات</option>
+                                <option value="scheduled">مجدولة</option>
+                                <option value="published">منشورة</option>
+                                <option value="failed">فشلت</option>
+                            </select>
+                            <select class="form-control" id="posts-filter-platform">
+                                <option value="all">جميع المنصات</option>
+                                <option value="facebook">Facebook</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="linkedin">LinkedIn</option>
+                                <option value="tiktok">TikTok</option>
+                            </select>
+                        </div>
+                        <button class="btn btn--primary" id="bulk-actions-toggle">
+                            <i class="fas fa-tasks"></i>
+                            إجراءات مجمعة
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="posts-container">
+                    <div class="posts-loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>جاري تحميل المنشورات...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics-section" class="app-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h1>التحليلات والإحصائيات</h1>
+                        <p>تحليل شامل لأداء النشر والاستيراد</p>
+                    </div>
+                    <div class="section-actions">
+                        <select class="form-control">
+                            <option value="7d">آخر 7 أيام</option>
+                            <option value="30d">آخر 30 يوم</option>
+                            <option value="90d">آخر 90 يوم</option>
+                        </select>
+                        <button class="btn btn--secondary">
+                            <i class="fas fa-download"></i>
+                            تصدير التقرير
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="analytics-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>جاري تحميل بيانات التحليل...</span>
+                </div>
+            </section>
+
+            <!-- Accounts Section -->
+            <section id="accounts-section" class="app-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h1>الحسابات المربوطة</h1>
+                        <p>ربط وإدارة حساباتك على المنصات الاجتماعية</p>
+                    </div>
+                    <div class="section-actions">
+                        <button class="btn btn--primary" id="add-account">
+                            <i class="fas fa-plus"></i>
+                            ربط حساب جديد
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="accounts-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>جاري تحميل الحسابات المربوطة...</span>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="app-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h1>الإعدادات</h1>
+                        <p>إعدادات النظام والتخصيص</p>
+                    </div>
+                </div>
+                
+                <div class="settings-tabs">
+                    <nav class="tabs-nav">
+                        <button class="tab-button active" data-tab="general">عام</button>
+                        <button class="tab-button" data-tab="notifications">الإشعارات</button>
+                        <button class="tab-button" data-tab="security">الأمان</button>
+                        <button class="tab-button" data-tab="api">API</button>
+                    </nav>
+                    
+                    <div class="tabs-content">
+                        <div class="tab-panel active" id="general-tab">
+                            <div class="settings-group">
+                                <h3>الإعدادات العامة</h3>
+                                <div class="setting-item">
+                                    <label class="setting-label">اللغة</label>
+                                    <select class="form-control">
+                                        <option value="ar">العربية</option>
+                                        <option value="en">English</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">المنطقة الزمنية</label>
+                                    <select class="form-control">
+                                        <option value="Asia/Dubai">دبي (UTC+4)</option>
+                                        <option value="Asia/Riyadh">الرياض (UTC+3)</option>
+                                        <option value="Asia/Baghdad">بغداد (UTC+3)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-panel" id="notifications-tab">
+                            <div class="settings-group">
+                                <h3>إعدادات الإشعارات</h3>
+                                <div class="setting-item">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" checked>
+                                        <span class="checkbox-custom"></span>
+                                        إشعارات النشر الناجح
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" checked>
+                                        <span class="checkbox-custom"></span>
+                                        إشعارات فشل النشر
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-panel" id="security-tab">
+                            <div class="settings-group">
+                                <h3>إعدادات الأمان</h3>
+                                <div class="setting-item">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" checked>
+                                        <span class="checkbox-custom"></span>
+                                        المصادقة الثنائية
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-panel" id="api-tab">
+                            <div class="settings-group">
+                                <h3>إعدادات API</h3>
+                                <p>إعدادات واجهة برمجة التطبيقات</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>جاري تحميل الإعدادات...</span>
+                </div>
+            </section>
+
+            <!-- Help Section -->
+            <section id="help-section" class="app-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h1>المساعدة والدعم</h1>
+                        <p>الأسئلة الشائعة والدعم الفني</p>
+                    </div>
+                </div>
+                
+                <div class="help-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>جاري تحميل المساعدة...</span>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    
+    <!-- Import Preview Modal -->
+    <div id="import-preview-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>معاينة البيانات المستوردة</h3>
+                <button class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="import-summary" class="import-summary">
+                    <!-- Summary will be populated by JavaScript -->
+                </div>
+                
+                <div id="import-errors" class="import-errors">
+                    <!-- Errors will be populated by JavaScript -->
+                </div>
+                
+                <div id="data-preview" class="data-preview">
+                    <!-- Data preview will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--secondary" onclick="cancelImport()">
+                    <i class="fas fa-times"></i>
+                    إلغاء
+                </button>
+                <button class="btn btn--primary" onclick="executeImport()">
+                    <i class="fas fa-upload"></i>
+                    تنفيذ الاستيراد
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Post Modal -->
+    <div id="edit-post-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>تعديل المنشور</h3>
+                <button class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-post-form">
+                    <div class="form-group">
+                        <label for="edit-title" class="form-label">عنوان المنشور</label>
+                        <input type="text" id="edit-title" class="form-control" data-field="socialTitle">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-description" class="form-label">وصف المنشور</label>
+                        <textarea id="edit-description" class="form-control" rows="4" data-field="socialDescription"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-url" class="form-label">الرابط</label>
+                        <input type="url" id="edit-url" class="form-control" data-field="shortUrl">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-scheduled-date" class="form-label">تاريخ النشر المجدول</label>
+                        <input type="datetime-local" id="edit-scheduled-date" class="form-control" data-field="scheduledAt">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--secondary modal-close">إلغاء</button>
+                <button class="btn btn--primary" id="save-post-changes">
+                    <i class="fas fa-save"></i>
+                    حفظ التغييرات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal-overlay">
+        <div class="modal-content confirm-modal">
+            <div class="modal-header">
+                <h3>تأكيد العملية</h3>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <p id="confirm-message">هل أنت متأكد من هذا الإجراء؟</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--secondary" id="confirm-cancel">إلغاء</button>
+                <button class="btn btn--danger" id="confirm-ok">تأكيد</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Panel -->
+    <div id="notifications-panel" class="notifications-panel">
+        <div class="notifications-header">
+            <h3>الإشعارات</h3>
+            <button class="btn btn--ghost btn--sm" id="mark-all-read">
+                <i class="fas fa-check-double"></i>
+                تحديد الكل كمقروء
+            </button>
+        </div>
+        <div class="notifications-list">
+            <div class="notification-item unread">
+                <div class="notification-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>استيراد مكتمل</h4>
+                    <p>تم استيراد 150 منشور بنجاح</p>
+                    <span class="notification-time">منذ 5 دقائق</span>
+                </div>
+            </div>
+            
+            <div class="notification-item unread">
+                <div class="notification-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>فشل في النشر</h4>
+                    <p>فشل نشر منشور على Facebook</p>
+                    <span class="notification-time">منذ 15 دقيقة</span>
+                </div>
+            </div>
+            
+            <div class="notification-item">
+                <div class="notification-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>نشر ناجح</h4>
+                    <p>تم نشر 25 منشور على جميع المنصات</p>
+                    <span class="notification-time">منذ ساعة</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container">
+        <!-- Toasts will be dynamically added here -->
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>جاري المعالجة...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    
+    <!-- Main Application Script -->
+    <script src="app.js"></script>
+    
+    <!-- Additional Scripts -->
+    <script>
+        // Initialize loading progress
+        let loadingProgress = 0;
+        const progressFill = document.getElementById('loading-progress-fill');
+        const progressText = document.getElementById('loading-progress-text');
+        
+        function updateLoadingProgress(progress, text = '') {
+            loadingProgress = Math.min(progress, 100);
+            if (progressFill) progressFill.style.width = loadingProgress + '%';
+            if (progressText) progressText.textContent = loadingProgress + '%';
+            if (text) {
+                const loadingTextEl = document.querySelector('.loading-text');
+                if (loadingTextEl) loadingTextEl.textContent = text;
+            }
+        }
+        
+        // Simulate loading progress
+        const loadingSteps = [
+            { progress: 20, text: 'جاري تحميل التكوين...' },
+            { progress: 40, text: 'جاري الاتصال بقاعدة البيانات...' },
+            { progress: 60, text: 'جاري تحميل الواجهة...' },
+            { progress: 80, text: 'جاري التحقق من الصلاحيات...' },
+            { progress: 100, text: 'اكتمل التحميل!' }
+        ];
+        
+        let stepIndex = 0;
+        const loadingInterval = setInterval(() => {
+            if (stepIndex < loadingSteps.length) {
+                const step = loadingSteps[stepIndex];
+                updateLoadingProgress(step.progress, step.text);
+                stepIndex++;
+            } else {
+                clearInterval(loadingInterval);
+                setTimeout(() => {
+                    const loadingScreen = document.getElementById('loading-screen');
+                    if (loadingScreen) {
+                        loadingScreen.style.opacity = '0';
+                        setTimeout(() => {
+                            loadingScreen.style.display = 'none';
+                        }, 500);
+                    }
+                }, 1000);
+            }
+        }, 800);
+        
+        // Password visibility toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordToggle = document.getElementById('password-toggle');
+            const passwordInput = document.getElementById('password');
+            
+            if (passwordToggle && passwordInput) {
+                passwordToggle.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    const icon = passwordToggle.querySelector('i');
+                    if (icon) {
+                        icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+                    }
+                });
+            }
+            
+            // Handle login form
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    
+                    if (email && password) {
+                        // This will be handled by the AuthService in app.js
+                        console.log('Login attempt:', { email });
+                    }
+                });
+            }
+            
+            // Handle forgot password
+            const forgotPasswordLink = document.getElementById('forgot-password-link');
+            if (forgotPasswordLink) {
+                forgotPasswordLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const email = document.getElementById('email').value;
+                    if (email) {
+                        // This will be handled by the AuthService in app.js
+                        console.log('Password reset requested for:', email);
+                    } else {
+                        alert('يرجى إدخال البريد الإلكتروني أولاً');
+                    }
+                });
+            }
+            
+            // Handle mapping guide toggle
+            const toggleMappingGuide = document.getElementById('toggle-mapping-guide');
+            const mappingGuideContent = document.getElementById('mapping-guide-content');
+            
+            if (toggleMappingGuide && mappingGuideContent) {
+                toggleMappingGuide.addEventListener('click', function() {
+                    const isVisible = mappingGuideContent.style.display !== 'none';
+                    mappingGuideContent.style.display = isVisible ? 'none' : 'block';
+                    
+                    const icon = toggleMappingGuide.querySelector('i');
+                    if (icon) {
+                        icon.className = isVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+                    }
+                });
+            }
+            
+            // Handle notifications panel toggle
+            const notificationsToggle = document.getElementById('notifications-toggle');
+            const notificationsPanel = document.getElementById('notifications-panel');
+            
+            if (notificationsToggle && notificationsPanel) {
+                notificationsToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    notificationsPanel.classList.toggle('active');
+                });
+                
+                // Close notifications panel when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!notificationsPanel.contains(e.target) && !notificationsToggle.contains(e.target)) {
+                        notificationsPanel.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Handle settings tabs
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+                    
+                    // Remove active class from all buttons and panels
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabPanels.forEach(panel => panel.classList.remove('active'));
+                    
+                    // Add active class to clicked button and corresponding panel
+                    this.classList.add('active');
+                    const targetPanel = document.getElementById(targetTab + '-tab');
+                    if (targetPanel) {
+                        targetPanel.classList.add('active');
+                    }
+                });
+            });
+        });
+        
+        // Handle responsive sidebar
+        function handleResponsiveSidebar() {
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('collapsed');
+                });
+            }
+            
+            if (mobileMenuToggle && sidebar) {
+                mobileMenuToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('mobile-open');
+                });
+            }
+            
+            // Close sidebar on mobile when clicking outside
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 1024 && 
+                    !sidebar.contains(e.target) && 
+                    !mobileMenuToggle.contains(e.target)) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            });
+        }
+        
+        // Initialize responsive sidebar when DOM is loaded
+        document.addEventListener('DOMContentLoaded', handleResponsiveSidebar);
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth > 1024 && sidebar) {
+                sidebar.classList.remove('mobile-open');
+            }
+        });
+        
+        // Error handling for missing resources
+        window.addEventListener('error', function(e) {
+            console.error('Resource loading error:', e.filename, e.message);
+        });
+        
+        // Handle offline/online status
+        window.addEventListener('online', function() {
+            const statusIndicator = document.getElementById('connection-status');
+            if (statusIndicator) {
+                statusIndicator.className = 'connection-status online';
+                statusIndicator.title = 'متصل';
+            }
+        });
+        
+        window.addEventListener('offline', function() {
+            const statusIndicator = document.getElementById('connection-status');
+            if (statusIndicator) {
+                statusIndicator.className = 'connection-status offline';
+                statusIndicator.title = 'غير متصل';
+            }
+        });
+        
+        // Service Worker registration (if available)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('Service Worker registered successfully:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+        
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            if ('performance' in window) {
+                const perfData = performance.getEntriesByType('navigation')[0];
+                if (perfData) {
+                    console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
+                    console.log('DOM content loaded:', perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart, 'ms');
+                }
+            }
+        });
+        
+        // Prevent FOUC (Flash of Unstyled Content)
+        document.documentElement.style.visibility = 'visible';
+    </script>
+</body>
+</html>
