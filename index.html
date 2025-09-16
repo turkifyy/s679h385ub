@@ -3933,20 +3933,35 @@
         }
 
         // معالج تسجيل الدخول
-        function handleUserSignedIn(user) {
-            try {
-                // تحديث واجهة المستخدم
-                document.getElementById('authScreen').classList.remove('active');
-                document.getElementById('mainApp').classList.remove('hidden');
+function handleUserSignedIn(user) {
+    try {
+        // إخفاء شاشة المصادقة وإظهار التطبيق الرئيسي
+        document.getElementById('authScreen').classList.remove('active');
+        document.getElementById('mainApp').classList.remove('hidden');
 
-                // تحديث معلومات المستخدم
-                updateUserProfile(user);
+        // ======= إصلاح مهم: إخفاء / إزالة شاشة التحميل حتى لا تمنع النقرات =======
+        const loading = document.getElementById('loadingScreen');
+        if (loading) {
+            // اضف صنف 'hidden' (إذا كان CSS لديك يتعامل معه)
+            loading.classList.add('hidden');
 
-                window.SocialHubPro.Logger.log('info', `👤 المستخدم ${user.email} سجل الدخول بنجاح`);
-            } catch (error) {
-                window.SocialHubPro.ErrorHandler.handle(error, { context: 'User Signed In' });
-            }
+            // بعد 300ms نخفيه نهائياً من العرض (حتى يختفي من طبقات الواجهة)
+            setTimeout(() => {
+                loading.style.display = 'none';
+                // لو تريد إزالة العنصر من الصفحة تماماً:
+                // if (loading.parentNode) loading.parentNode.removeChild(loading);
+            }, 300);
         }
+        // ===================================================================
+
+        // تحديث معلومات المستخدم في الواجهة
+        updateUserProfile(user);
+
+        window.SocialHubPro.Logger.log('info', `👤 المستخدم ${user.email} سجل الدخول بنجاح`);
+    } catch (error) {
+        window.SocialHubPro.ErrorHandler.handle(error, { context: 'User Signed In' });
+    }
+}
 
         // معالج تسجيل الخروج
         function handleUserSignedOut() {
